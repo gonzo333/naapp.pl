@@ -26,6 +26,9 @@ const translations = {
         angular_header: "Ergonomics and Aesthetics",
         angular_text: "The appearance is developed using the Angular framework. Utilizing component libraries such" +
             " as ng-zorro, Material, and Bootstrap.",
+        teach_header: "Tutoring - Training",
+        teach_text: "We offer individual tutoring and training in programming and application and website development" +
+            " (languages: JAVA, JAVASCRIPT, HTML...).",
         tech_header: "Modern Technologies",
         tech_text: "We use HTML5, CSS, JS, jQuery, and many other technologies to create our websites. We also create websites based on WordPress.",
         social_header: "Social Media",
@@ -139,7 +142,7 @@ const translations = {
         tech_text: "Do tworzenia naszych stron używamy HTML5, CSS, JS, jQuery i wielu innych technologii. Tworzymy" +
             " też strony oparte o wordpress.",
         teach_header: "Korepetycje - szkolenia",
-        teach_text: "Udzielamy indywidualnych korepetycji oraz szkoleń z zakresu programowania oraz tworzenia aplikacji oraz stron www\n" +
+        teach_text: "Udzielamy indywidualnych korepetycji oraz szkoleń z zakresu programowania oraz tworzenia aplikacji oraz stron www" +
             "    (języki: JAVA, JAVASCRIPT, HTML...).",
         social_header: "Social Media",
         social_text: "Dajemy możliwość integracji z portalami społecznościowymi: facebook, whats'up, instagram. Mamy" +
