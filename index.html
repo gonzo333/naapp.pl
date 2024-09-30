@@ -35,11 +35,19 @@
 <body>
 
   <div class="hero_area">
+
     <div class="bg-box">
       <img src="images/hero-bg.png" alt="">
+
     </div>
+
     <!-- slider section -->
     <section class="slider_section" id="main">
+        <div id="lang-select">
+          <img src="images/flags/pl.svg" alt="Polski" class="flag" data-lang="pl">
+          <img src="images/flags/gb-eng.svg" alt="English" class="flag" data-lang="en">
+          <img src="images/flags/es.svg" alt="Español" class="flag" data-lang="es">
+        </div>
       <div id="customCarousel1" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
@@ -47,10 +55,10 @@
               <div class="row">
                 <div class="col-md-7 col-lg-6 ">
                   <div class="detail-box">
-                    <h1>
+                    <h1 id="www_header">
                       Strony WWW
                     </h1>
-                    <p>
+                    <p id="www_text">
                       Efektowne i ergonomiczne strony WWW dla małych i średnich firm. Wykonanie kilku wariantów projektu, nowoczesne technologie, integracja z Social Media, Youtube. Obsługa baz danych i paneli administracyjnych.
                     </p>
                   </div>
@@ -63,10 +71,10 @@
               <div class="row">
                 <div class="col-md-7 col-lg-6 ">
                   <div class="detail-box">
-                    <h1>
+                    <h1 id="web_app_header">
                       Aplikacje webowe
                     </h1>
-                    <p>
+                    <p id="web_app_text">
                       Tworzymy aplikacje webowe dla małych oraz średnich firm, instytucji, klubów sportowych. Od projektu, przez event storming, po ergonomiczne i funkcjonalne aplikacje webowe, tworzone w najnowszych technologiach.
                     </p>
                   </div>
@@ -80,10 +88,10 @@
               <div class="row">
                 <div class="col-md-7 col-lg-6 ">
                   <div class="detail-box">
-                    <h1>
+                    <h1 id="apex_header">
                       Generowanie aplikacji APEX
                     </h1>
-                    <p>
+                    <p id="apex_text">
                       - Drobne aplikacje dla twojego biznesu.
                       <br>
                       - Raporty, statystyki, terminarze, dashbaordy.
@@ -99,13 +107,11 @@
               <div class="row">
                 <div class="col-md-7 col-lg-6 ">
                   <div class="detail-box">
-                    <h1>
+                    <h1 id="ai_header">
                       Szkolenia ze sztucznej inteligencji
                     </h1>
-                    <p>
-                      - Sztuczna inteligencja w twojej firmie.
-                      <br>
-                      - Dedykowane prompty, usługi skrojone pod konkretny biznes.
+                    <p id="ai_text">
+                      Sztuczna inteligencja w twojej firmie. Dedykowane prompty, usługi skrojone pod konkretny biznes.
                     </p>
                   </div>
                 </div>
@@ -118,17 +124,18 @@
               <div class="row">
                 <div class="col-md-7 col-lg-6 ">
                   <div class="detail-box">
-                    <h1>
+                    <h1 id="other_header">
                       Pozostałe usługi
                     </h1>
-                    <p>
-                      - Usługi dronem. Robienie zdjęć, nagrywanie filmów.
-                      <br>
-                      - Wypożyczanie sprzętu: projektor, ekran projekcyjny.
+                    <p id="other_text">
+                      Usługi dronem. Robienie zdjęć, nagrywanie filmów. Wypożyczanie sprzętu: projektor, ekran
+                      projekcyjny.
                     </p>
                   </div>
                 </div>
+
               </div>
+
             </div>
           </div>
 
@@ -145,26 +152,31 @@
             <li data-target="#customCarousel1" data-slide-to="3"></li>
             <li data-target="#customCarousel1" data-slide-to="4"></li>
           </ol>
+
         </div>
       </div>
 
+
+
     </section>
+
+
   </div>
 
   <section class="service_section layout_padding-bottom" id="uslugi">
     <div class="container">
       <div class="heading_container heading_center">
-        <h2>
+        <h2 id="uslugi_all_header">
           Zakres usług
         </h2>
       </div>
 
       <ul class="filters_menu">
-        <li class="active" data-filter="*">Wszystkie</li>
-        <li data-filter=".web">Aplikacje WEB</li>
-        <li data-filter=".www">Strony WWW</li>
-        <li data-filter=".other">Pozostałe usługi</li>
-        <li data-filter=".apex">Aplikacje APEX</li>
+        <li class="active" data-filter="*" id="all_filter">Wszystkie</li>
+        <li data-filter=".web" id="app_filter">Aplikacje WEB</li>
+        <li data-filter=".www" id="www_filter">Strony WWW</li>
+        <li data-filter=".other" id="other_filter">Pozostałe usługi</li>
+        <li data-filter=".apex" id="apex_filter">Aplikacje APEX</li>
         <li data-filter=".ai">AI</li>
       </ul>
 
@@ -177,10 +189,10 @@
                   <img src="images/projectwww.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="graph_header">
                     Projekty graficzne
                   </h5>
-                  <p>
+                  <p id="graph_text">
                     Proponujemy indywidualny projekt graficzny strony WWW dopasowany po Klienta i Jego Biznes. Jesteśmy otwarci na pomysły Klienta.
                   </p>
                   <div class="options">
@@ -196,10 +208,10 @@
                   <img src="images/angular.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="angular_header">
                     Ergonomia i estetyka
                   </h5>
-                  <p>
+                  <p id="angular_text">
                     Wygląd oprogramowany przy pomocy framework'a Angular. Z użyciem takich zestawu komponentów jak ng-zorro, material, bootstrap.
                   </p>
                   <div class="options">
@@ -215,11 +227,11 @@
                   <img src="images/html5.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="tech_header">
                     Nowoczesne technologie
                   </h5>
-                  <p>
-                    Do tworzenia naszych stron używamy HTML5, CSS, JS, jQuery i wielu innych technologii. Tworzymy też strony oparte o wo
+                  <p id="tech_text">
+                    Do tworzenia naszych stron używamy HTML5, CSS, JS, jQuery i wielu innych technologii. Tworzymy też strony oparte o wordpress.
                   </p>
                   <div class="options">
                   </div>
@@ -234,10 +246,10 @@
                   <img src="images/java.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="teach_header">
                     Korepetycje - szkolenia
                   </h5>
-                  <p>
+                  <p id="teach_text">
                     Udzielamy indywidualnych korepetycji oraz szkoleń z zakresu programowania oraz tworzenia aplikacji oraz stron www (języki: JAVA, JAVASCRIPT, HTML...).
                   </p>
                   <div class="options">
@@ -253,10 +265,10 @@
                   <img src="images/facebook.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="social_header">
                     Social Media
                   </h5>
-                  <p>
+                  <p id="social_text">
                     Dajemy możliwość integracji z portalami społecznościowymi: facebook, whats'up, instagram. Mamy kilka sposobów integracji z Youtube.
                   </p>
                   <div class="options">
@@ -271,10 +283,10 @@
                 <img src="images/java.png" alt="">
               </div>
               <div class="detail-box">
-                <h5>
+                <h5 id="security_header">
                   Wydajność i bezpieczeństwo
                 </h5>
-                <p>
+                <p id="security_text">
                   Bezpieczna baza danych oraz wydajne komunikujące się z bazą danych aplikacje napisane w języku JAVA, stanowią logikę biznesową tworzonych aplikacji.
                 </p>
                 <div class="options">
@@ -289,10 +301,10 @@
                   <img src="images/event.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="buisnes_header">
                     Wymagania biznesowe.
                   </h5>
-                  <p>
+                  <p id="buisnes_text">
                     100% zrozumienia wymagań biznesowych poprzez: komunikację z Klientem, wymianę doświadczeń, opis wymagań Event Storming.
                   </p>
                   <div class="options">
@@ -308,10 +320,10 @@
                   <img src="images/dron.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="drone_header">
                     Usługi dronem
                   </h5>
-                  <p>
+                  <p id="drone_text">
                     Nagrywanie filmów oraz robienie zdjęć dronem. Sprzę jakim dysponujemy to Parrot ANNAFI-H063536. Nagrania i zdjęcia w jakości FULL HD.
                   </p>
                   <div class="options">
@@ -328,10 +340,10 @@
                   <img src="images/projector.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="equipment_header">
                     Wypożyczalnia sprzętu
                   </h5>
-                  <p>
+                  <p id="equipment_text">
                     Wypożyczamy sprzęt do prezentacji: projektor - BenQ MH733 DLP (1920 x 1080), ekran do projektora - Avtek Ekran na statywie, wys 200cm, szer 200 cm.
                   </p>
                   <div class="options">
@@ -341,12 +353,6 @@
             </div>
           </div>
 
-
-
-
-
-
-
           <div class="col-sm-6 col-lg-4 all apex">
             <div class="box">
               <div>
@@ -354,10 +360,10 @@
                   <img src="images/apex.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="apex_off_header">
                     Tworzenie aplikacji APEX.
                   </h5>
-                  <p>
+                  <p id="apex_off_text">
                     Stworzymy szybką, prostą, tanią, funkcjonalną aplikację dla Twojej firmy, wystarczy nam twój excel.
                   </p>
                   <div class="options">
@@ -374,10 +380,10 @@
                   <img src="images/ai.png" alt="">
                 </div>
                 <div class="detail-box">
-                  <h5>
+                  <h5 id="ai_teach_header">
                     Szkolenia z używania sztucznej inteligencji.
                   </h5>
-                  <p>
+                  <p id="ai_teach_text">
                     Szkolenie w tworzeniu zapytań. Automatyzacja twojego biznesu. Dedykowane prompty.
                   </p>
                   <div class="options">
@@ -393,14 +399,14 @@
         </div>
       </div>
       <div class="btn-box">
-        <a href="">
+        <a href="" id="all_text">
           Pokaż wszystkie
         </a>
       </div>
     </div>
   </section>
 
-  <section class="service_section layout_padding-bottom" id="uslugi">
+  <section class="service_section layout_padding-bottom" id="cooperation">
     <div class="container">
       <div class="heading_container heading_center">
         <h2>
@@ -737,7 +743,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
   <!-- custom js -->
   <script src="js/custom.js"></script>
-
+  <!-- translation js -->
+  <script src="js/translation.js"></script>
 <!-- Messenger Wtyczka czatu Code -->
     <div id="fb-root"></div>
 
