@@ -1,1 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>NAAPP NFC – przekierowanie</title>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // stały identyfikator przypisany do tego konkretnego pliku / tagu
+      const CODE = "nfc1";
 
+      try {
+        const res = await fetch("https://TWÓJ-SERWER/ords/TWOJ_SCHEMA/nfc/" + CODE);
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+
+        if (data && data.target_url) {
+          window.location.href = data.target_url;
+        } else {
+          // brak konfiguracji – fallback
+          window.location.href = "https://naapp.pl/nfc-brak-konfiguracji.html";
+        }
+      } catch (e) {
+        // błąd API – fallback
+        window.location.href = "https://naapp.pl/nfc-błąd.html";
+      }
+    });
+  </script>
+</head>
+<body>
+  <p>Przekierowuję...</p>
+</body>
+</html>
