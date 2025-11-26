@@ -1,34 +1,89 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <title>NAAPP NFC – przekierowanie</title>
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      // stały identyfikator przypisany do tego konkretnego pliku / tagu
-      const CODE = "nfc1";
-
-      try {
-        const res = await fetch("https://TWÓJ-SERWER/ords/TWOJ_SCHEMA/nfc/" + CODE);
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
+    <meta charset="UTF-8">
+    <title>Przekierowanie...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            padding: 20px;
+            text-align: center;
         }
-        const data = await res.json();
-
-        if (data && data.target_url) {
-          window.location.href = data.target_url;
-        } else {
-          // brak konfiguracji – fallback
-          window.location.href = "https://naapp.pl/nfc-brak-konfiguracji.html";
+        .spinner {
+            margin: 30px auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid #ccc;
+            border-top-color: #000;
+            animation: spin 0.8s linear infinite;
         }
-      } catch (e) {
-        // błąd API – fallback
-        window.location.href = "https://naapp.pl/nfc-błąd.html";
-      }
-    });
-  </script>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            color: #b00020;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <p>Przekierowuję...</p>
+    <h1>Trwa przekierowanie...</h1>
+    <p>Proszę czekać chwilę, odczytuję dane z serwera.</p>
+    <div class="spinner"></div>
+    <div id="message" class="error"></div>
+
+    <script>
+        // 👉 Konfiguracja: baza URL do Twojego API
+        const API_BASE_URL = "https://oracleapex.com/ords/nfc_admin/nfc/url/";
+
+        // Pobieramy ?id= z adresu strony
+        function getIdFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("id");
+        }
+
+        async function redirectFromApi() {
+            const msgEl = document.getElementById("message");
+            const id = getIdFromQuery();
+
+            if (!id) {
+                msgEl.textContent = "Brak parametru 'id' w adresie strony.";
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL + encodeURIComponent(id));
+
+                if (!response.ok) {
+                    msgEl.textContent = "Błąd połączenia z serwerem (HTTP " + response.status + ").";
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!data || !data.value) {
+                    msgEl.textContent = "Brak pola 'value' w odpowiedzi serwera.";
+                    return;
+                }
+
+                let targetUrl = data.value.trim();
+
+                // Jeśli w bazie jest np. "www.onet.pl", to dodaj protokół
+                if (!/^https?:\/\//i.test(targetUrl)) {
+                    targetUrl = "https://" + targetUrl;
+                }
+
+                // Faktyczne przekierowanie
+                window.location.replace(targetUrl);
+            } catch (e) {
+                console.error(e);
+                msgEl.textContent = "Wystąpił nieoczekiwany błąd podczas przekierowania.";
+            }
+        }
+
+        redirectFromApi();
+    </script>
 </body>
 </html>
