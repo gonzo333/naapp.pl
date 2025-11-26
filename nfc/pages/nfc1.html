@@ -36,25 +36,12 @@
 
     <script>
         // 👉 Konfiguracja: baza URL do Twojego API
-        const API_BASE_URL = "https://oracleapex.com/ords/nfc_admin/nfc/url/";
-
-        // Pobieramy ?id= z adresu strony
-        function getIdFromQuery() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get("id");
-        }
+        const API_BASE_URL = "https://oracleapex.com/ords/nfc_admin/nfc/url/1";
 
         async function redirectFromApi() {
             const msgEl = document.getElementById("message");
-            const id = getIdFromQuery();
-
-            if (!id) {
-                msgEl.textContent = "Brak parametru 'id' w adresie strony.";
-                return;
-            }
-
             try {
-                const response = await fetch(API_BASE_URL + encodeURIComponent(id));
+                const response = await fetch(API_BASE_URL);
 
                 if (!response.ok) {
                     msgEl.textContent = "Błąd połączenia z serwerem (HTTP " + response.status + ").";
