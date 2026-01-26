@@ -1,4 +1,5 @@
 let currentPage = 'home';
+let api_url = 'https://oracleapex.com/ords/zmigrs/api';
 
 const cities = [
     { name: "Ostrowiec Swietokrzyski", path: "czlonkowie/miasta_i_gminy/ostrowiec_swietokrzyski.html" },
@@ -107,6 +108,7 @@ const municipalities = [
     { name: "Złota", path: "czlonkowie/miasta_i_gminy/zlota.html" }
 ];
 
+// Generate Members links from static tables for now. Will be moved to the database if requested.
 function generateLinks(list, containerId) {
     const container = document.getElementById(containerId);
     let html = '';
@@ -116,42 +118,59 @@ function generateLinks(list, containerId) {
     container.innerHTML += html;
 }
 
-async function loadArticle(path) {
+// Change the date MM/DD/YYYY to Polish format.
+function formatDatePolish(dateString) {
+    const date = new Date(dateString);
+
+    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    return new Intl.DateTimeFormat('pl-PL', options).format(date);
+}
+
+// Load full content of the article in the database.
+async function loadArticle(id) {
     const articleContainer = document.getElementById('article-div');
 
-    const response = await fetch(path);
+    const response = await fetch(`${api_url}/article/${id}`);
+    const item = await response.json();
+    console.log("item:", item);
 
-    const html = await response.text();
+    const article = item.items[0];
 
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const content = doc.querySelector('article');
+    articleContainer.innerHTML = `<div class="about-text glass">
+        <article>
+            <h2>${article.name}</h2>
+            <p><small>${formatDatePolish(article.publication_date)}</small></p>
+            <p>${article.content}</p>
+            <p>${article.author || ''}</p>
+        </article>
+    </div>`;
 
-    articleContainer.innerHTML = content.innerHTML;
+    // Display the content through page system.
     showPage('article');
 }
 
-
-const newsList = [
-    "2026-01-20_1.html"
-];
-
-async function generateNews(list, containerId) {
+// Generate news from the database.
+async function generateNews(containerId) {
     const container = document.getElementById(containerId);
     let html = '';
 
-    for (const item of list) {
-        const response = await fetch(`assets/news/${item}`)
-            .then(r => r.text());
-        const doc = new DOMParser().parseFromString(response, 'text/html');
+    let data = await fetch(`${api_url}/articles`).then(r => r.json());
+    let list = data.items;
+    if (list == null || list.length == 0) {
+        container.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
+        return;
+    }
 
-        const title = doc.querySelector('meta[name="article:title"]')?.content;
-        const date = doc.querySelector('meta[name="article:date"]')?.content;
-        const desc = doc.querySelector('meta[name="article:desc"]')?.content;
-        const author = doc.querySelector('meta[name="article:author"]')?.content;
+    for (const item of list) {
+        const id = item.news_id;
+        const title = item.name;
+        const date = item.publication_date;
+        const desc = item.description;
+        const author = item.author || "Unknown";
 
         html += `<div class="about-text glass">
-            <h3><a href="#" onclick="loadArticle('assets/news/${item}')">${title}</a></h3>
-            <p><small>${date}</small></p>
+            <h3><a href="#" onclick="loadArticle('${id}')">${title}</a></h3>
+            <p><small>${formatDatePolish(date)}</small></p>
             <p style="white-space: pre-line">${desc}</p>
             <p>${author}</p>
         </div>`;
@@ -160,144 +179,51 @@ async function generateNews(list, containerId) {
     container.innerHTML = html;
 }
 
-const resolutionsList = [
-    {
-        name: "Uchwała Nr 2/2023 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2023r.",
-        desc: "Uchwała Nr 2/2023 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2023r. w sprawie ustalenia wysokości składki członkowskiej na 2023 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2023-05-11",
-        path: "uchwała składka czł. 2023r.pdf"
-    },
-    {
-        name: "Uchwała Nr 1/2023 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2023r.",
-        desc: "Uchwała Nr 1/2023 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2023r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2022 rok.",
-        date: "2023-05-11",
-        path: "uchwała Nr 1 w spr.przyjęcia sprawozdania.pdf"
-    },
-    {
-        name: "Uchwała Nr 4/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22.02.2022 r.",
-        desc: "Uchwała Nr 4/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22.02.2022 r. w sprawie poparcia stanowiska Zarządu Związku Gmin Wiejskich RP w sprawie wdrożenia działań osłonowych chroniących samorządy przed drastycznym wzrostem cen energii i gazu.",
-        date: "2022-04-12",
-        path: "Uchwała Nr 42022.png"
-    },
-    {
-        name: "Uchwała Nr 3/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22 lutego 2022r.",
-        desc: "Uchwała Nr 3/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22 lutego 2022r. w sprawie zmiany Statutu Stowarzyszenia.",
-        date: "2022-04-12",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 2/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22.02.2022 r.",
-        desc: "Uchwała Nr 2/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22.02.2022 r. w sprawie ustalenia wysokości składki członkowskiej na 2022 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2022-04-12",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 1/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22 lutego 2022r.",
-        desc: "Uchwała Nr 1/2022 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 22.02.2020r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2021 rok.",
-        date: "2022-04-12",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 3/2021 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia lutego 2021r.",
-        desc: "Uchwała Nr 3/2021 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia lutego 2021r. w sprawie ustalenia wysokości składki członkowskiej na 2021 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2021-03-17",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 2/2021 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2021r.",
-        desc: "Uchwała Nr 2/2021 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 24 lutego 2021r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2020 rok.",
-        date: "2021-03-17",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 2/2020 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 12.02.2020 r.",
-        desc: "Uchwała Nr 2/2020 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 12.02.2020 r. w sprawie ustalenia wysokości składki członkowskiej na 2020 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2020-02-14",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 1/2020 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 12.02.2020",
-        desc: "Uchwała Nr 1/2020 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 12.02.2020r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2019 rok.",
-        date: "2020-02-14",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 5/2019 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 5 lutego 2019",
-        desc: "Uchwała Nr 5/2019 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 5 lutego 2019r. w sprawie ustalenia wysokości składki członkowskiej na 2019 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego",
-        date: "2019-04-18",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 1/2019 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 5 lutego 2019",
-        desc: "Uchwała Nr 1/2019 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 5 lutego 2019r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2018 rok",
-        date: "2019-04-18",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 11/2018 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 20 lutego 2018",
-        desc: "Uchwała Nr 11/2018 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 20 lutego 2018r. w sprawie ustalenia wysokości składki członkowskiej na 2018 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2018-05-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 10/2018 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 20 lutego 2018",
-        desc: "Uchwała Nr 10/2018 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 20 lutego 2018r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2017 rok.",
-        date: "2018-05-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 9/2017 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 14 lutego 2017",
-        desc: "Uchwała Nr 9/2017 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 14 lutego 2017r. w sprawie ustalenia wysokości składki członkowskiej na 2017 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego.",
-        date: "2018-05-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 8/2017 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 14 lutego 2017",
-        desc: "Uchwała Nr 8/2017 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 14 lutego 2017r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2016 rok.",
-        date: "2018-05-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 5/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015",
-        desc: "Uchwała Nr 5/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015r. w sprawie ustalenia wysokości składki członkowskiej na 2015 rok oraz przyjęcia planu dochodów i wydatków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego",
-        date: "2015-02-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 4/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015",
-        desc: "Uchwała Nr 4/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015r. w sprawie wyboru Członków Komisji Rewizyjnej Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego",
-        date: "2015-02-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 3/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015",
-        desc: "Uchwała Nr 3/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015r. w sprawie wyboru Członków Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego",
-        date: "2015-02-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 2/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015",
-        desc: "Uchwała Nr 2/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015r. w sprawie wyboru Prezesa Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego",
-        date: "2015-02-02",
-        path: ""
-    },
-    {
-        name: "Uchwała Nr 1/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015",
-        desc: "Uchwała Nr 1/2015 Walnego Zebrania Członków Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego z dnia 2 lutego 2015r. w sprawie przyjęcia sprawozdania z działalności Zarządu Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego za 2014 rok",
-        date: "2015-02-02",
-        path: ""
-    }
-];
-
-function generateResolutions(list, containerId) {
+// Generate resolutions from the database.
+async function generateResolutions(containerId) {
     const container = document.getElementById(containerId);
     let html = '';
+
+    let data = await fetch(`${api_url}/resolutions`).then(r => r.json());
+    let list = data.items;
+    // If no records will be returned it will display placeholder instead of throwing error.
+    if (list == null || list.length == 0) {
+        container.innerHTML = "<p>Brak uchwał do wyświetlenia.</p>";
+        return;
+    }
+
+    // Files to be downloaded are stored in assets/resolutions/<resolutions id>/<file name>
     list.forEach(item => {
-        html += `<div class="about-text glass"><h3><a href="${item.path}" title="${item.name}">${item.name}</a></h3><p>${item.desc}</p><p><small>${item.date}</small></p></div>`;
+        html += `<div class="about-text glass">
+        <h3><a href="assets/resolutions/${item.resolutions_id}/${item.path}" title="${item.name}">${item.name}</a></h3>
+        <p>${item.description}</p><p><small>${formatDatePolish(item.publication_date)}</small></p>
+        </div>`;
     });
     container.innerHTML += html;
 }
 
+// Generate reports from the database.
+async function generateReports(containerId) {
+    const container = document.getElementById(containerId);
+    let html = '';
+
+    let data = await fetch(`${api_url}/reports`).then(r => r.json());
+    let list = data.items;
+    // If no records will be returned it will display placeholder instead of throwing error.
+    if (list == null || list.length == 0) {
+        container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
+        return;
+    }
+
+    // Files to be downloaded are stored in assets/reports/<reports id>/<file name>
+    list.forEach(item => {
+        html += `<div class="about-text glass">
+        <h3><a href="assets/reports/${item.reports_id}/${item.path}" title="${item.name}">${item.name}</a></h3>
+        <p>${item.description}</p><p><small>${formatDatePolish(item.publication_date)}</small></p>
+        </div>`;
+    });
+    container.innerHTML += html;
+}
 const stancesList = [
     {
         name: "Stanowisko Związku Miast i Gmin Regionu Świętokrzyskiego z dnia 2 września 2022r. w sprawie wdrożenia mechanizmów osłonowych zabezpieczających jednostki samorządu terytorialnego przed drastycznym wzrostem cen energii elektrycznej",
@@ -316,11 +242,15 @@ const stancesList = [
     }
 ];
 
+// Generate stances, will be moved to the database later if requested.
 function generateStances(list, containerId) {
     const container = document.getElementById(containerId);
     let html = '';
     list.forEach(item => {
-        html += `<div class="about-text glass"><h3><a href="${item.path}" title="${item.name}">${item.name}</a></h3><p><small>${item.date}</small></p></div>`;
+        html += `<div class="about-text glass">
+        <h3><a href="${item.path}" title="${item.name}">${item.name}</a></h3>
+        <p><small>${formatDatePolish(item.date)}</small></p>
+        </div>`;
     });
     container.innerHTML += html;
 }
@@ -360,8 +290,9 @@ window.addEventListener('DOMContentLoaded', () => {
     generateLinks(cities, 'cities');
     generateLinks(cities_and_municipalities, 'cities-and-municipalities');
     generateLinks(municipalities, 'municipalities');
-    generateNews(newsList, 'news-div');
-    generateResolutions(resolutionsList, 'resolutions-div');
+    generateNews('news-div');
+    generateResolutions('resolutions-div');
+    generateReports('reports-div');
     generateStances(stancesList, 'stances-div');
     homePage.appendChild(footer);
 });
