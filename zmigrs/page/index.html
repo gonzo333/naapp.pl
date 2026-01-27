@@ -7,7 +7,8 @@
     <title>Związek Miast i Gmin Regionu Świętokrzyskiego</title>
 
     <link rel="stylesheet" href="style.css" />
-    <style></style>
+    
+    <link href="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -341,6 +342,8 @@
     <div id="article" class="page">
         <div class="container">
             <div class="content-wrapper" id="article-div">
+                <div id="article-text-div"></div>
+                <div id="article-gallery-div"></div>
             </div>
         </div>
     </div>
@@ -541,15 +544,15 @@
             <footer class="glass">
                 <div class="footer-content">
                     <div class="footer-links">
-                    <a href="#" onclick="showPage('home')" class="active">Związek</a>
-                    <a href="#" onclick="showPage('authorities')">Władze</a>
-                    <a href="#" onclick="showPage('news')">Aktualności</a>
-                    <a href="#" onclick="showPage('members')">Członkowie</a>
-                    <a href="#" onclick="showPage('statutes')">Statut</a>
-                    <a href="#" onclick="showPage('resolutions')">Uchwały</a>
-                    <a href="#" onclick="showPage('reports')">Sprawozdania</a>
-                    <a href="#" onclick="showPage('contacts')">Kontakt</a>
-                </div>
+                        <a href="#" onclick="showPage('home')" class="active">Związek</a>
+                        <a href="#" onclick="showPage('authorities')">Władze</a>
+                        <a href="#" onclick="showPage('news')">Aktualności</a>
+                        <a href="#" onclick="showPage('members')">Członkowie</a>
+                        <a href="#" onclick="showPage('statutes')">Statut</a>
+                        <a href="#" onclick="showPage('resolutions')">Uchwały</a>
+                        <a href="#" onclick="showPage('reports')">Sprawozdania</a>
+                        <a href="#" onclick="showPage('contacts')">Kontakt</a>
+                    </div>
                     <div class="copyright">
                         &copy; 2025
                         <a rel="nofollow" href="https://naapp.pl" target="_blank">NAAPP New Advance APP</a>
@@ -559,6 +562,19 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe-lightbox.esm.min.js';
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#article-gallery-div',
+            children: 'a',
+            // Dynamiczne załadowanie głównego modułu PhotoSwipe
+            pswpModule: () => import('https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.esm.min.js')
+        });
+
+        lightbox.init();
+    </script>
+
 </body>
 
 </html>

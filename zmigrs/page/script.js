@@ -1,8 +1,11 @@
-let currentPage = 'home';
-let api_url = 'https://oracleapex.com/ords/zmigrs/api';
+let currentPage = "home";
+let api_url = "https://oracleapex.com/ords/zmigrs/api";
 
 const cities = [
-    { name: "Ostrowiec Swietokrzyski", path: "czlonkowie/miasta_i_gminy/ostrowiec_swietokrzyski.html" },
+    {
+        name: "Ostrowiec Swietokrzyski",
+        path: "czlonkowie/miasta_i_gminy/ostrowiec_swietokrzyski.html",
+    },
     { name: "Sandomierz", path: "czlonkowie/miasta_i_gminy/sandomierz.html" },
     { name: "Skarzysko-Kamienna", path: "czlonkowie/miasta_i_gminy/skarzysko-kamienna.html" },
     { name: "Starachowice", path: "czlonkowie/miasta_i_gminy/starachowice.html" },
@@ -105,30 +108,49 @@ const municipalities = [
     { name: "Wilczyce", path: "czlonkowie/miasta_i_gminy/wilczyce.html" },
     { name: "Wojciechowice", path: "czlonkowie/miasta_i_gminy/wojciechowice.html" },
     { name: "Zagnańsk", path: "czlonkowie/miasta_i_gminy/zagansk.html" },
-    { name: "Złota", path: "czlonkowie/miasta_i_gminy/zlota.html" }
+    { name: "Złota", path: "czlonkowie/miasta_i_gminy/zlota.html" },
 ];
 
 // Generate Members links from static tables for now. Will be moved to the database if requested.
 function generateLinks(list, containerId) {
     const container = document.getElementById(containerId);
-    let html = '';
-    list.forEach(item => {
+    let html = "";
+    list.forEach((item) => {
         html += `<a href="${item.path}" class="link-button" title="${item.name}">${item.name}</a>`;
     });
     container.innerHTML += html;
 }
 
 // Change the date MM/DD/YYYY to Polish format.
-function formatDatePolish(dateString) {
+function formatDateToPolish(dateString) {
     const date = new Date(dateString);
 
-    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    return new Intl.DateTimeFormat('pl-PL', options).format(date);
+    const options = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+    return new Intl.DateTimeFormat("pl-PL", options).format(date);
+}
+
+// Change base64 to blob
+function base64ToBlob(base64, mimeType) {
+    const byteChars = atob(base64);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteChars.length; offset += 512) {
+        const slice = byteChars.slice(offset, offset + 512);
+        const byteNumbers = new Array(slice.length);
+
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    return new Blob(byteArrays, { type: mimeType });
 }
 
 // Load full content of the article in the database.
 async function loadArticle(id) {
-    const articleContainer = document.getElementById('article-div');
+    const articleContainer = document.getElementById("article-div");
 
     const response = await fetch(`${api_url}/article/${id}`);
     const item = await response.json();
@@ -139,22 +161,56 @@ async function loadArticle(id) {
     articleContainer.innerHTML = `<div class="about-text glass">
         <article>
             <h2>${article.name}</h2>
-            <p><small>${formatDatePolish(article.publication_date)}</small></p>
+            <p><small>${formatDateToPolish(article.publication_date)}</small></p>
             <p>${article.content}</p>
-            <p>${article.author || ''}</p>
+            <p>${article.author || ""}</p>
+            <div id="article-gallery-div"></div>
         </article>
     </div>`;
 
+    fetch(`${api_url}/attachments/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+            const galleryContainer = document.getElementById("article-gallery-div");
+            data.items.forEach((item) => {
+                // Just images for now
+                if (!item.mime_type.startsWith("image/")) return;
+
+                const blob = base64ToBlob(item.file_content, item.mime_type);
+                const objectUrl = URL.createObjectURL(blob);
+
+                const div = document.createElement("div");
+                const a = document.createElement("a");
+                const img = document.createElement("img");
+
+                a.href = objectUrl;
+                a.target = "_blank";
+
+                // Fallback image size
+                a.dataset.pswpWidth = 600;
+                a.dataset.pswpHeight = 800;
+
+                img.src = objectUrl;
+                img.alt = item.file_name;
+                img.loading = "lazy";
+
+                a.appendChild(img);
+                div.appendChild(a);
+                galleryContainer.appendChild(div);
+            });
+        })
+        .catch((err) => console.error("API error:", err));
+
     // Display the content through page system.
-    showPage('article');
+    showPage("article");
 }
 
 // Generate news from the database.
 async function generateNews(containerId) {
     const container = document.getElementById(containerId);
-    let html = '';
+    let html = "";
 
-    let data = await fetch(`${api_url}/articles`).then(r => r.json());
+    let data = await fetch(`${api_url}/articles`).then((r) => r.json());
     let list = data.items;
     if (list == null || list.length == 0) {
         container.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
@@ -170,7 +226,7 @@ async function generateNews(containerId) {
 
         html += `<div class="about-text glass">
             <h3><a href="#" onclick="loadArticle('${id}')">${title}</a></h3>
-            <p><small>${formatDatePolish(date)}</small></p>
+            <p><small>${formatDateToPolish(date)}</small></p>
             <p style="white-space: pre-line">${desc}</p>
             <p>${author}</p>
         </div>`;
@@ -182,9 +238,9 @@ async function generateNews(containerId) {
 // Generate resolutions from the database.
 async function generateResolutions(containerId) {
     const container = document.getElementById(containerId);
-    let html = '';
+    let html = "";
 
-    let data = await fetch(`${api_url}/resolutions`).then(r => r.json());
+    let data = await fetch(`${api_url}/resolutions`).then((r) => r.json());
     let list = data.items;
     // If no records will be returned it will display placeholder instead of throwing error.
     if (list == null || list.length == 0) {
@@ -193,10 +249,10 @@ async function generateResolutions(containerId) {
     }
 
     // Files to be downloaded are stored in assets/resolutions/<resolutions id>/<file name>
-    list.forEach(item => {
+    list.forEach((item) => {
         html += `<div class="about-text glass">
         <h3><a href="assets/resolutions/${item.resolutions_id}/${item.path}" title="${item.name}">${item.name}</a></h3>
-        <p>${item.description}</p><p><small>${formatDatePolish(item.publication_date)}</small></p>
+        <p>${item.description}</p><p><small>${formatDateToPolish(item.publication_date)}</small></p>
         </div>`;
     });
     container.innerHTML += html;
@@ -205,9 +261,9 @@ async function generateResolutions(containerId) {
 // Generate reports from the database.
 async function generateReports(containerId) {
     const container = document.getElementById(containerId);
-    let html = '';
+    let html = "";
 
-    let data = await fetch(`${api_url}/reports`).then(r => r.json());
+    let data = await fetch(`${api_url}/reports`).then((r) => r.json());
     let list = data.items;
     // If no records will be returned it will display placeholder instead of throwing error.
     if (list == null || list.length == 0) {
@@ -216,40 +272,10 @@ async function generateReports(containerId) {
     }
 
     // Files to be downloaded are stored in assets/reports/<reports id>/<file name>
-    list.forEach(item => {
+    list.forEach((item) => {
         html += `<div class="about-text glass">
         <h3><a href="assets/reports/${item.reports_id}/${item.path}" title="${item.name}">${item.name}</a></h3>
-        <p>${item.description}</p><p><small>${formatDatePolish(item.publication_date)}</small></p>
-        </div>`;
-    });
-    container.innerHTML += html;
-}
-const stancesList = [
-    {
-        name: "Stanowisko Związku Miast i Gmin Regionu Świętokrzyskiego z dnia 2 września 2022r. w sprawie wdrożenia mechanizmów osłonowych zabezpieczających jednostki samorządu terytorialnego przed drastycznym wzrostem cen energii elektrycznej",
-        date: "2022-10-11",
-        path: ""
-    },
-    {
-        name: "Stanowisko zał.nr 1 do uchwały Nr 5/2022 Związku Miast i Gmin Regionu Świętokrzyskiego z dnia 31 maja 2022r. w sprawie problemów finansowych oświaty",
-        date: "2022-10-11",
-        path: ""
-    },
-    {
-        name: "Stanowisko zał.nr 1 do uchwały Nr 4/2022 Związku Miast i Gmin Regionu Świętokrzyskiego z dnia 31 maja 2022r. w sprawie ograniczenia możliwości rozwojowych ze względu na rosnący koszt obsługi długu publicznego",
-        date: "2022-10-11",
-        path: ""
-    }
-];
-
-// Generate stances, will be moved to the database later if requested.
-function generateStances(list, containerId) {
-    const container = document.getElementById(containerId);
-    let html = '';
-    list.forEach(item => {
-        html += `<div class="about-text glass">
-        <h3><a href="${item.path}" title="${item.name}">${item.name}</a></h3>
-        <p><small>${formatDatePolish(item.date)}</small></p>
+        <p>${item.description}</p><p><small>${formatDateToPolish(item.publication_date)}</small></p>
         </div>`;
     });
     container.innerHTML += html;
@@ -257,49 +283,48 @@ function generateStances(list, containerId) {
 
 function showPage(pageId) {
     // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
+    document.querySelectorAll(".page").forEach((page) => {
+        page.classList.remove("active");
     });
 
     // Show selected page
-    document.getElementById(pageId).classList.add('active');
+    document.getElementById(pageId).classList.add("active");
 
     // Update navigation
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('onclick') === `showPage('${pageId}')`) {
-            link.classList.add('active');
+    document.querySelectorAll(".nav-links a").forEach((link) => {
+        link.classList.remove("active");
+        if (link.getAttribute("onclick") === `showPage('${pageId}')`) {
+            link.classList.add("active");
         }
     });
 
     currentPage = pageId;
 
     // Move footer to the active page
-    const footer = document.getElementById('footer');
+    const footer = document.getElementById("footer");
     const activePage = document.getElementById(pageId);
     activePage.appendChild(footer);
 
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Initialize footer position
-window.addEventListener('DOMContentLoaded', () => {
-    const footer = document.getElementById('footer');
-    const homePage = document.getElementById('home');
-    generateLinks(cities, 'cities');
-    generateLinks(cities_and_municipalities, 'cities-and-municipalities');
-    generateLinks(municipalities, 'municipalities');
-    generateNews('news-div');
-    generateResolutions('resolutions-div');
-    generateReports('reports-div');
-    generateStances(stancesList, 'stances-div');
+window.addEventListener("DOMContentLoaded", () => {
+    const footer = document.getElementById("footer");
+    const homePage = document.getElementById("home");
+    generateLinks(cities, "cities");
+    generateLinks(cities_and_municipalities, "cities-and-municipalities");
+    generateLinks(municipalities, "municipalities");
+    generateNews("news-div");
+    generateResolutions("resolutions-div");
+    generateReports("reports-div");
     homePage.appendChild(footer);
 });
 
 // Add interactive parallax effect to background shapes
-document.addEventListener('mousemove', (e) => {
-    const shapes = document.querySelectorAll('.shape');
+document.addEventListener("mousemove", (e) => {
+    const shapes = document.querySelectorAll(".shape");
     const x = e.clientX / window.innerWidth;
     const y = e.clientY / window.innerHeight;
 
@@ -312,17 +337,17 @@ document.addEventListener('mousemove', (e) => {
 });
 
 // Add scroll-based animations
-window.addEventListener('scroll', () => {
+window.addEventListener("scroll", () => {
     const scrolled = window.pageYOffset;
-    const parallax = document.querySelector('.bg-shapes');
+    const parallax = document.querySelector(".bg-shapes");
     const speed = scrolled * 0.5;
     parallax.style.transform = `translateY(${speed}px)`;
 });
 
 // Add click ripple effect to glass elements
-document.querySelectorAll('.glass').forEach(element => {
-    element.addEventListener('click', function (e) {
-        const ripple = document.createElement('div');
+document.querySelectorAll(".glass").forEach((element) => {
+    element.addEventListener("click", function (e) {
+        const ripple = document.createElement("div");
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
         const x = e.clientX - rect.left - size / 2;
@@ -342,7 +367,7 @@ document.querySelectorAll('.glass').forEach(element => {
                     z-index: 1000;
                 `;
 
-        this.style.position = 'relative';
+        this.style.position = "relative";
         this.appendChild(ripple);
 
         setTimeout(() => {
@@ -352,7 +377,7 @@ document.querySelectorAll('.glass').forEach(element => {
 });
 
 // Add ripple animation keyframes
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = `
             @keyframes ripple {
                 to {
@@ -364,11 +389,11 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Form submission handling
-document.querySelector('form').addEventListener('submit', function (e) {
+document.querySelector("form").addEventListener("submit", function (e) {
     e.preventDefault();
 
     // Create success message
-    const successMsg = document.createElement('div');
+    const successMsg = document.createElement("div");
     successMsg.style.cssText = `
                 position: fixed;
                 top: 50%;
@@ -382,7 +407,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
                 z-index: 10000;
                 animation: fadeIn 0.3s ease;
             `;
-    successMsg.textContent = 'Message sent successfully! We\'ll get back to you soon.';
+    successMsg.textContent = "Message sent successfully! We'll get back to you soon.";
 
     document.body.appendChild(successMsg);
 
@@ -396,7 +421,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
 });
 
 // Add fade in animation
-const fadeStyle = document.createElement('style');
+const fadeStyle = document.createElement("style");
 fadeStyle.textContent = `
             @keyframes fadeIn {
                 from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
