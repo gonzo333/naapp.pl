@@ -3,7 +3,7 @@ let api_url = "https://oracleapex.com/ords/zmigrs/api";
 
 const cities = [
     {
-        name: "Ostrowiec Swietokrzyski",
+        name: "Ostrowiec Świętokrzyski",
         path: "czlonkowie/miasta_i_gminy/ostrowiec_swietokrzyski.html",
     },
     { name: "Sandomierz", path: "czlonkowie/miasta_i_gminy/sandomierz.html" },
@@ -37,7 +37,7 @@ const cities_and_municipalities = [
     { name: "Opatów", path: "czlonkowie/miasta_i_gminy/opatow.html" },
     { name: "Opatowiec", path: "czlonkowie/miasta_i_gminy/opatowiec.html" },
     { name: "Ożarów", path: "czlonkowie/miasta_i_gminy/ozarow.html" },
-    { name: "Pacanóww", path: "czlonkowie/miasta_i_gminy/pacanow.html" },
+    { name: "Pacanów", path: "czlonkowie/miasta_i_gminy/pacanow.html" },
     { name: "Piekoszów", path: "czlonkowie/miasta_i_gminy/piekoszow.html" },
     { name: "Pierzchnica", path: "czlonkowie/miasta_i_gminy/pierzchnica.html" },
     { name: "Pinczów", path: "czlonkowie/miasta_i_gminy/pinczow.html" },
@@ -150,21 +150,19 @@ function base64ToBlob(base64, mimeType) {
 
 // Load full content of the article in the database.
 async function loadArticle(id) {
-    const articleContainer = document.getElementById("article-div");
+    const articleContainer = document.getElementById("article-text-div");
 
     const response = await fetch(`${api_url}/article/${id}`);
     const item = await response.json();
-    console.log("item:", item);
 
     const article = item.items[0];
 
-    articleContainer.innerHTML = `<div class="about-text glass">
+    articleContainer.innerHTML = `<div class="about-text">
         <article>
             <h2>${article.name}</h2>
             <p><small>${formatDateToPolish(article.publication_date)}</small></p>
             <p>${article.content}</p>
             <p>${article.author || ""}</p>
-            <div id="article-gallery-div"></div>
         </article>
     </div>`;
 
@@ -179,7 +177,6 @@ async function loadArticle(id) {
                 const blob = base64ToBlob(item.file_content, item.mime_type);
                 const objectUrl = URL.createObjectURL(blob);
 
-                const div = document.createElement("div");
                 const a = document.createElement("a");
                 const img = document.createElement("img");
 
@@ -187,22 +184,22 @@ async function loadArticle(id) {
                 a.target = "_blank";
 
                 // Fallback image size
-                a.dataset.pswpWidth = 600;
-                a.dataset.pswpHeight = 800;
+                a.dataset.pswpWidth = 1600;
+                a.dataset.pswpHeight = 900;
 
                 img.src = objectUrl;
                 img.alt = item.file_name;
                 img.loading = "lazy";
 
                 a.appendChild(img);
-                div.appendChild(a);
-                galleryContainer.appendChild(div);
+                galleryContainer.appendChild(a);
             });
         })
         .catch((err) => console.error("API error:", err));
 
     // Display the content through page system.
     showPage("article");
+    initLightbox();
 }
 
 // Generate news from the database.

@@ -11,11 +11,11 @@ https://templatemo.com/tm-592-glossy-touch
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
 
-    button[type="submit"] {
-        font-family: inherit;
-        font-size: 16px;
-    }
+button[type="submit"] {
+    font-family: inherit;
+    font-size: 16px;
 }
 
 body {
@@ -191,6 +191,7 @@ nav {
 
 .nav-links {
     display: flex;
+    flex-direction:row;
     gap: 30px;
 }
 
@@ -304,7 +305,6 @@ nav {
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -325,7 +325,7 @@ nav {
 }
 
 .link-button:visited {
-    color: darkgray;
+    color: lightgray;
     text-decoration: none;
 }
 
@@ -385,7 +385,7 @@ button[type="submit"] {
 }
 
 .about-text h2, .note-editable h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 20px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
@@ -409,7 +409,7 @@ button[type="submit"] {
 }
 
 .about-text a:visited, .note-editable a:visited {
-    color: darkgray;
+    color: lightgray;
     text-decoration:none;
 }
 
@@ -427,7 +427,7 @@ button[type="submit"] {
 }
 
 .stat-number {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: bold;
     color: white;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -602,6 +602,17 @@ article p {
     white-space: pre-line;
 }
 
+#article-gallery-div {
+    display:flex;
+    gap:2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom:2rem;
+}
+
+#article-gallery-div a img {
+    width: 200px;
+}
 
 /* Contact page styles */
 .contact-grid {
@@ -732,6 +743,12 @@ article p {
     backdrop-filter: blur(10px);
 }
 
+.responsive-map {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
 .map-placeholder {
     width: 100%;
     height: 100%;
@@ -844,7 +861,6 @@ article p {
     }
 
     nav {
-        flex-direction: column;
         gap: 20px;
         padding: 20px 30px;
     }
@@ -852,8 +868,9 @@ article p {
     .nav-links {
         gap: 15px;
         justify-content: center;
-        flex-direction: column;
         align-items: center;
+        display: grid;
+        grid-template-columns:repeat(2,1fr);
     }
 
     .nav-links a {
@@ -881,7 +898,8 @@ article p {
 
     .footer-links {
         gap: 15px;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
     }
 
     .footer-links a {
@@ -904,5 +922,6 @@ article p {
 
     .logo {
         font-size: 22px;
+        margin-bottom: 1rem;
     }
 }
