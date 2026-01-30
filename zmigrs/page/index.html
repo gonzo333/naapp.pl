@@ -7,7 +7,7 @@
     <title>Związek Miast i Gmin Regionu Świętokrzyskiego</title>
 
     <link rel="stylesheet" href="style.css" />
-    
+
     <link href="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.min.css" rel="stylesheet">
 </head>
 
@@ -27,7 +27,8 @@
             <div class="logo" onclick="showPage('home')">
                 <img src="assets/images/logo-icon.png" alt="Herb Związeku Miast i Gmin Regionu Świętokrzyskiego"
                     class="logo-icon" />
-                    <span style="font-family:sans-serif;text-wrap:wrap;">Związek Miast i Gmin Regionu Świętokrzyskiego</span>
+                <span style="font-family:sans-serif;text-wrap:wrap;">Związek Miast i Gmin Regionu
+                    Świętokrzyskiego</span>
             </div>
             <nav class="glass">
                 <div class="nav-links">
@@ -332,8 +333,7 @@
     <div id="news" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero glass" id="news-div">
-                    <h2 style="grid-column:1/-1">Aktualności:</h2>
+                <section class="hero" id="news-div">
                 </section>
             </div>
         </div>
@@ -346,6 +346,15 @@
                 <div id="article-text-div"></div>
                 <div id="article-gallery-div"></div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal"
+        style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+        <div class="modal-content">
+            <span id="close-modal" style="float:right; cursor:pointer;">&times;</span>
+            <h4>Wybierz załącznik</h4>
+            <div id="modal-buttons"></div>
         </div>
     </div>
 
@@ -421,7 +430,7 @@
     <div id="resolutions" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero glass" id="resolutions-div">
+                <section class="hero" id="resolutions-div">
                     <h2 style="grid-column:1/-1">Uchwaly:</h2>
                 </section>
             </div>
@@ -432,7 +441,7 @@
     <div id="reports" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero glass" id="reports-div">
+                <section class="hero" id="reports-div">
                     <h2 style="grid-column:1/-1">Sprawozdania:</h2>
                 </section>
             </div>

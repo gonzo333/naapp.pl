@@ -300,6 +300,23 @@ nav {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
+.modal-content {
+    background:white; 
+    margin:10% auto; 
+    padding:20px; 
+    width:80%; 
+    max-width:20rem; 
+    border-radius:8px;
+}
+
+#modal-buttons {
+    margin-top:1rem;
+}
+
+#modal-buttons .link-button {
+    background-color:#16213e!important;
+}
+
 .link-button {
     display: flex;
     align-items: center;
