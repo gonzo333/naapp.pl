@@ -1,0 +1,1 @@
+// Plik nieużywany - cała logika SPA znajduje się w index.html w tagu script
