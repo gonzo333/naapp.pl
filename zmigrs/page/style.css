@@ -869,6 +869,11 @@ article p {
     animation: fadeOut 0.4s ease forwards;
 }
 
+.no-flex {
+    display:block;
+    padding: 10px;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translate(-50%, -45%); }
     to { opacity: 1; transform: translate(-50%, -50%); }

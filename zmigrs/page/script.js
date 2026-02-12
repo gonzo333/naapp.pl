@@ -132,7 +132,7 @@ function formatDateToPolish(dateString) {
 // Change base64 to blob
 function base64ToBlob(base64, mimeType) {
     const base64Data = base64.replace(/\s/g, '');
-    // console.log({ base64, base64Data });
+    console.log({ base64, base64Data });
     const byteChars = atob(base64Data);
     const byteArrays = [];
 
@@ -156,7 +156,7 @@ async function loadArticle(id) {
 
     const response = await fetch(`${api_url}/article/${id}`);
     const item = await response.json();
-    // console.log("Article data:", item);
+    console.log("Article data:", item);
 
     const article = item.items[0];
 
@@ -216,7 +216,7 @@ async function generateNews(containerId) {
 
     let data = await fetch(`${api_url}/articles`).then((r) => r.json());
     let list = data.items;
-    // console.log(list);
+    console.log(list);
     if (list == null || list.length == 0) {
         container.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
         return;
@@ -244,34 +244,65 @@ async function downloadFile(fileId, type) {
     const res = await fetch(`${api_url}/attachments/${type}/file/${fileId}`);
     const data = await res.json();
     const item = data.items[0];
-
-    const blob = base64ToBlob(item.file_content, item.mime_type);
-    const file_url = URL.createObjectURL(blob);
+    console.log("downloadFile File data:", item);
 
     const a = document.createElement('a');
-    a.href = file_url;
+    a.href = item.file_path;
     a.download = item.file_name;
     a.click();
 }
 
-function openAttachmentModal(fileIds, type) {
+function openAttachmentModal(contentId, type) {
     const modalButtons = document.getElementById("modal-buttons");
     modalButtons.innerHTML = "";
-
-    const fileIdsArray = JSON.parse(fileIds);
-
-    fileIdsArray.forEach((fileId, index) => {
-        // console.log("fileId: ", fileId);
-        const btn = document.createElement("a");
-        btn.href = "#";
-        btn.classList = "link-button";
-        btn.textContent = `Plik ${index + 1}`;
-        btn.onclick = () => downloadFile(fileId, type);
-        modalButtons.appendChild(btn);
-        modalButtons.appendChild(document.createElement("br"));
-    });
+    if (!contentId) return;
 
     document.getElementById("modal").style.display = "block";
+    modalButtons.innerHTML = "<p>Ładowanie załączników...</p>";
+
+    fetch(`${api_url}/attachments/${type}/${contentId}`)
+        .then((res) => {
+            if (!res.ok) throw new Error("Błąd sieci");
+            return res.json();
+        })
+        .then((data) => {
+            const items = data.items || [];
+            console.log("Attachments data:", items);
+            modalButtons.innerHTML = ""; // Clear loading text
+
+            if (items.length === 0) {
+                modalButtons.innerHTML = "<p>Brak załączników do wyświetlenia.</p>";
+                return;
+            }
+
+            items.forEach((file, index) => {
+                // Grab the data from item object (np. file_id, name)
+                const { file_id: itemId, file_name: fileName, date_created: file_created_date } = file;
+
+                const btn = document.createElement("a");
+                btn.href = "#";
+                btn.classList = "link-button no-flex";
+                
+                // Try to use file name from the database, otherwise "Plik X"
+                if (fileName) {
+                    btn.innerHTML = `${fileName}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
+                } else {
+                    btn.innerHTML = `Plik ${index + 1}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
+                }
+                
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    downloadFile(itemId, type);
+                };
+
+                modalButtons.appendChild(btn);
+                modalButtons.appendChild(document.createElement("br"));
+            });
+        })
+        .catch((e) => {
+            console.error("Błąd pobierania załączników:", e);
+            modalButtons.innerHTML = "<p>Wystąpił błąd podczas pobierania plików.</p>";
+        });
 }
 
 // Generate resolutions from the database.
@@ -282,70 +313,7 @@ async function generateResolutions(containerId) {
         const response = await fetch(`${api_url}/resolutions`);
         const data = await response.json();
         const list = data.items;
-        // console.log(list);
-
-        if (!list || list.length === 0) {
-            container.innerHTML = "<p>Brak uchwał do wyświetlenia.</p>";
-            return;
-        }
-
-        list.forEach((item) => {
-            // Create elements
-            const div = document.createElement("div");
-            div.className = "about-text glass";
-
-            const h3 = document.createElement("h3");
-            const link = document.createElement("a");
-            link.title = item.name;
-            link.textContent = item.name;
-            h3.appendChild(link);
-
-            const p1 = document.createElement("p");
-            p1.textContent = item.description;
-
-            const p2 = document.createElement("p");
-            if (item.attachments_count > 0) {
-                const button = document.createElement("a");
-                button.textContent = "Załączniki";
-                button.href = "#";
-                button.classList="link-button";
-                button.style.marginLeft = "10px";
-                button.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    openAttachmentModal(item.attachments_ids, "resolutions");
-                });
-                p2.appendChild(button);
-            }
-
-            const p3 = document.createElement("p");
-            const small = document.createElement("small");
-            small.textContent = formatDateToPolish(item.publication_date);
-            p3.appendChild(small);
-
-            // Put elements together
-            div.appendChild(h3);
-            div.appendChild(p1);
-            div.appendChild(p2);
-            div.appendChild(p3);
-
-            // Add to container
-            container.appendChild(div);
-        });
-    } catch (error) {
-        console.error("Błąd podczas ładowania uchwał:", error);
-        container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
-    }
-}
-
-// Generate reports from the database.
-async function generateReports(containerId) {
-    const container = document.getElementById(containerId);
-
-    try {
-        const response = await fetch(`${api_url}/reports`);
-        const data = await response.json();
-        const list = data.items;
-        // console.log(list);
+        console.log(list);
 
         if (!list || list.length === 0) {
             container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
@@ -353,22 +321,29 @@ async function generateReports(containerId) {
         }
 
         list.forEach((item) => {
+            const { 
+                resolutions_id: item_id, 
+                name, 
+                description, 
+                attachments_count
+            } = item;
+
             // Create each element of the list
             const div = document.createElement("div");
             div.className = "about-text glass";
 
             const h3 = document.createElement("h3");
             const link = document.createElement("a");
-            link.title = item.name;
-            link.textContent = item.name;
+            link.title = name;
+            link.textContent = name;
             h3.appendChild(link);
 
             const p1 = document.createElement("p");
-            p1.textContent = item.description;
+            p1.textContent = description;
 
             // Attachments (if any)
             const p2 = document.createElement("p");
-            if (item.attachments_count > 0 && item.attachments_ids) {
+            if (attachments_count > 0) {
                 
                 const btn = document.createElement("a");
                 btn.href = "#";
@@ -378,7 +353,80 @@ async function generateReports(containerId) {
 
                 btn.onclick = (e) => {
                     e.preventDefault();
-                    openAttachmentModal(item.attachments_ids, "reports");
+                    openAttachmentModal(item_id, "resolutions");
+                };
+
+                p2.appendChild(btn);
+            }
+
+            const p3 = document.createElement("p");
+            const small = document.createElement("small");
+            small.textContent = formatDateToPolish(item.publication_date);
+            p3.appendChild(small);
+
+            // Put all elements together
+            div.appendChild(h3);
+            div.appendChild(p1);
+            div.appendChild(p2);
+            div.appendChild(p3);
+
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error("Błąd podczas ładowania sprawozdań:", error);
+        container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
+    }
+}   
+
+// Generate reports from the database.
+async function generateReports(containerId) {
+    const container = document.getElementById(containerId);
+
+    try {
+        const response = await fetch(`${api_url}/reports`);
+        const data = await response.json();
+        const list = data.items;
+        console.log(list);
+
+        if (!list || list.length === 0) {
+            container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
+            return;
+        }
+
+        list.forEach((item) => {
+            const { 
+                reports_id: item_id, 
+                name, 
+                description, 
+                attachments_count
+            } = item;
+
+            // Create each element of the list
+            const div = document.createElement("div");
+            div.className = "about-text glass";
+
+            const h3 = document.createElement("h3");
+            const link = document.createElement("a");
+            link.title = name;
+            link.textContent = name;
+            h3.appendChild(link);
+
+            const p1 = document.createElement("p");
+            p1.textContent = description;
+
+            // Attachments (if any)
+            const p2 = document.createElement("p");
+            if (attachments_count > 0) {
+                
+                const btn = document.createElement("a");
+                btn.href = "#";
+                btn.textContent = "Załączniki";
+                btn.style.marginLeft = "10px";
+                btn.classList = "link-button";
+
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    openAttachmentModal(item_id, "reports");
                 };
 
                 p2.appendChild(btn);
