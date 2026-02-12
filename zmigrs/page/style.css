@@ -167,6 +167,7 @@ nav {
     align-items: center;
     gap: 15px;
     cursor: pointer;
+    margin-bottom: 1rem;
 }
 
 .logo-icon {
@@ -843,6 +844,39 @@ article p {
 .copyright a {
     color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
+}
+
+/* Toast style */
+.success-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(206, 206, 206, 0.9);
+    color: black;
+    padding: 20px 40px;
+    border-radius: 10px;
+    backdrop-filter: blur(20px);
+    z-index: 10000;
+    opacity: 0;
+}
+
+.success-toast.show {
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.success-toast.hide {
+    animation: fadeOut 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -45%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translate(-50%, -50%); }
+    to { opacity: 0; transform: translate(-50%, -55%); }
 }
 
 /* Responsive design */
