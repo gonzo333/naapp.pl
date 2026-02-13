@@ -131,8 +131,8 @@ function formatDateToPolish(dateString) {
 
 // Change base64 to blob
 function base64ToBlob(base64, mimeType) {
-    const base64Data = base64.replace(/\s/g, '');
-    console.log({ base64, base64Data });
+    const base64Data = base64.replace(/\s/g, "");
+    // console.log({ base64, base64Data });
     const byteChars = atob(base64Data);
     const byteArrays = [];
 
@@ -156,7 +156,7 @@ async function loadArticle(id) {
 
     const response = await fetch(`${api_url}/article/${id}`);
     const item = await response.json();
-    console.log("Article data:", item);
+    // console.log("Article data:", item);
 
     const article = item.items[0];
 
@@ -170,38 +170,51 @@ async function loadArticle(id) {
         </article>
     </div>`;
 
-    // Load attachments (if any)
-    if (article.attachmentsCount > 0){
-    fetch(`${api_url}/attachments/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-            const galleryContainer = document.getElementById("article-gallery-div");
-            data.items.forEach((item) => {
-                // Just images for now
-                if (!item.mime_type.startsWith("image/")) return;
+    // Helper functions to try accessing image dimensions
+    const getImageSize = (url) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+            img.onerror = () => resolve({ width: 1600, height: 900 }); // Fallback
+            img.src = url;
+        });
+    };
 
-                const blob = base64ToBlob(item.file_content, item.mime_type);
-                const objectUrl = URL.createObjectURL(blob);
+    // Load attachments if any
+    if (article.attachments_count > 0) {
+        fetch(`${api_url}/attachments/news/${id}`)
+            .then((res) => res.json())
+            .then(async (data) => {
+                const galleryContainer = document.getElementById("article-gallery-div");
+                galleryContainer.innerHTML = "";
 
-                const a = document.createElement("a");
-                const img = document.createElement("img");
+                // Use Promise.all, to wait for all image sizes
+                for (const item of data.items) {
+                    if (!item.mime_type.startsWith("image/")) continue;
 
-                a.href = objectUrl;
-                a.target = "_blank";
+                    const fileId = item.file_path.match(/[-\w]{25,}/);
+                    if (!fileId) continue;
 
-                // Fallback image size
-                a.dataset.pswpWidth = 1600;
-                a.dataset.pswpHeight = 900;
+                    const directImageUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
 
-                img.src = objectUrl;
-                img.alt = item.file_name;
-                img.loading = "lazy";
+                    // Try to pull image dimensions
+                    const dimensions = await getImageSize(directImageUrl);
 
-                a.appendChild(img);
-                galleryContainer.appendChild(a);
+                    const a = document.createElement("a");
+                    const img = document.createElement("img");
+
+                    a.href = directImageUrl;
+                    a.dataset.pswpWidth = dimensions.width;
+                    a.dataset.pswpHeight = dimensions.height;
+
+                    img.src = directImageUrl;
+                    img.alt = item.file_name;
+                    img.loading = "lazy";
+
+                    a.appendChild(img);
+                    galleryContainer.appendChild(a);
+                }
             });
-        })
-        .catch((err) => console.error("Attachments couldn't load:", err));
     }
 
     // Display the content through page system.
@@ -216,7 +229,7 @@ async function generateNews(containerId) {
 
     let data = await fetch(`${api_url}/articles`).then((r) => r.json());
     let list = data.items;
-    console.log(list);
+    // console.log(list);
     if (list == null || list.length == 0) {
         container.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
         return;
@@ -244,9 +257,9 @@ async function downloadFile(fileId, type) {
     const res = await fetch(`${api_url}/attachments/${type}/file/${fileId}`);
     const data = await res.json();
     const item = data.items[0];
-    console.log("downloadFile File data:", item);
+    // console.log("downloadFile File data:", item);
 
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = item.file_path;
     a.download = item.file_name;
     a.click();
@@ -267,7 +280,7 @@ function openAttachmentModal(contentId, type) {
         })
         .then((data) => {
             const items = data.items || [];
-            console.log("Attachments data:", items);
+            // console.log("Attachments data:", items);
             modalButtons.innerHTML = ""; // Clear loading text
 
             if (items.length === 0) {
@@ -277,19 +290,23 @@ function openAttachmentModal(contentId, type) {
 
             items.forEach((file, index) => {
                 // Grab the data from item object (np. file_id, name)
-                const { file_id: itemId, file_name: fileName, date_created: file_created_date } = file;
+                const {
+                    file_id: itemId,
+                    file_name: fileName,
+                    date_created: file_created_date,
+                } = file;
 
                 const btn = document.createElement("a");
                 btn.href = "#";
                 btn.classList = "link-button no-flex";
-                
+
                 // Try to use file name from the database, otherwise "Plik X"
                 if (fileName) {
                     btn.innerHTML = `${fileName}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
                 } else {
                     btn.innerHTML = `Plik ${index + 1}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
                 }
-                
+
                 btn.onclick = (e) => {
                     e.preventDefault();
                     downloadFile(itemId, type);
@@ -313,7 +330,7 @@ async function generateResolutions(containerId) {
         const response = await fetch(`${api_url}/resolutions`);
         const data = await response.json();
         const list = data.items;
-        console.log(list);
+        // console.log(list);
 
         if (!list || list.length === 0) {
             container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
@@ -321,12 +338,7 @@ async function generateResolutions(containerId) {
         }
 
         list.forEach((item) => {
-            const { 
-                resolutions_id: item_id, 
-                name, 
-                description, 
-                attachments_count
-            } = item;
+            const { resolutions_id: item_id, name, description, attachments_count } = item;
 
             // Create each element of the list
             const div = document.createElement("div");
@@ -344,7 +356,6 @@ async function generateResolutions(containerId) {
             // Attachments (if any)
             const p2 = document.createElement("p");
             if (attachments_count > 0) {
-                
                 const btn = document.createElement("a");
                 btn.href = "#";
                 btn.textContent = "Załączniki";
@@ -376,7 +387,7 @@ async function generateResolutions(containerId) {
         console.error("Błąd podczas ładowania sprawozdań:", error);
         container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
     }
-}   
+}
 
 // Generate reports from the database.
 async function generateReports(containerId) {
@@ -386,7 +397,7 @@ async function generateReports(containerId) {
         const response = await fetch(`${api_url}/reports`);
         const data = await response.json();
         const list = data.items;
-        console.log(list);
+        // console.log(list);
 
         if (!list || list.length === 0) {
             container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
@@ -394,12 +405,7 @@ async function generateReports(containerId) {
         }
 
         list.forEach((item) => {
-            const { 
-                reports_id: item_id, 
-                name, 
-                description, 
-                attachments_count
-            } = item;
+            const { reports_id: item_id, name, description, attachments_count } = item;
 
             // Create each element of the list
             const div = document.createElement("div");
@@ -417,7 +423,6 @@ async function generateReports(containerId) {
             // Attachments (if any)
             const p2 = document.createElement("p");
             if (attachments_count > 0) {
-                
                 const btn = document.createElement("a");
                 btn.href = "#";
                 btn.textContent = "Załączniki";
@@ -449,7 +454,7 @@ async function generateReports(containerId) {
         console.error("Błąd podczas ładowania sprawozdań:", error);
         container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
     }
-}   
+}
 
 function showPage(pageId) {
     // Hide all pages
@@ -501,7 +506,6 @@ window.addEventListener("DOMContentLoaded", () => {
             modal.style.display = "none";
         }
     };
-
 });
 
 // Add interactive parallax effect to background shapes
@@ -582,10 +586,10 @@ document.querySelector("form").addEventListener("submit", function (e) {
 
     // Funkcja zamykająca z animacją
     const closeToast = () => {
-        if (successMsg.classList.contains('hide')) return; // Zabezpieczenie przed podwójnym kliknięciem
-        
-        successMsg.classList.remove('show');
-        successMsg.classList.add('hide');
+        if (successMsg.classList.contains("hide")) return; // Zabezpieczenie przed podwójnym kliknięciem
+
+        successMsg.classList.remove("show");
+        successMsg.classList.add("hide");
 
         // Usuwamy z DOM dopiero po zakończeniu animacji CSS (400ms)
         setTimeout(() => {
@@ -597,7 +601,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
     const autoCloseTimeout = setTimeout(closeToast, 3000);
 
     // OPCJONALNIE: Zamknięcie po kliknięciu w komunikat
-    successMsg.addEventListener('click', () => {
+    successMsg.addEventListener("click", () => {
         clearTimeout(autoCloseTimeout); // Anuluj auto-zamykanie, jeśli użytkownik kliknął sam
         closeToast();
     });
