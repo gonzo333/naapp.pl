@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ecomy | Profesjonalna Gospodarka Odpadami</title>
+    <title>ecomy</title>
     <meta name="description" content="ecomy - Pośredniczymy w zbiórce i zagospodarowaniu odpadów. Organizacja odbioru, dokumentacja BDO.">
     <meta name="keywords" content="ecomy, pośrednictwo w zbiórce odpadów, odbiór odpadami dla firm, gospodarka odpadami, obsługa BDO">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +13,7 @@
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.active { max-height: 500px; }
         
+        /* POWRÓT DO POPRZEDNIEGO LOGO */
         .logo-text {
             font-family: 'Georgia', 'Times New Roman', serif;
             letter-spacing: -0.02em;
@@ -62,11 +63,11 @@
         }
 
         .menu-open .mobile-link { opacity: 1; transform: translateY(0); }
+        /* Przycisk (4 element) pojawia się teraz jako pierwszy dla lepszego UX */
+        .menu-open .mobile-link:nth-child(4) { transition-delay: 0.05s; }
         .menu-open .mobile-link:nth-child(1) { transition-delay: 0.15s; }
         .menu-open .mobile-link:nth-child(2) { transition-delay: 0.25s; }
         .menu-open .mobile-link:nth-child(3) { transition-delay: 0.35s; }
-        .menu-open .mobile-link:nth-child(4) { transition-delay: 0.45s; }
-        .menu-open .mobile-link:nth-child(5) { transition-delay: 0.55s; }
 
         #privacy-modal.hidden { display: none; }
         #privacy-modal { display: flex; }
@@ -98,7 +99,6 @@
 
             <nav class="hidden md:flex items-center space-x-10">
                 <a href="#o-nas" data-i18n="nav-about" class="text-xl text-slate-600 hover:text-blue-900 font-semibold transition-colors">O nas</a>
-                <a href="#uslugi" data-i18n="nav-services" class="text-xl text-slate-600 hover:text-blue-900 font-semibold transition-colors">Usługi</a>
                 <a href="#jak-dzialamy" data-i18n="nav-process" class="text-xl text-slate-600 hover:text-blue-900 font-semibold transition-colors">Jak działamy</a>
                 <a href="#kontakt" data-i18n="nav-contact" class="text-xl text-slate-600 hover:text-blue-900 font-semibold transition-colors">Kontakt</a>
                 
@@ -131,7 +131,6 @@
 
         <div id="mobile-menu" class="md:hidden bg-white border-t border-slate-100 flex flex-col space-y-1 shadow-2xl overflow-hidden px-4">
             <a href="#o-nas" data-i18n="nav-about" class="mobile-link text-2xl text-slate-800 font-bold py-6 px-4 border-b border-slate-50 transition-colors">O nas</a>
-            <a href="#uslugi" data-i18n="nav-services" class="mobile-link text-2xl text-slate-800 font-bold py-6 px-4 border-b border-slate-50 transition-colors">Usługi</a>
             <a href="#jak-dzialamy" data-i18n="nav-process" class="mobile-link text-2xl text-slate-800 font-bold py-6 px-4 border-b border-slate-50 transition-colors">Jak działamy</a>
             <a href="#kontakt" data-i18n="nav-contact" class="mobile-link text-2xl text-slate-800 font-bold py-6 px-4 border-b border-slate-50 transition-colors">Kontakt</a>
             <div class="mobile-link pt-6 pb-10">
@@ -150,7 +149,7 @@
                         Kompleksowe rozwiązania w gospodarce odpadami
                     </h1>
                     <p data-i18n="hero-desc" class="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl leading-relaxed">
-                        Organizujemy legalny i sprawny odbiór odpadów dla firm i instytucji. Zapewniamy dobór certyfikowanych odbiorców, koordynację transportu oraz pełną obsługę formalną.
+                        Organizujemy sprawny i zgodny z przepisami odbiór odpadów od firm i instytucji. Zapewniamy dobór certyfikowanych odbiorców, koordynację transportu oraz pełną obsługę formalną.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-5">
                         <a href="#kontakt" data-i18n="hero-cta-quote" class="px-10 py-4 bg-blue-900 text-white text-center rounded-2xl font-bold hover:bg-blue-800 transition-all shadow-xl">Bezpłatna wycena</a>
@@ -211,61 +210,6 @@
             </div>
         </section>
 
-        <!-- USŁUGI -->
-        <section id="uslugi" class="py-24 bg-white">
-            <div class="container mx-auto px-4 md:px-8">
-                <h2 data-i18n="services-title" class="text-3xl md:text-4xl font-bold text-blue-900 mb-16 text-center uppercase tracking-widest">Zakres usług</h2>
-                
-                <div class="hidden md:grid grid-cols-2 gap-10">
-                    <div class="p-10 rounded-3xl bg-slate-50 border border-slate-100 flex space-x-8 hover:bg-white hover:shadow-2xl transition-all group">
-                        <div class="flex-shrink-0 w-14 h-14 bg-blue-900 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg">1</div>
-                        <div>
-                            <h3 data-i18n="service-1-title" class="text-2xl font-bold text-blue-900 mb-4">Wycena odpadów</h3>
-                            <p data-i18n="service-1-desc" class="text-slate-600 text-lg">Kompleksowa usługa analizy i wyceny frakcji odpadowych pod kątem optymalizacji.</p>
-                        </div>
-                    </div>
-                    <div class="p-10 rounded-3xl bg-slate-50 border border-slate-100 flex space-x-8 hover:bg-white hover:shadow-2xl transition-all group">
-                        <div class="flex-shrink-0 w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg">2</div>
-                        <div>
-                            <h3 data-i18n="service-2-title" class="text-2xl font-bold text-blue-900 mb-4">Transport i odbiór</h3>
-                            <p data-i18n="service-2-desc" class="text-slate-600 text-lg">Organizacja sprawnej logistyki i certyfikowanego transportu przez pewnych podwykonawców.</p>
-                        </div>
-                    </div>
-                    <div class="p-10 rounded-3xl bg-slate-50 border border-slate-100 flex space-x-8 hover:bg-white hover:shadow-2xl transition-all group">
-                        <div class="flex-shrink-0 w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg">3</div>
-                        <div>
-                            <h3 data-i18n="service-3-title" class="text-2xl font-bold text-blue-900 mb-4">Koordynacja BDO</h3>
-                            <p data-i18n="service-3-desc" class="text-slate-600 text-lg">Zarządzanie odbiorami oraz pełna ewidencja w systemie BDO dla Twojego spokoju.</p>
-                        </div>
-                    </div>
-                    <div class="p-10 rounded-3xl bg-slate-50 border border-slate-100 flex space-x-8 hover:bg-white hover:shadow-2xl transition-all group">
-                        <div class="flex-shrink-0 w-14 h-14 bg-blue-900 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg">4</div>
-                        <div>
-                            <h3 data-i18n="service-4-title" class="text-2xl font-bold text-blue-900 mb-4">Doradztwo</h3>
-                            <p data-i18n="service-4-desc" class="text-slate-600 text-lg">Profesjonalne wsparcie merytoryczne w zakresie skomplikowanej gospodarki odpadami.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="md:hidden space-y-4">
-                    <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-                        <button class="accordion-trigger w-full flex justify-between items-center p-6 text-left font-bold text-blue-900 uppercase">
-                            <span data-i18n="service-1-title">Wycena odpadów</span>
-                            <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        <div data-i18n="service-1-desc" class="accordion-content px-6 pb-6 text-slate-600">Kompleksowa usługa analizy i wyceny frakcji odpadowych pod kątem optymalizacji.</div>
-                    </div>
-                    <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-                        <button class="accordion-trigger w-full flex justify-between items-center p-6 text-left font-bold text-blue-900 uppercase">
-                            <span data-i18n="service-2-title">Transport i odbiór</span>
-                            <svg class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        <div data-i18n="service-2-desc" class="accordion-content px-6 pb-6 text-slate-600">Organizacja sprawnej logistyki i certyfikowanego transportu przez pewnych podwykonawców.</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- JAK DZIAŁAMY -->
         <section id="jak-dzialamy" class="py-24 bg-slate-900 text-white">
             <div class="container mx-auto px-4 md:px-8">
@@ -289,12 +233,12 @@
                     <div class="text-center group">
                         <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-6 group-hover:scale-110 transition-transform">4</div>
                         <h3 data-i18n="step-4-title" class="font-bold mb-4 text-2xl md:text-3xl">BDO</h3>
-                        <p data-i18n="step-4-desc" class="text-slate-300 text-base leading-relaxed">Zapewniamy pełną obsługę formalną.</p>
+                        <p data-i18n="step-4-desc" class="text-slate-300 text-base leading-relaxed">Zapewniamy wsparcie w obsłudze BDO</p>
                     </div>
                     <div class="text-center group">
                         <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-6 group-hover:scale-110 transition-transform">5</div>
                         <h3 data-i18n="step-5-title" class="font-bold mb-4 text-2xl md:text-3xl">Dokumenty</h3>
-                        <p data-i18n="step-5-desc" class="text-slate-300 text-base leading-relaxed">Przekazujemy potwierdzenia odzysku.</p>
+                        <p data-i18n="step-5-desc" class="text-slate-300 text-base leading-relaxed">Przekazujemy dokumenty potwierdzające przyjęcie</p>
                     </div>
                 </div>
             </div>
@@ -307,17 +251,33 @@
                     <div>
                         <h2 data-i18n="contact-title" class="text-3xl md:text-5xl font-bold text-blue-900 mb-8 uppercase tracking-tight">Kontakt</h2>
                         <div class="space-y-4 mb-12">
+                            <svg class="h-16 md:h-24 w-auto" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g class="logo-arrows">
+                                    <path d="M14 33 V 24 Q 14 18 22 18 H 46" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M42 13 L 52 18 L 42 23 Z" fill="#4d6b30"></path>
+                                    <path d="M46 27 V 36 Q 46 42 38 42 H 14" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M18 37 L 8 42 L 18 47 Z" fill="#4d6b30"></path>
+                                </g>
+                                <text x="64" y="44" class="logo-text" font-weight="500" font-size="38">
+                                    <tspan fill="#4d6b30">eco</tspan><tspan fill="#1e4079">my</tspan>
+                                </text>
+                            </svg>
                             <p class="text-2xl font-bold text-slate-800 tracking-tight uppercase">ECOMY</p>
-                            <p data-i18n="footer-tagline" class="text-lg text-slate-600">Profesjonalna Gospodarka Odpadami</p>
                             <p class="text-slate-500 text-lg">Błaszków 10, 26-220 Stąporków</p>
                         </div>
                         <div class="space-y-8 font-semibold text-slate-700">
+                            <!-- PRZYCISK NAD NUMEREM -->
+                            <div class="pb-2">
+                                <a href="#kontakt" data-i18n="btn-order" class="inline-block bg-blue-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-800 transition-all shadow-md text-lg">👉 Zamów odbiór</a>
+                            </div>
+
                             <div class="flex items-center space-x-6 group">
                                 <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-emerald-500 text-2xl transition-all group-hover:bg-emerald-500 group-hover:text-white">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                                 </div>
                                 <a href="tel:+48663762792" class="text-2xl text-blue-900 hover:text-emerald-600 transition-colors">663 762 792</a>
                             </div>
+
                             <div class="flex items-center space-x-6 group">
                                 <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-emerald-500 text-2xl transition-all group-hover:bg-emerald-500 group-hover:text-white">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -345,7 +305,18 @@
                                 <input required name="city" data-i18n-placeholder="form-placeholder-city" class="sm:col-span-2 w-full px-6 py-4 rounded-2xl border border-slate-200 outline-none focus:border-blue-900 transition-all shadow-sm" placeholder="Miejscowość">
                             </div>
 
-                            <input required name="phone" data-i18n-placeholder="form-placeholder-phone" class="w-full px-6 py-4 rounded-2xl border border-slate-200 outline-none focus:border-blue-900 transition-all shadow-sm" placeholder="Numer telefonu">
+                            <!-- Zaktualizowane pole telefonu: tylko polskie numery -->
+                            <input required 
+                                name="phone" 
+                                id="phone-input" 
+                                type="tel" 
+                                inputmode="numeric" 
+                                pattern="(?:\+48)?[1-9][0-9]{8}" 
+                                maxlength="12"
+                                data-i18n-placeholder="form-placeholder-phone" 
+                                class="w-full px-6 py-4 rounded-2xl border border-slate-200 outline-none focus:border-blue-900 transition-all shadow-sm" 
+                                placeholder="Numer telefonu (9 cyfr)">
+                            
                             <input required name="email" type="email" data-i18n-placeholder="form-placeholder-email" class="w-full px-6 py-4 rounded-2xl border border-slate-200 outline-none focus:border-blue-900 transition-all shadow-sm" placeholder="Adres e-mail">
                             <textarea name="msg" rows="3" data-i18n-placeholder="form-placeholder-msg" class="w-full px-6 py-4 rounded-2xl border border-slate-200 outline-none focus:border-blue-900 transition-all shadow-sm resize-none" placeholder="W czym możemy pomóc?"></textarea>
                             
@@ -353,7 +324,7 @@
                             <div class="flex items-start space-x-3 text-sm text-slate-500 px-2">
                                 <input type="checkbox" required id="rodo-consent" class="mt-1 w-4 h-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
                                 <label for="rodo-consent" class="leading-snug cursor-pointer">
-                                    <span data-i18n="rodo-consent-text">Wyrażam zgodę na przetwarzanie moich danych osobowych w celu obsługi zapytania. Zapoznałem się z </span><button type="button" id="open-privacy" data-i18n="privacy-policy-link" class="underline hover:text-blue-900 transition-colors">Polityką Prywatności</button>.
+                                    <span data-i18n="rodo-consent-text">Wyrażam zgodę na przetwarzanie moich danych osobowych w celu obsługi zapytania. Zapoznałem się z </span><button type="button" id="open-privacy" data-i18n="privacy-policy-link" class="underline hover:text-blue-900 transition-colors">Polityka Prywatności</button>.
                                 </label>
                             </div>
 
@@ -394,12 +365,12 @@
         <div class="container mx-auto px-4 md:px-8">
             <div class="grid md:grid-cols-3 gap-16 mb-16">
                 <div>
-                    <svg class="h-14 w-auto mb-8" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="h-16 md:h-24 w-auto mb-8" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g class="logo-arrows">
-                            <path d="M14 33 V 24 Q 14 18 22 18 H 46" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M42 13 L 52 18 L 42 23 Z" fill="#4d6b30" />
-                            <path d="M46 27 V 36 Q 46 42 38 42 H 14" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M18 37 L 8 42 L 18 47 Z" fill="#4d6b30" />
+                            <path d="M14 33 V 24 Q 14 18 22 18 H 46" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M42 13 L 52 18 L 42 23 Z" fill="#4d6b30"></path>
+                            <path d="M46 27 V 36 Q 46 42 38 42 H 14" stroke="#4d6b30" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M18 37 L 8 42 L 18 47 Z" fill="#4d6b30"></path>
                         </g>
                         <text x="64" y="44" class="logo-text" font-weight="500" font-size="38">
                             <tspan fill="#4d6b30">eco</tspan><tspan fill="#1e4079">my</tspan>
@@ -413,7 +384,6 @@
                     <h4 data-i18n="footer-nav-title" class="text-white font-bold mb-8 uppercase tracking-[0.2em] text-sm">Nawigacja</h4>
                     <ul class="space-y-4 text-base">
                         <li><a href="#o-nas" data-i18n="nav-about" class="hover:text-emerald-400 transition-colors">O firmie</a></li>
-                        <li><a href="#uslugi" data-i18n="nav-services" class="hover:text-emerald-400 transition-colors">Nasze usługi</a></li>
                         <li><a href="#jak-dzialamy" data-i18n="nav-process" class="hover:text-emerald-400 transition-colors">Jak działamy</a></li>
                         <li><button type="button" data-i18n="privacy-policy-link" class="open-privacy-link hover:text-emerald-400 transition-colors text-left">Polityka Prywatności</button></li>
                         <li><a href="https://bdo.mos.gov.pl/" target="_blank" class="hover:text-emerald-400 transition-colors">Platforma BDO</a></li>
@@ -447,12 +417,11 @@
         const translations = {
             pl: {
                 "nav-about": "O nas",
-                "nav-services": "Usługi",
                 "nav-process": "Jak działamy",
                 "nav-contact": "Kontakt",
                 "btn-order": "👉 Zamów odbiór",
                 "hero-title": "Kompleksowe rozwiązania w gospodarce odpadami",
-                "hero-desc": "Organizujemy legalny i sprawny odbiór odpadów dla firm i instytucji. Zapewniamy dobór certyfikowanych odbiorców, koordynację transportu oraz pełną obsługę formalną.",
+                "hero-desc": "Organizujemy sprawny i zgodny z przepisami odbiór odpadów od firm i instytucji. Zapewniamy dobór certyfikowanych odbiorców, koordynację transportu oraz pełną obsługę formalną.",
                 "hero-cta-quote": "Bezpłatna wycena",
                 "hero-cta-contact": "Skontaktuj się z nami",
                 "about-title": "Kim jesteśmy",
@@ -464,39 +433,29 @@
                 "feature-2": "Pełna zgodność z BDO",
                 "feature-3": "Sprawdzeni, certyfikowani partnerzy",
                 "feature-4": "Oszczędność czasu i kosztów",
-                "services-title": "Zakres usług",
-                "service-1-title": "Wycena odpadów",
-                "service-1-desc": "Kompleksowa usługa analizy i wyceny frakcji odpadowych pod kątem optymalizacji.",
-                "service-2-title": "Transport i odbiór",
-                "service-2-desc": "Organizacja sprawnej logistyki i certyfikowanego transportu przez pewnych podwykonawców.",
-                "service-3-title": "Koordynacja BDO",
-                "service-3-desc": "Zarządzanie odbiorami oraz pełna ewidencja w systemie BDO dla Twojego spokoju.",
-                "service-4-title": "Doradztwo",
-                "service-4-desc": "Profesjonalne wsparcie merytoryczne w zakresie skomplikowanej gospodarki odpadami.",
                 "process-title": "Jak wygląda współpraca",
-                "step-1-title": "Analiza",
+                "step-1-title": "Audit",
                 "step-1-desc": "Określamy rodzaj i ilość odpadów.",
                 "step-2-title": "Dobór",
                 "step-2-desc": "Wybieramy najlepszy kanał zagospodarowania.",
                 "step-3-title": "Organizacja",
                 "step-3-desc": "Ustalamy termin i bezpieczny transport.",
                 "step-4-title": "BDO",
-                "step-4-desc": "Zapewniamy pełną obsługę formalną.",
+                "step-4-desc": "Zapewniamy wsparcie w obsłudze BDO",
                 "step-5-title": "Dokumenty",
-                "step-5-desc": "Przekazujemy potwierdzenia odzysku.",
+                "step-5-desc": "Przekazujemy dokumenty potwierdzające przyjęcie",
                 "contact-title": "Kontakt",
-                "footer-tagline": "Profesjonalna Gospodarka Odpadami",
                 "form-placeholder-company": "Nazwa firmy/instytucji",
                 "form-placeholder-zip": "Kod (XX-XXX)",
                 "form-placeholder-city": "Miejscowość",
-                "form-placeholder-phone": "Numer telefonu",
+                "form-placeholder-phone": "Numer telefonu (9 cyfr)",
                 "form-placeholder-email": "Adres e-mail",
                 "form-placeholder-msg": "W czym możemy pomóc?",
                 "form-btn-send": "Wyślij zapytanie",
                 "form-success-title": "Wysłano pomyślnie!",
                 "form-success-desc": "Dziękujemy. Nasz konsultant odezwie się wkrótce.",
                 "rodo-consent-text": "Wyrażam zgodę na przetwarzanie moich danych osobowych w celu obsługi zapytania. Zapoznałem się z ",
-                "privacy-policy-link": "Polityką Prywatności",
+                "privacy-policy-link": "Polityka Prywatności",
                 "rodo-admin-info": "Administratorem danych jest ECOMY z siedzibą w Błaszkowie. Dane są przetwarzane wyłącznie w celu udzielenia odpowiedzi na zapytanie. Przysługuje Państwu prawo do dostępu, sprostowania oraz żądania usunięcia danych.",
                 "footer-desc": "Profesjonalne pośrednictwo w obrocie i zagospodarowaniu odpadów. Legalność, terminowość i pełna obsługa BDO.",
                 "footer-nav-title": "Nawigacja",
@@ -518,7 +477,6 @@
             },
             en: {
                 "nav-about": "About us",
-                "nav-services": "Services",
                 "nav-process": "Our process",
                 "nav-contact": "Contact",
                 "btn-order": "👉 Schedule Collection",
@@ -535,15 +493,6 @@
                 "feature-2": "National BDO system compliance",
                 "feature-3": "Trusted, certified partners",
                 "feature-4": "Time and cost optimization",
-                "services-title": "Our Services",
-                "service-1-title": "Waste Valuation",
-                "service-1-desc": "Detailed analysis and valuation of waste fractions to optimize your disposal costs.",
-                "service-2-title": "Transport & Collection",
-                "service-2-desc": "Efficient logistics and certified waste transport provided by verified contractors.",
-                "service-3-title": "BDO Management",
-                "service-3-desc": "Collection management and full legal records in the BDO system for your peace of mind.",
-                "service-4-title": "Consulting",
-                "service-4-desc": "Professional expert support in the field of complex environmental regulations.",
                 "process-title": "Collaboration Steps",
                 "step-1-title": "Audit",
                 "step-1-desc": "Identifying waste types and volumes.",
@@ -552,15 +501,14 @@
                 "step-3-title": "Logistics",
                 "step-3-desc": "Scheduling collection and safe transport.",
                 "step-4-title": "Compliance",
-                "step-4-desc": "Managing full formal documentation.",
+                "step-4-desc": "Supporting BDO management",
                 "step-5-title": "Closing",
                 "step-5-desc": "Providing recovery confirmations.",
                 "contact-title": "Contact Us",
-                "footer-tagline": "Professional Waste Management",
                 "form-placeholder-company": "Company / Institution",
                 "form-placeholder-zip": "Postal code",
                 "form-placeholder-city": "City",
-                "form-placeholder-phone": "Phone number",
+                "form-placeholder-phone": "Phone (9 digits)",
                 "form-placeholder-email": "Email address",
                 "form-placeholder-msg": "How can we assist you?",
                 "form-btn-send": "Send Inquiry",
@@ -570,7 +518,7 @@
                 "privacy-policy-link": "Privacy Policy",
                 "rodo-admin-info": "The data controller is ECOMY based in Błaszków. Data is processed solely to respond to the inquiry. You have the right to access, rectify, and request deletion of your data.",
                 "footer-desc": "Professional brokerage in waste trade and management. Legality, punctuality, and full BDO support.",
-                "footer-nav-title": "Navigation",
+                "footer-nav-title": "Nawigacja",
                 "footer-contact-title": "Quick Contact",
                 "footer-rights": "© 2025 ECOMY – ALL RIGHTS RESERVED.",
                 "privacy-html": `
@@ -645,6 +593,36 @@
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 5) value = value.slice(0, 5);
             e.target.value = value.length > 2 ? value.slice(0, 2) + '-' + value.slice(2) : value;
+        });
+
+        const phoneInput = document.getElementById('phone-input');
+        phoneInput?.addEventListener('input', (e) => {
+            // Czyścimy wszystko co nie jest cyfrą lub plusem na początku
+            let val = e.target.value.replace(/[^\d+]/g, '');
+            
+            // Plus może być tylko na samym początku
+            if (val.indexOf('+') > 0) {
+                val = val.substring(0, val.indexOf('+')) + val.substring(val.indexOf('+') + 1);
+            }
+
+            // Jeśli numer zaczyna się od cyfry, blokujemy 0 na początku (format 9-cyfrowy)
+            if (val.length > 0 && val[0] === '0') {
+                val = val.substring(1);
+            }
+            
+            // Jeśli mamy +48, blokujemy 0 po prefiksie (np. +480...)
+            if (val.startsWith('+48') && val.length > 3 && val[3] === '0') {
+                val = val.substring(0, 3) + val.substring(4);
+            }
+
+            // Ograniczenie długości
+            if (val.startsWith('+')) {
+                if (val.length > 12) val = val.slice(0, 12); // +48 123456789
+            } else {
+                if (val.length > 9) val = val.slice(0, 9); // 123456789
+            }
+            
+            e.target.value = val;
         });
 
         const privacyModal = document.getElementById('privacy-modal');
