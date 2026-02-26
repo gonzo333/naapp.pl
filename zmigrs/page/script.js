@@ -111,6 +111,13 @@ const municipalities = [
     { name: "Złota", path: "https://gminazlota.pl" },
 ];
 
+// Pagination states to keep track of offsets and loading status for each content type. This allows us to manage infinite scroll and loading states separately for news, resolutions, and reports.
+const paginationState = {
+    news: { offset: 0, loading: false },
+    resolutions: { offset: 0, loading: false },
+    reports: { offset: 0, loading: false }
+};
+
 // Generate Members links from static tables for now. Will be moved to the database if requested.
 function generateLinks(list, containerId) {
     const container = document.getElementById(containerId);
@@ -123,6 +130,7 @@ function generateLinks(list, containerId) {
 
 // Change the date MM/DD/YYYY to Polish format.
 function formatDateToPolish(dateString) {
+    if (!dateString) return "";
     const date = new Date(dateString);
 
     const options = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
@@ -150,107 +158,265 @@ function base64ToBlob(base64, mimeType) {
     return new Blob(byteArrays, { type: mimeType });
 }
 
+function setupInfiniteScroll(type, sentinelId, containerId) {
+    const sentinel = document.getElementById(sentinelId);
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !paginationState[type].loading) {
+            observer.unobserve(sentinel);
+            if (type === 'news') {
+                generateNews(containerId, false);
+            } else {
+                generateDataList(type, containerId, false);
+            }
+        }
+    }, { rootMargin: '200px' });
+
+    observer.observe(sentinel);
+}
+
+// Helper function to check if gallery has enough items to scroll and show or hide buttons if needed.
+function checkGalleryNavigation() {
+    const container = document.getElementById("article-gallery-div");
+    const prevBtn = document.querySelector(".prev-btn");
+    const nextBtn = document.querySelector(".next-btn");
+
+    if (!container || !prevBtn || !nextBtn) return;
+    const hasItems = container.querySelectorAll("a").length > 0;
+
+    // If enough width to scroll, show buttons
+    if (hasItems && container.scrollWidth > container.clientWidth) {
+        prevBtn.style.display = "block";
+        nextBtn.style.display = "block";
+    } else {
+        prevBtn.style.display = "none";
+        nextBtn.style.display = "none";
+    }
+}
+
+// Gallery scroll functionality, moves the gallery left or right by the width of one item.
+function moveGallery(direction) {
+    const container = document.getElementById("article-gallery-div");
+    const itemWidth = container.querySelector("a").offsetWidth + 15;
+
+    container.scrollBy({
+        left: direction * itemWidth,
+        behavior: 'smooth'
+    });
+}
+
 // Load full content of the article in the database.
 async function loadArticle(id) {
     const articleContainer = document.getElementById("article-text-div");
+    const galleryContainer = document.getElementById("article-gallery-div");
 
-    const response = await fetch(`${api_url}/article/${id}`);
-    const item = await response.json();
-    // console.log("Article data:", item);
+    // Clear previous content
+    galleryContainer.innerHTML = "";
+    document.querySelectorAll(".prev-btn, .next-btn").forEach(btn => btn.style.display = "none");
 
-    const article = item.items[0];
+    try {
+        const response = await fetch(`${api_url}/article/${id}`);
+        const item = await response.json();
+        const [article] = item.items;
 
-    articleContainer.innerHTML = `<div class="about-text">
-        <article>
-            <h2>${article.name}</h2>
-            <p><small>${formatDateToPolish(article.publication_date)}</small></p>
-            <p>${article.description}</p>
-            <p>${article.content}</p>
-            <p>${article.author || ""}</p>
-        </article>
-    </div>`;
+        if (!article) return;
 
-    // Helper functions to try accessing image dimensions
-    const getImageSize = (url) => {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-            img.onerror = () => resolve({ width: 1600, height: 900 }); // Fallback
-            img.src = url;
-        });
-    };
+        const {
+            name = "Brak tytułu",
+            publication_date,
+            author,
+            description,
+            content
+        } = article;
 
-    // Load attachments if any
-    if (article.attachments_count > 0) {
-        fetch(`${api_url}/attachments/news/${id}`)
-            .then((res) => res.json())
-            .then(async (data) => {
-                const galleryContainer = document.getElementById("article-gallery-div");
-                galleryContainer.innerHTML = "";
+        articleContainer.innerHTML = `
+            <div class="about-text">
+                <article>
+                    <h2>${name}</h2>
+                    <p><small>${formatDateToPolish(publication_date)}</small></p>
+                    <p>${description ?? ""}</p>
+                    <p>${content ?? ""}</p>
+                    <p>${author ?? "Zarząd ZMiGRS"}</p>
+                </article>
+            </div>`;
 
-                // Use Promise.all, to wait for all image sizes
-                for (const item of data.items) {
-                    if (!item.mime_type.startsWith("image/")) continue;
+        if (article.attachments_count > 0) {
+            await fetchAttachmentsRecursive(id, galleryContainer);
+        }
 
-                    const fileId = item.file_path.match(/[-\w]{25,}/);
-                    if (!fileId) continue;
+        // Display the content through page system.
+        showPage("article");
+        initLightbox();
+    } catch (e) {
+        console.error("Błąd ładowania artykułu:", e);
+    }
+}
 
-                    const directImageUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+async function fetchAttachmentsRecursive(id, container, offset = 0) {
+    const res = await fetch(`${api_url}/attachments/news/${id}?offset=${offset}`);
+    const data = await res.json();
 
-                    // Try to pull image dimensions
-                    const dimensions = await getImageSize(directImageUrl);
+    for (const item of data.items) {
+        if (!item.mime_type.startsWith("image/")) continue;
+        const fileIdMatch = item.file_path.match(/[-\w]{25,}/);
+        if (!fileIdMatch) continue;
 
-                    const a = document.createElement("a");
-                    const img = document.createElement("img");
+        const directImageUrl = `https://lh3.googleusercontent.com/d/${fileIdMatch[0]}`;
 
-                    a.href = directImageUrl;
-                    a.dataset.pswpWidth = dimensions.width;
-                    a.dataset.pswpHeight = dimensions.height;
-
-                    img.src = directImageUrl;
-                    img.alt = item.file_name;
-                    img.loading = "lazy";
-
-                    a.appendChild(img);
-                    galleryContainer.appendChild(a);
-                }
+        // Helper functions to try accessing image dimensions
+        const getImageSize = (url) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+                img.onerror = () => resolve({ width: 1600, height: 900 }); // Fallback
+                img.src = url;
             });
+        };
+
+        // Try to pull image dimensions
+        const dimensions = await getImageSize(directImageUrl);
+
+        const a = document.createElement("a");
+        a.href = directImageUrl;
+        a.dataset.pswpWidth = dimensions.width;
+        a.dataset.pswpHeight = dimensions.height;
+
+        const img = document.createElement("img");
+        img.src = directImageUrl;
+        img.alt = item.file_name;
+        img.loading = "lazy";
+
+        a.appendChild(img);
+        container.appendChild(a);
     }
 
-    // Display the content through page system.
-    showPage("article");
-    initLightbox();
+    if (data.hasMore) {
+        await fetchAttachmentsRecursive(id, container, offset + data.items.length);
+    } else {
+        setTimeout(checkGalleryNavigation, 200);
+    }
 }
 
 // Generate news from the database.
-async function generateNews(containerId) {
+let newsOffset = 0;
+let isNewsLoading = false;
+
+async function generateNews(containerId, isInitialLoad = true) {
     const container = document.getElementById(containerId);
-    let html = `<h2 style="grid-column:1/-1">Aktualności:</h2>`;
+    const state = paginationState.news;
+    if (!container || state.loading) return;
 
-    let data = await fetch(`${api_url}/articles`).then((r) => r.json());
-    let list = data.items;
-    // console.log(list);
-    if (list == null || list.length == 0) {
-        container.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
-        return;
+    // Reset przy pierwszym ładowaniu
+    if (isInitialLoad) {
+        state.offset = 0;
+        container.innerHTML = `<h2 style="grid-column:1/-1">Aktualności:</h2>
+                               <div id="article-list-content" class="grid-list"></div>`;
     }
 
-    for (const item of list) {
-        const id = item.news_id;
-        const title = item.name;
-        const date = item.publication_date;
-        const desc = item.description;
-        const author = item.author || "Unknown";
+    const contentDiv = document.getElementById("article-list-content");
+    state.loading = true;
 
-        html += `<div class="about-text glass">
-            <h3><a href="#" onclick="loadArticle('${id}')">${title}</a></h3>
-            <p><small>${formatDateToPolish(date)}</small></p>
-            <p style="white-space: pre-line">${desc}</p>
-            <p>${author}</p>
-        </div>`;
+    try {
+        const response = await fetch(`${api_url}/articles?offset=${state.offset}`);
+        const data = await response.json();
+        const list = data.items || [];
+
+        if (list.length === 0 && state.offset === 0) {
+            contentDiv.innerHTML = "<p>Brak aktualności do wyświetlenia.</p>";
+            state.loading = false;
+            return;
+        }
+
+        let html = "";
+        for (const item of list) {
+            const { news_id, name, publication_date, author, description } = item;
+            html += `
+            <div class="about-text glass">
+                <h3><a href="#" onclick="loadArticle('${news_id}')">${name ?? "Brak tytułu"}</a></h3>
+                <p><small>${formatDateToPolish(publication_date)}</small></p>
+                <p style="white-space: pre-line">${description ?? ""}</p>
+                <p>${author ?? "Zarząd ZMiGRS"}</p>
+            </div>`;
+        }
+
+        // InsertAdjacent to avoid removing previous content
+        contentDiv.insertAdjacentHTML('beforeend', html);
+
+        const oldSentinel = document.getElementById("news-sentinel");
+        if (oldSentinel) oldSentinel.remove();
+
+        // Update offset for the next batch
+        state.offset += list.length;
+
+        if (data.hasMore) {
+            contentDiv.insertAdjacentHTML('afterend', `<div id="news-sentinel" style="grid-column:1/-1; height:20px;"></div>`);
+            setupInfiniteScroll('news', 'news-sentinel', containerId);
+        }
+
+    } catch (e) {
+        console.error("Błąd ładowania newsów:", e);
+    } finally {
+        state.loading = false;
+    }
+}
+
+async function generateDataList(type, containerId, isInitialLoad = true) {
+    const container = document.getElementById(containerId);
+    const state = paginationState[type];
+    if (!container || state.loading) return;
+
+    const listContentId = `${type}-list-content`;
+
+    if (isInitialLoad) {
+        state.offset = 0;
+        const title = type === 'resolutions' ? 'Uchwały' : 'Sprawozdania';
+        container.innerHTML = `<h2 style="grid-column:1/-1">${title}:</h2>
+                               <div id="${listContentId}" class="grid-list"></div>`;
     }
 
-    container.innerHTML = html;
+    const contentDiv = document.getElementById(listContentId);
+    state.loading = true;
+
+    try {
+        const response = await fetch(`${api_url}/${type}?offset=${state.offset}`);
+        const data = await response.json();
+        const list = data.items || [];
+
+        let html = "";
+        list.forEach((item) => {
+            const itemId = item[`${type}_id`];
+            const { name, description, attachments_count, publication_date } = item;
+
+            html += `
+                <div class="about-text glass">
+                    <h3><a title="${name}">${name}</a></h3>
+                    <p>${description ?? ""}</p>
+                    <p>${attachments_count > 0 ? 
+                        `<a href="#" class="link-button" onclick="event.preventDefault(); openAttachmentModal('${itemId}', '${type}')">Załączniki</a>` 
+                        : ""}</p>
+                    <p><small>${formatDateToPolish(publication_date)}</small></p>
+                </div>
+            `;
+        });
+
+        contentDiv.insertAdjacentHTML('beforeend', html);
+
+        const sentinelId = `${type}-sentinel`;
+        const oldSentinel = document.getElementById(sentinelId);
+        if (oldSentinel) oldSentinel.remove();
+
+        state.offset += list.length;
+
+        if (data.hasMore) {
+            container.insertAdjacentHTML('beforeend', `<div id="${sentinelId}" style="grid-column:1/-1; height:10px;"></div>`);
+            setupInfiniteScroll(type, sentinelId, containerId);
+        }
+    } catch (e) {
+        console.error(`Błąd ${type}:`, e);
+    } finally {
+        state.loading = false;
+    }
 }
 
 async function downloadFile(fileId, type) {
@@ -259,13 +425,15 @@ async function downloadFile(fileId, type) {
     const item = data.items[0];
     // console.log("downloadFile File data:", item);
 
-    const a = document.createElement("a");
-    a.href = item.file_path;
-    a.download = item.file_name;
-    a.click();
+    if (item) {
+        const a = document.createElement("a");
+        a.href = item.file_path;
+        a.download = item.file_name;
+        a.click();
+    }
 }
 
-function openAttachmentModal(contentId, type) {
+async function openAttachmentModal(contentId, type) {
     const modalButtons = document.getElementById("modal-buttons");
     modalButtons.innerHTML = "";
     if (!contentId) return;
@@ -273,15 +441,14 @@ function openAttachmentModal(contentId, type) {
     document.getElementById("modal").style.display = "block";
     modalButtons.innerHTML = "<p>Ładowanie załączników...</p>";
 
-    fetch(`${api_url}/attachments/${type}/${contentId}`)
-        .then((res) => {
-            if (!res.ok) throw new Error("Błąd sieci");
-            return res.json();
-        })
-        .then((data) => {
+    async function fetchAll(offset = 0) {
+        try {
+            const response = await fetch(`${api_url}/attachments/${type}/${contentId}?offset=${offset}`);
+            const data = await response.json();
             const items = data.items || [];
-            // console.log("Attachments data:", items);
             modalButtons.innerHTML = ""; // Clear loading text
+
+            if (offset === 0) modalButtons.innerHTML = "";
 
             if (items.length === 0) {
                 modalButtons.innerHTML = "<p>Brak załączników do wyświetlenia.</p>";
@@ -301,11 +468,8 @@ function openAttachmentModal(contentId, type) {
                 btn.classList = "link-button no-flex";
 
                 // Try to use file name from the database, otherwise "Plik X"
-                if (fileName) {
-                    btn.innerHTML = `${fileName}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
-                } else {
-                    btn.innerHTML = `Plik ${index + 1}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
-                }
+                const label = fileName ? fileName : `Plik ${offset + index + 1}`;
+                btn.innerHTML = `${label}<p><small>${formatDateToPolish(file_created_date)}</small></p>`;
 
                 btn.onclick = (e) => {
                     e.preventDefault();
@@ -313,148 +477,19 @@ function openAttachmentModal(contentId, type) {
                 };
 
                 modalButtons.appendChild(btn);
-                modalButtons.appendChild(document.createElement("br"));
             });
-        })
-        .catch((e) => {
-            console.error("Błąd pobierania załączników:", e);
-            modalButtons.innerHTML = "<p>Wystąpił błąd podczas pobierania plików.</p>";
-        });
-}
 
-// Generate resolutions from the database.
-async function generateResolutions(containerId) {
-    const container = document.getElementById(containerId);
-
-    try {
-        const response = await fetch(`${api_url}/resolutions`);
-        const data = await response.json();
-        const list = data.items;
-        // console.log(list);
-
-        if (!list || list.length === 0) {
-            container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
-            return;
+            if (data.hasMore) await fetchAll(offset + items.length);
+        } catch (error) {
+            console.error("Błąd pobierania załączników:", error);
+            modalButtons.innerHTML = "<p>Wystąpił błąd podczas pobierania załączników.</p>";
         }
-
-        list.forEach((item) => {
-            const { resolutions_id: item_id, name, description, attachments_count } = item;
-
-            // Create each element of the list
-            const div = document.createElement("div");
-            div.className = "about-text glass";
-
-            const h3 = document.createElement("h3");
-            const link = document.createElement("a");
-            link.title = name;
-            link.textContent = name;
-            h3.appendChild(link);
-
-            const p1 = document.createElement("p");
-            p1.textContent = description;
-
-            // Attachments (if any)
-            const p2 = document.createElement("p");
-            if (attachments_count > 0) {
-                const btn = document.createElement("a");
-                btn.href = "#";
-                btn.textContent = "Załączniki";
-                btn.style.marginLeft = "10px";
-                btn.classList = "link-button";
-
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    openAttachmentModal(item_id, "resolutions");
-                };
-
-                p2.appendChild(btn);
-            }
-
-            const p3 = document.createElement("p");
-            const small = document.createElement("small");
-            small.textContent = formatDateToPolish(item.publication_date);
-            p3.appendChild(small);
-
-            // Put all elements together
-            div.appendChild(h3);
-            div.appendChild(p1);
-            div.appendChild(p2);
-            div.appendChild(p3);
-
-            container.appendChild(div);
-        });
-    } catch (error) {
-        console.error("Błąd podczas ładowania sprawozdań:", error);
-        container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
     }
+    await fetchAll();
 }
 
-// Generate reports from the database.
-async function generateReports(containerId) {
-    const container = document.getElementById(containerId);
-
-    try {
-        const response = await fetch(`${api_url}/reports`);
-        const data = await response.json();
-        const list = data.items;
-        // console.log(list);
-
-        if (!list || list.length === 0) {
-            container.innerHTML = "<p>Brak sprawozdań do wyświetlenia.</p>";
-            return;
-        }
-
-        list.forEach((item) => {
-            const { reports_id: item_id, name, description, attachments_count } = item;
-
-            // Create each element of the list
-            const div = document.createElement("div");
-            div.className = "about-text glass";
-
-            const h3 = document.createElement("h3");
-            const link = document.createElement("a");
-            link.title = name;
-            link.textContent = name;
-            h3.appendChild(link);
-
-            const p1 = document.createElement("p");
-            p1.textContent = description;
-
-            // Attachments (if any)
-            const p2 = document.createElement("p");
-            if (attachments_count > 0) {
-                const btn = document.createElement("a");
-                btn.href = "#";
-                btn.textContent = "Załączniki";
-                btn.style.marginLeft = "10px";
-                btn.classList = "link-button";
-
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    openAttachmentModal(item_id, "reports");
-                };
-
-                p2.appendChild(btn);
-            }
-
-            const p3 = document.createElement("p");
-            const small = document.createElement("small");
-            small.textContent = formatDateToPolish(item.publication_date);
-            p3.appendChild(small);
-
-            // Put all elements together
-            div.appendChild(h3);
-            div.appendChild(p1);
-            div.appendChild(p2);
-            div.appendChild(p3);
-
-            container.appendChild(div);
-        });
-    } catch (error) {
-        console.error("Błąd podczas ładowania sprawozdań:", error);
-        container.innerHTML = "<p>Wystąpił błąd podczas ładowania danych.</p>";
-    }
-}
+async function generateResolutions(containerId) { await generateDataList('resolutions', containerId, true); }
+async function generateReports(containerId) { await generateDataList('reports', containerId, true); }
 
 function showPage(pageId) {
     // Hide all pages

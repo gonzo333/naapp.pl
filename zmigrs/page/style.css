@@ -615,27 +615,41 @@ button[type="submit"] {
     color: rgba(255, 255, 255, 0.9);
 }
 
+.grid-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    align-items: start;
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
 /* Article generated styles */
 article p {
     white-space: pre-line;
 }
 
+.gallery-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    gap: 10px;
+}
+
 #article-gallery-div {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 1rem;
-    padding: 1rem;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    margin-bottom: 2rem;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    gap: 15px;
+    width: 100%;
+    padding: 10px 0;
 }
 
 #article-gallery-div a {
-    flex: 0 0 auto;
-    width: 300px;
-    height: 200px;
-    scroll-snap-align: center;
+    flex: 0 0 calc(33.333% - 10px);
+    height: 250px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -653,12 +667,20 @@ article p {
     transform: scale(1.05);
 }
 
-#article-gallery-div::-webkit-scrollbar {
-    height: 8px;
+/* Gallery buttons styles */
+.prev-btn, .next-btn {
+    display: none; 
+    cursor: pointer;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
-#article-gallery-div::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
+
+.prev-btn:hover, .next-btn:hover {
+    background: rgba(0,0,0,0.8);
 }
 
 /* Contact page styles */
@@ -913,16 +935,24 @@ article p {
     to { opacity: 0; transform: translate(-50%, -55%); }
 }
 
-/* Responsive design */
+/* Desktop style */
 @media (max-width: 1024px) {
     .team-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .grid-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #article-gallery-div a {
+        flex: 0 0 calc(50% - 8px);
+    }
 }
 
+/* Mobile style */
 @media (max-width: 768px) {
 
-    /* Adjust padding for mobile */
     .page {
         padding: 30px 20px 20px;
     }
@@ -979,6 +1009,14 @@ article p {
     .team-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+
+    .grid-list {
+        grid-template-columns: 1fr;
+    }
+
+    #article-gallery-div a {
+        flex: 0 0 100%;
     }
 
     .footer-links {
