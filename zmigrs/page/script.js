@@ -36,6 +36,7 @@ const cities_and_municipalities = [
     { name: "Oleśnica", path: "https://gminaolesnica.pl" },
     { name: "Opatów", path: "https://www.umopatow.pl" },
     { name: "Opatowiec", path: "https://umig.opatowiec.pl" },
+    { name: "Osiek", path: "https://gmina-osiek.pl/" },
     { name: "Ożarów", path: "https://www.ozarow.pl" },
     { name: "Pacanów", path: "https://pacanow.pl" },
     { name: "Piekoszów", path: "https://www.piekoszow.pl" },
