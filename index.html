@@ -678,29 +678,6 @@
             </form>
           </div>
         </div>
-
-        <div class="col-md-6 text-center mt-4 mt-md-0" id="agent-column">
-
-          <div id="agent-trigger-box" class="form_container">
-            <button type="button" id="open-agent-btn">
-              Rozmowa z agentem
-            </button>
-          </div>
-
-          <div id="agent-display-box" style="display: none; width: 100%;">
-
-            <div id="d-id-agent-container"
-              style="display: block !important; width: 100% !important; height: 600px !important; min-height: 600px !important; background-color: #f8f9fa; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 10px; margin-bottom: 25px;">
-            </div>
-
-            <button id="close-agent-btn" class="btn btn-outline-secondary btn-sm"
-              style="border-radius: 30px; padding: 8px 25px;">
-              <i class="fa fa-arrow-left "></i> Wróć do formularza
-            </button>
-          </div>
-
-        </div>
-
       </div>
     </div>
   </section>
@@ -821,9 +798,10 @@
     }(document, 'script', 'facebook-jssdk'));
   </script>
 
-  <script type="module" src="https://agent.d-id.com/v2/index.js" data-mode="full"
+  <script type="module" src="https://agent.d-id.com/v2/index.js" data-mode="fabio"
     data-client-key="ck_O95ZjlBMYf9mSatG3rqlJ" data-agent-id="v2_agt_eVJhJeqG" data-name="did-agent" data-monitor="true"
-    data-target-id="d-id-agent-container">
+    data-orientation="horizontal" data-position="right" data-open-mode="compact" data-speech-silence-timeout-ms="1000"
+    data-track="false">
     </script>
 </body>
 
