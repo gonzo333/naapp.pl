@@ -1,772 +1,564 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="author" content="" />
-  <link rel="shortcut icon" href="images/favicon.png" type="">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title> New Advance APP </title>
+  <title>New Advance APP | Hologramy, Awatary AI, Strony WWW i Aplikacje</title>
+  <meta name="description" content="New Advance APP — hologramy 1:1 i interaktywne awatary AI (HOLOAVI), strony WWW, aplikacje webowe i APEX, rozwiązania NFC oraz szkolenia z AI. Partner technologiczny firmy Altar." />
+  <meta name="keywords" content="hologramy, awatar AI, HOLOAVI, strony www, aplikacje webowe, APEX, sztuczna inteligencja, AI, szkolenia, NFC, Altar" />
+  <meta name="author" content="New Advance APP" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#222831" />
+  <link rel="canonical" href="https://naapp.pl/" />
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
 
-  <!-- bootstrap core css -->
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://naapp.pl/" />
+  <meta property="og:site_name" content="New Advance APP" />
+  <meta property="og:title" content="New Advance APP | Hologramy, Awatary AI, Strony WWW i Aplikacje" />
+  <meta property="og:description" content="Hologramy 1:1 i awatary AI (HOLOAVI), strony WWW, aplikacje webowe i APEX, NFC oraz szkolenia z AI. Partner technologiczny firmy Altar." />
+  <meta property="og:image" content="https://naapp.pl/images/logo.png" />
+  <meta property="og:locale" content="pl_PL" />
 
-  <!--owl slider stylesheet -->
-  <link rel="stylesheet" type="text/css"
-    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
-  <!-- nice select  -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css"
-    integrity="sha512-CruCP+TD3yXzlvvijET8wV5WxxEh5H8P4cmz0RFbKK6FlZ2sYl3AEsKlLPHbniXKSrDdFewhbmBK5skbdsASbQ=="
-    crossorigin="anonymous" />
-  <!-- font awesome style -->
-  <link href="css/font-awesome.min.css" rel="stylesheet" />
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="New Advance APP | Hologramy, Awatary AI, Strony WWW i Aplikacje" />
+  <meta name="twitter:description" content="Hologramy 1:1, awatary AI, strony WWW, aplikacje webowe, APEX, NFC i szkolenia AI dla firm." />
+  <meta name="twitter:image" content="https://naapp.pl/images/logo.png" />
 
-  <!-- Custom styles for this template -->
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "New Advance APP",
+    "url": "https://naapp.pl/",
+    "logo": "https://naapp.pl/images/logo.png",
+    "email": "newadvanceapp@gmail.com",
+    "telephone": "+48697022087",
+    "sameAs": [
+      "https://www.facebook.com/newadvanceapps",
+      "https://www.linkedin.com/in/paweł-nowaczek-programista"
+    ],
+    "makesOffer": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hologramy 1:1 — HOLOAVI" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Interaktywne awatary AI" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Strony WWW" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Aplikacje webowe" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Aplikacje Oracle APEX" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Szkolenia i wdrożenia AI" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Rozwiązania NFC" } }
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts: Inter + Syne -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Custom styles -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
-  <link href="css/responsive.css" rel="stylesheet" />
-
 </head>
 
 <body>
 
-  <div class="hero_area">
+  <!-- ===== Navbar ===== -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#main" class="logo" aria-label="naapp.pl — strona główna">
+        <span class="logo-name">naapp</span><span class="logo-dot" aria-hidden="true"></span><span class="logo-tld">pl</span>
+      </a>
 
-    <div class="bg-box">
-      <img src="images/hero-bg.png" alt="">
+      <nav class="nav-links" id="nav-links" aria-label="Nawigacja główna">
+        <a href="#main" data-i18n="nav_home">Start</a>
+        <a href="#uslugi" data-i18n="nav_services">Usługi</a>
+        <a href="#cooperation" data-i18n="nav_systems">Systemy</a>
+        <a href="#klienci" data-i18n="nav_clients">Klienci</a>
+        <a href="#kontakt" data-i18n="nav_contact">Kontakt</a>
+      </nav>
 
+      <div class="nav-right">
+        <div id="lang-select" aria-label="Wybór języka">
+          <img src="images/flags/pl.svg" alt="Polski" class="flag" data-lang="pl" width="34" height="22" />
+          <img src="images/flags/gb-eng.svg" alt="English" class="flag" data-lang="en" width="34" height="22" />
+          <img src="images/flags/es.svg" alt="Español" class="flag" data-lang="es" width="34" height="22" />
+          <img src="images/flags/ua.svg" alt="Українська" class="flag" data-lang="uk" width="34" height="22" />
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="main">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-blob hero-blob-1"></div>
+      <div class="hero-blob hero-blob-2"></div>
+      <img class="hero-logo" src="images/logo-hero.png" alt="" width="460" height="460" loading="eager" decoding="async" />
+      <svg class="hero-deco hero-deco-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="160" height="160" rx="28" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1.5" />
+      </svg>
+      <svg class="hero-deco hero-deco-3" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="60,8 112,98 8,98" fill="none" stroke="#ffbe33" stroke-opacity="0.35" stroke-width="1.5" />
+      </svg>
     </div>
 
-    <!-- slider section -->
-    <section class="slider_section" id="main">
-      <div id="lang-select">
-        <img src="images/flags/pl.svg" alt="Polski" class="flag" data-lang="pl">
-        <img src="images/flags/gb-eng.svg" alt="English" class="flag" data-lang="en">
-        <img src="images/flags/es.svg" alt="Español" class="flag" data-lang="es">
-      </div>
-      <div id="customCarousel1" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-7 col-lg-6 ">
-                  <div class="detail-box">
-                    <h1 id="www_header">
-                      Strony WWW
-                    </h1>
-                    <p id="www_text">
-                      Efektowne i ergonomiczne strony WWW dla małych i średnich firm. Wykonanie kilku wariantów
-                      projektu, nowoczesne technologie, integracja z Social Media, Youtube. Obsługa baz danych i paneli
-                      administracyjnych.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item ">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-7 col-lg-6 ">
-                  <div class="detail-box">
-                    <h1 id="web_app_header">
-                      Aplikacje webowe
-                    </h1>
-                    <p id="web_app_text">
-                      Tworzymy aplikacje webowe dla małych oraz średnich firm, instytucji, klubów sportowych. Od
-                      projektu, przez event storming, po ergonomiczne i funkcjonalne aplikacje webowe, tworzone w
-                      najnowszych technologiach.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div class="container hero-content">
+      <p class="hero-kicker"><span class="kicker-dot"></span><span data-i18n="hero_kicker">New Advance APP — software house</span></p>
 
-          <div class="carousel-item">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-7 col-lg-6 ">
-                  <div class="detail-box">
-                    <h1 id="apex_header">
-                      Generowanie aplikacji APEX
-                    </h1>
-                    <p id="apex_text">
-                      - Drobne aplikacje dla twojego biznesu.
-                      <br>
-                      - Raporty, statystyki, terminarze, dashbaordy.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-item">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-7 col-lg-6 ">
-                  <div class="detail-box">
-                    <h1 id="ai_header">
-                      Szkolenia ze sztucznej inteligencji
-                    </h1>
-                    <p id="ai_text">
-                      Sztuczna inteligencja w twojej firmie. Dedykowane prompty, usługi skrojone pod konkretny biznes.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-item">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-7 col-lg-6 ">
-                  <div class="detail-box">
-                    <h1 id="other_header">
-                      Pozostałe usługi
-                    </h1>
-                    <p id="other_text">
-                      Usługi dronem. Robienie zdjęć, nagrywanie filmów. Wypożyczanie sprzętu: projektor, ekran
-                      projekcyjny.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-
-
-
-
-
+      <div class="hero-slides" id="hero-slides">
+        <div class="hero-slide" style="--i:0">
+          <h1 data-i18n="hero1_title">Strony WWW</h1>
+          <p data-i18n="hero1_text">Projektujemy szybkie, responsywne i efektowne strony WWW dla małych i średnich firm. Kilka wariantów projektu do wyboru, integracja z Social Media i YouTube, wygodne panele administracyjne.</p>
         </div>
-        <div class="container">
-          <ol class="carousel-indicators">
-            <li data-target="#customCarousel1" data-slide-to="0" class="active"></li>
-            <li data-target="#customCarousel1" data-slide-to="1"></li>
-            <li data-target="#customCarousel1" data-slide-to="2"></li>
-            <li data-target="#customCarousel1" data-slide-to="3"></li>
-            <li data-target="#customCarousel1" data-slide-to="4"></li>
-          </ol>
-
+        <div class="hero-slide" style="--i:1">
+          <h1 data-i18n="hero5_title">Hologramy i awatary AI</h1>
+          <p data-i18n="hero5_text">Twoja marka w trzech wymiarach: hologramy 1:1 z HOLOAVI, awatary AI rozmawiające z klientami głosowo oraz wizytówki NFC — na eventy, targi, do recepcji i na Twoją stronę.</p>
+        </div>
+        <div class="hero-slide" style="--i:2">
+          <h1 data-i18n="hero2_title">Aplikacje webowe</h1>
+          <p data-i18n="hero2_text">Budujemy aplikacje webowe dla firm, instytucji i klubów sportowych — od warsztatów Event Storming, przez projekt UX, po wdrożenie w najnowszych technologiach.</p>
+        </div>
+        <div class="hero-slide" style="--i:3">
+          <h1 data-i18n="hero4_title">Szkolenia i wdrożenia AI</h1>
+          <p data-i18n="hero4_text">Wdrażamy sztuczną inteligencję w Twojej firmie. Dedykowane prompty, automatyzacje i szkolenia skrojone pod konkretny biznes.</p>
+        </div>
+        <div class="hero-slide" style="--i:4">
+          <h1 data-i18n="hero3_title">Aplikacje Oracle APEX</h1>
+          <p data-i18n="hero3_text">Lekkie aplikacje biznesowe gotowe w kilka dni: raporty, statystyki, terminarze i dashboardy — dokładnie tam, gdzie kończy się Excel.</p>
         </div>
       </div>
 
+      <div class="hero-actions">
+        <a href="#uslugi" class="btn btn-primary"><span data-i18n="hero_cta">Zobacz usługi</span> <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#kontakt" class="btn btn-ghost" data-i18n="hero_cta2">Porozmawiajmy</a>
+      </div>
 
+      <div class="hero-tags" aria-hidden="true">
+        <span>Hologramy</span><span>Awatary AI</span><span>WWW</span><span>Angular</span><span>Java</span><span>Oracle APEX</span><span>AI</span><span>NFC</span>
+      </div>
+    </div>
 
-    </section>
+    <a href="#uslugi" class="hero-scroll" aria-label="Przewiń w dół">
+      <i class="fa-solid fa-chevron-down"></i>
+    </a>
+  </section>
 
-
-  </div>
-
-  <section class="service_section layout_padding-bottom" id="uslugi">
+  <!-- ===== Services ===== -->
+  <section class="section" id="uslugi">
     <div class="container">
-      <div class="heading_container heading_center">
-        <h2 id="uslugi_all_header">
-          Zakres usług
-        </h2>
+      <div class="section-head reveal">
+        <span class="section-kicker" data-i18n="services_kicker">Co robimy</span>
+        <h2 data-i18n="services_header">Zakres usług</h2>
+        <p data-i18n="services_sub">Kompleksowo: od hologramów i awatarów AI, przez strony i aplikacje, po NFC oraz szkolenia z AI i cyberbezpieczeństwa.</p>
       </div>
 
-      <ul class="filters_menu">
-        <li class="active" data-filter="*" id="all_filter">Wszystkie</li>
-        <li data-filter=".web" id="app_filter">Aplikacje WEB</li>
-        <li data-filter=".www" id="www_filter">Strony WWW</li>
-        <li data-filter=".other" id="other_filter">Pozostałe usługi</li>
-        <li data-filter=".apex" id="apex_filter">Aplikacje APEX</li>
-        <li data-filter=".ai">AI</li>
-      </ul>
-
-      <div class="filters-content">
-        <div class="row grid">
-          <div class="col-sm-6 col-lg-4 all www">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/projectwww.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="graph_header">
-                    Projekty graficzne
-                  </h5>
-                  <p id="graph_text">
-                    Proponujemy indywidualny projekt graficzny strony WWW dopasowany po Klienta i Jego Biznes. Jesteśmy
-                    otwarci na pomysły Klienta.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all web">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/angular.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="angular_header">
-                    Ergonomia i estetyka
-                  </h5>
-                  <p id="angular_text">
-                    Wygląd oprogramowany przy pomocy framework'a Angular. Z użyciem takich zestawu komponentów jak
-                    ng-zorro, material, bootstrap.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all www">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/html5.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="tech_header">
-                    Nowoczesne technologie
-                  </h5>
-                  <p id="tech_text">
-                    Do tworzenia naszych stron używamy HTML5, CSS, JS, jQuery i wielu innych technologii. Tworzymy też
-                    strony oparte o wordpress.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all other">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/java.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="teach_header">
-                    Korepetycje - szkolenia
-                  </h5>
-                  <p id="teach_text">
-                    Udzielamy indywidualnych korepetycji oraz szkoleń z zakresu programowania oraz tworzenia aplikacji
-                    oraz stron www (języki: JAVA, JAVASCRIPT, HTML...).
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all www">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/facebook.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="social_header">
-                    Social Media
-                  </h5>
-                  <p id="social_text">
-                    Dajemy możliwość integracji z portalami społecznościowymi: facebook, whats'up, instagram. Mamy kilka
-                    sposobów integracji z Youtube.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all web">
-            <div class="box">
-              <div class="img-box">
-                <img src="images/java.png" alt="">
-              </div>
-              <div class="detail-box">
-                <h5 id="security_header">
-                  Wydajność i bezpieczeństwo
-                </h5>
-                <p id="security_text">
-                  Bezpieczna baza danych oraz wydajne komunikujące się z bazą danych aplikacje napisane w języku JAVA,
-                  stanowią logikę biznesową tworzonych aplikacji.
-                </p>
-                <div class="options">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all web">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/event.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="buisnes_header">
-                    Wymagania biznesowe.
-                  </h5>
-                  <p id="buisnes_text">
-                    100% zrozumienia wymagań biznesowych poprzez: komunikację z Klientem, wymianę doświadczeń, opis
-                    wymagań Event Storming.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all other">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/dron.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="drone_header">
-                    Usługi dronem
-                  </h5>
-                  <p id="drone_text">
-                    Nagrywanie filmów oraz robienie zdjęć dronem. Sprzę jakim dysponujemy to Parrot ANNAFI-H063536.
-                    Nagrania i zdjęcia w jakości FULL HD.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-sm-6 col-lg-4 all other">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/projector.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="equipment_header">
-                    Wypożyczalnia sprzętu
-                  </h5>
-                  <p id="equipment_text">
-                    Wypożyczamy sprzęt do prezentacji: projektor - BenQ MH733 DLP (1920 x 1080), ekran do projektora -
-                    Avtek Ekran na statywie, wys 200cm, szer 200 cm.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-sm-6 col-lg-4 all apex">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/apex.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="apex_off_header">
-                    Tworzenie aplikacji APEX.
-                  </h5>
-                  <p id="apex_off_text">
-                    Stworzymy szybką, prostą, tanią, funkcjonalną aplikację dla Twojej firmy, wystarczy nam twój excel.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-sm-6 col-lg-4 all ai">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="images/ai.png" alt="">
-                </div>
-                <div class="detail-box">
-                  <h5 id="ai_teach_header">
-                    Szkolenia z używania sztucznej inteligencji.
-                  </h5>
-                  <p id="ai_teach_text">
-                    Szkolenie w tworzeniu zapytań. Automatyzacja twojego biznesu. Dedykowane prompty.
-                  </p>
-                  <div class="options">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-
-
-        </div>
+      <div class="filters" id="filters">
+        <button type="button" class="active" data-filter="all" data-i18n="filter_all" aria-pressed="true">Wszystkie</button>
+        <button type="button" data-filter="holo" data-i18n="filter_holo" aria-pressed="false">Hologramy i awatary</button>
+        <button type="button" data-filter="www" data-i18n="filter_www" aria-pressed="false">Strony WWW</button>
+        <button type="button" data-filter="web" data-i18n="filter_web" aria-pressed="false">Aplikacje WEB</button>
+        <button type="button" data-filter="apex" data-i18n="filter_apex" aria-pressed="false">Aplikacje APEX</button>
+        <button type="button" data-filter="ai" data-i18n="filter_ai" aria-pressed="false">Szkolenia i AI</button>
+        <button type="button" data-filter="nfc" aria-pressed="false">NFC</button>
       </div>
-      <div class="btn-box">
-        <a href="" id="all_text">
-          Pokaż wszystkie
+
+      <div class="cards-grid" id="services-grid">
+
+        <!-- HOLO -->
+        <article class="card card-featured reveal" data-category="holo">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <ellipse cx="24" cy="40" rx="16" ry="4" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M24 34c5 0 9-6.3 9-14S29 6 24 6s-9 6.3-9 14 4 14 9 14z" stroke="#ffbe33" stroke-width="2.5" opacity="0.9" />
+              <path d="M15.5 15h17M15.5 25h17" stroke="#ffbe33" stroke-width="2" opacity="0.6" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_holo">Hologramy i awatary</span>
+          <h3 data-i18n="svc_holo_title">Hologramy 1:1 — HOLOAVI</h3>
+          <p data-i18n="svc_holo_text">Wynajem urządzeń holograficznych na targi, konferencje i eventy: 4K Ultra HD, jasność ponad 1200 nitów, montaż, obsługa i produkcja contentu w pakiecie.</p>
+          <a href="https://holoavi.pl" target="_blank" rel="noopener noreferrer" class="card-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></a>
+        </article>
+
+        <article class="card card-featured reveal" data-category="holo">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="24" cy="16" r="7" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M11 40c1.5-8 6.5-12 13-12s11.5 4 13 12" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <path d="M36 8l1.2 3 3 1.2-3 1.2L36 16.4l-1.2-3-3-1.2 3-1.2L36 8z" fill="#ffbe33" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_holo">Hologramy i awatary</span>
+          <h3 data-i18n="svc_avatar_title">Awatary AI</h3>
+          <p data-i18n="svc_avatar_text">Interaktywny asystent AI na Twoją stronę, do recepcji lub showroomu — rozmawia z klientami głosowo, odpowiada na pytania i zbiera kontakty.</p>
+          <a href="https://holoavi.pl" target="_blank" rel="noopener noreferrer" class="card-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></a>
+        </article>
+
+        <!-- WWW -->
+        <article class="card reveal" data-category="www">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="6" y="8" width="36" height="28" rx="3" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M6 15h36" stroke="#ffbe33" stroke-width="2.5" />
+              <circle cx="11" cy="11.5" r="1.5" fill="#ffbe33" />
+              <circle cx="16" cy="11.5" r="1.5" fill="#ffbe33" />
+              <path d="M13 24l14-3-4 6 6 2-14 4 4-6-6-3z" fill="#ffbe33" opacity="0.85" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_www">Strony WWW</span>
+          <h3 data-i18n="svc_graph_title">Projekty graficzne</h3>
+          <p data-i18n="svc_graph_text">Indywidualny projekt graficzny dopasowany do Twojej marki. Kilka wariantów do wyboru — jesteśmy otwarci na Twoje pomysły.</p>
+        </article>
+
+        <article class="card reveal" data-category="www">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 16l-8 8 8 8" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M32 16l8 8-8 8" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M27 10l-6 28" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_www">Strony WWW</span>
+          <h3 data-i18n="svc_tech_title">Nowoczesne technologie</h3>
+          <p data-i18n="svc_tech_text">Nowoczesny stack: HTML5, CSS3, JavaScript i sprawdzone frameworki. Tworzymy również szybkie strony oparte o WordPress.</p>
+        </article>
+
+        <article class="card reveal" data-category="www">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="12" cy="24" r="5" stroke="#ffbe33" stroke-width="2.5" />
+              <circle cx="34" cy="11" r="5" stroke="#ffbe33" stroke-width="2.5" />
+              <circle cx="34" cy="37" r="5" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M16.4 21.4l13.2-8M16.4 26.6l13.2 8" stroke="#ffbe33" stroke-width="2.5" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_www">Strony WWW</span>
+          <h3 data-i18n="svc_social_title">Social Media</h3>
+          <p data-i18n="svc_social_text">Integracja z Facebookiem, WhatsAppem i Instagramem oraz kilka sposobów osadzenia treści z YouTube — Twoja strona żyje razem z Twoimi kanałami.</p>
+        </article>
+
+        <!-- WEB -->
+        <article class="card reveal" data-category="web">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M24 5l17 6-2.7 24L24 43 9.7 35 7 11l17-6z" stroke="#ffbe33" stroke-width="2.5" stroke-linejoin="round" />
+              <path d="M24 13l8.5 19h-4l-1.8-4h-5.4l-1.8 4h-4L24 13zm0 8.5L21.8 25h4.4L24 21.5z" fill="#ffbe33" opacity="0.85" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_web">Aplikacje WEB</span>
+          <h3 data-i18n="svc_ergo_title">Ergonomia i estetyka</h3>
+          <p data-i18n="svc_ergo_text">Interfejsy budowane w Angularze z użyciem komponentów ng-zorro, Material i Bootstrap — spójne, dostępne i przyjemne w użyciu.</p>
+        </article>
+
+        <article class="card reveal" data-category="web">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M24 5l15 6v11c0 9.5-6.4 17.3-15 21-8.6-3.7-15-11.5-15-21V11l15-6z" stroke="#ffbe33" stroke-width="2.5" stroke-linejoin="round" />
+              <path d="M17 24l5 5 9-10" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_web">Aplikacje WEB</span>
+          <h3 data-i18n="svc_perf_title">Wydajność i bezpieczeństwo</h3>
+          <p data-i18n="svc_perf_text">Logika biznesowa w Javie i bezpieczna baza danych — wydajne, stabilne i skalowalne aplikacje.</p>
+        </article>
+
+        <article class="card reveal" data-category="web">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="14" cy="14" r="6" stroke="#ffbe33" stroke-width="2.5" />
+              <circle cx="34" cy="14" r="6" stroke="#ffbe33" stroke-width="2.5" />
+              <circle cx="24" cy="35" r="6" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M17 19l4 10M31 19l-4 10M20 14h8" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_web">Aplikacje WEB</span>
+          <h3 data-i18n="svc_biz_title">Wymagania biznesowe</h3>
+          <p data-i18n="svc_biz_text">100% zrozumienia wymagań dzięki warsztatom Event Storming, stałej komunikacji i wymianie doświadczeń.</p>
+        </article>
+
+        <!-- APEX -->
+        <article class="card reveal" data-category="apex">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="6" y="6" width="36" height="36" rx="4" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M14 32V22M22 32V16M30 32v-8M38 32H10" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="36" cy="14" r="3" fill="#ffbe33" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_apex">Aplikacje APEX</span>
+          <h3 data-i18n="svc_apex_title">Tworzenie aplikacji APEX</h3>
+          <p data-i18n="svc_apex_text">Szybka, prosta i tania aplikacja dla Twojej firmy — wystarczy nam Twój Excel, resztą zajmiemy się my.</p>
+        </article>
+
+        <!-- AI -->
+        <article class="card reveal" data-category="ai">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M24 6a10 10 0 00-10 10c-3.5 1.4-6 4.8-6 8.8A9.2 9.2 0 0017.2 34H18v6l6-4 6 4v-6h.8A9.2 9.2 0 0040 24.8c0-4-2.5-7.4-6-8.8A10 10 0 0024 6z" stroke="#ffbe33" stroke-width="2.5" stroke-linejoin="round" />
+              <circle cx="18.5" cy="22" r="2" fill="#ffbe33" />
+              <circle cx="29.5" cy="22" r="2" fill="#ffbe33" />
+              <path d="M19 28c1.4 1.2 3.1 1.8 5 1.8s3.6-.6 5-1.8" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_ai">Szkolenia i AI</span>
+          <h3 data-i18n="svc_ai_title">Szkolenia i wdrożenia AI</h3>
+          <p data-i18n="svc_ai_text">Nauczymy Twój zespół skutecznego promptowania i zautomatyzujemy powtarzalne procesy. Dedykowane prompty pod Twój biznes.</p>
+        </article>
+
+        <article class="card reveal" data-category="ai">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M24 5l15 6v11c0 9.5-6.4 17.3-15 21-8.6-3.7-15-11.5-15-21V11l15-6z" stroke="#ffbe33" stroke-width="2.5" stroke-linejoin="round" />
+              <rect x="18" y="21" width="12" height="10" rx="2" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M20 21v-3a4 4 0 018 0v3" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="24" cy="26" r="1.8" fill="#ffbe33" />
+            </svg>
+          </div>
+          <span class="card-tag" data-i18n="filter_ai">Szkolenia i AI</span>
+          <h3 data-i18n="svc_cyber_title">Szkolenia z cyberbezpieczeństwa</h3>
+          <p data-i18n="svc_cyber_text">Praktyczne warsztaty dla zespołów: rozpoznawanie phishingu, bezpieczne hasła i MFA, ochrona danych oraz bezpieczne korzystanie z narzędzi AI w firmie.</p>
+        </article>
+
+        <!-- NFC -->
+        <article class="card reveal" data-category="nfc">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="6" y="12" width="36" height="24" rx="4" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M6 20h14" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M30 20c2.2 1 3.5 2.4 3.5 4s-1.3 3-3.5 4M34.5 17c3.3 1.6 5.5 4.1 5.5 7s-2.2 5.4-5.5 7" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="13" cy="28" r="3" fill="#ffbe33" opacity="0.85" />
+            </svg>
+          </div>
+          <span class="card-tag">NFC</span>
+          <h3 data-i18n="svc_nfccard_title">Wizytówki NFC</h3>
+          <p data-i18n="svc_nfccard_text">Interaktywne wizytówki z tagiem NFC — jedno przyłożenie telefonu i klient trafia na Twoją stronę, PDF, prezentację lub wideo.</p>
+          <a href="nfc/index.html" class="card-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></a>
+        </article>
+
+        <article class="card reveal" data-category="nfc">
+          <div class="card-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="10" y="6" width="28" height="30" rx="3" stroke="#ffbe33" stroke-width="2.5" />
+              <path d="M16 14h16M16 20h16M16 26h9" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <path d="M24 36v6M17 42h14" stroke="#ffbe33" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="33" cy="29" r="2.5" fill="#ffbe33" />
+            </svg>
+          </div>
+          <span class="card-tag">NFC</span>
+          <h3 data-i18n="svc_nfcboard_title">Tablice i naklejki NFC</h3>
+          <p data-i18n="svc_nfcboard_text">Zawsze aktualne treści bez kosztów druku: regulaminy, przewodniki audio i wideo dla muzeów, urzędów, szkół i szlaków turystycznych.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOLOAVI spotlight ===== -->
+  <section class="holo-banner" id="holoavi" aria-label="HOLOAVI — hologramy i awatary AI">
+    <div class="container holo-banner-inner reveal">
+      <div class="holo-banner-text">
+        <p class="holo-wordmark" aria-hidden="true">HOLO<span>AVI</span></p>
+        <span class="holo-kicker" data-i18n="holo_kicker">Nasza marka hologramów i awatarów</span>
+        <h2 data-i18n="holo_title">Hologramy 1:1 i awatary AI, które sprzedają za Ciebie</h2>
+        <p class="holo-desc" data-i18n="holo_text">Przyciągnij tłum na targach hologramem w skali 1:1 albo powitaj klientów interaktywnym awatarem AI — w recepcji, showroomie i na stronie WWW. Sprzęt, montaż, obsługa i produkcja contentu w jednym pakiecie.</p>
+        <a href="https://holoavi.pl" target="_blank" rel="noopener noreferrer" class="btn btn-dark"><span data-i18n="holo_cta">Poznaj HOLOAVI</span> <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="holo-visual" aria-hidden="true">
+        <svg viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="110" cy="216" rx="86" ry="16" fill="none" stroke="#222831" stroke-width="3" />
+          <ellipse cx="110" cy="216" rx="52" ry="9" fill="#222831" opacity="0.12" />
+          <path d="M110 196c26 0 46-32 46-84S136 28 110 28 64 60 64 112s20 84 46 84z" fill="none" stroke="#222831" stroke-width="3" opacity="0.9" />
+          <path d="M67 76h86M67 148h86" stroke="#222831" stroke-width="2" opacity="0.45" />
+          <circle cx="110" cy="94" r="16" fill="none" stroke="#222831" stroke-width="3" />
+          <path d="M84 158c4-20 14-30 26-30s22 10 26 30" fill="none" stroke="#222831" stroke-width="3" stroke-linecap="round" />
+          <path d="M176 34l2.4 6 6 2.4-6 2.4-2.4 6-2.4-6-6-2.4 6-2.4 2.4-6z" fill="#222831" />
+          <path d="M44 18l1.8 4.5 4.5 1.8-4.5 1.8L44 30.6l-1.8-4.5-4.5-1.8 4.5-1.8L44 18z" fill="#222831" opacity="0.6" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Partner systems ===== -->
+  <section class="section section-dark" id="cooperation">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="section-kicker" data-i18n="coop_kicker">Strategiczne partnerstwo z Altar</span>
+        <h2 data-i18n="coop_header">Systemy współtworzone z Altar</h2>
+        <p data-i18n="coop_intro">Altar to nasz strategiczny partner technologiczny i lider rozwiązań contact center w Polsce. Od początku działalności współtworzymy systemy AI, które rewolucjonizują obsługę klienta w dużych organizacjach.</p>
+        <a class="coop-partner-badge" href="https://altar.com.pl" target="_blank" rel="noopener noreferrer">
+          <img src="images/client1.png" alt="Altar" loading="lazy" />
+          <span>altar.com.pl <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+      </div>
+
+      <div class="coop-grid">
+        <a class="coop-card reveal" href="https://altar.com.pl/ai-quality-management-to-twoj-sukces-w-kazdym-kontakcie-z-klientem/" target="_blank" rel="noopener noreferrer">
+          <div class="coop-img"><img src="images/aiqm.png" alt="AI Quality Management" loading="lazy" /></div>
+          <h3>AI Quality Management</h3>
+          <p data-i18n="coop1_text">Pełna, zautomatyzowana kontrola jakości contact center Twojej firmy — w każdej rozmowie, na każdym kanale.</p>
+          <span class="coop-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+        <a class="coop-card reveal" href="https://altar.com.pl/ai-contact-center/" target="_blank" rel="noopener noreferrer">
+          <div class="coop-img"><img src="images/aicc.png" alt="AI Contact Center" loading="lazy" /></div>
+          <h3>AI Contact Center</h3>
+          <p data-i18n="coop2_text">Wielokanałowa platforma contact center z obsługą procesową i mechanizmami AI do profesjonalnej obsługi klientów.</p>
+          <span class="coop-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+        <a class="coop-card reveal" href="https://altar.com.pl/ai-case-management/" target="_blank" rel="noopener noreferrer">
+          <div class="coop-img"><img src="images/aicm.png" alt="AI Case Management" loading="lazy" /></div>
+          <h3>AI Case Management</h3>
+          <p data-i18n="coop3_text">Nowoczesne narzędzie do obsługi spraw klienckich — Twój wirtualny partner w biznesie.</p>
+          <span class="coop-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+        <a class="coop-card reveal" href="https://altar.com.pl/produkty/ai-support-assistant/" target="_blank" rel="noopener noreferrer">
+          <div class="coop-img coop-img-cover"><img src="images/aisa.png" alt="AISA — Artificial Intelligence Support Assistant" loading="lazy" /></div>
+          <h3>AISA — AI Support Assistant</h3>
+          <p data-i18n="coop4_text">Inteligentny asystent AI oparty na wiedzy Twojej organizacji — bezpieczne odpowiedzi z firmowych dokumentów, modele lokalne lub chmurowe, otwarte API.</p>
+          <span class="coop-link"><span data-i18n="coop_more">Dowiedz się więcej</span> <i class="fa-solid fa-arrow-right"></i></span>
         </a>
       </div>
     </div>
   </section>
 
-  <section class="service_section layout_padding-bottom" id="cooperation">
+  <!-- ===== Clients ===== -->
+  <section class="section" id="klienci">
     <div class="container">
-      <div class="heading_container heading_center">
-        <h2>
-          Współtworzone systemy
-        </h2>
-        <p>
-          Od początku działalności firmy wspólnie z naszym kluczowym partnerem firmą Altar współtworzymy systemy
-          rewolucjonizujące obsługę klieta.
-        </p>
+      <div class="section-head reveal">
+        <span class="section-kicker" data-i18n="clients_kicker">Zaufali nam</span>
+        <h2 data-i18n="clients_header">Nasi klienci</h2>
       </div>
 
-      <div class="filters-content">
-        <div class="row grid">
-          <div class="col-sm-6 col-lg-4 all aiqm">
-            <div class="box">
-              <div>
-                <a href="https://altar.com.pl/ai-quality-management-to-twoj-sukces-w-kazdym-kontakcie-z-klientem/"
-                  style="text-decoration: none; color: inherit;" target="_blank" rel="noopener noreferrer">
-                  <div class="img-box">
-                    <img src="images/aiqm.png" alt="">
-                  </div>
-                  <div class="detail-box">
-                    <h5>
-                      AI Quality Management
-                    </h5>
-                    <p>
-                      To rewolucyjne narzędzie, które zapewnia pełną, zautomatyzowaną kontrolę jakości contact center
-                      Twojej firmy.
-                    </p>
-                    <div class="options">
-                    </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all aicc">
-            <div class="box">
-              <div>
-                <a href="https://altar.com.pl/ai-contact-center/" style="text-decoration: none; color: inherit;"
-                  target="_blank" rel="noopener noreferrer">
-                  <div class="img-box">
-                    <img src="images/aicc.png" alt="">
-                  </div>
-                  <div class="detail-box">
-                    <h5>
-                      AI Contact Center
-                    </h5>
-                    <p>
-                      Wielokanałowa platforma contact center z obsługą procesową i mechanizmami AI do profesjonalnej
-                      obsługi klientów.
-                    </p>
-                    <div class="options">
-                    </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-6 col-lg-4 all aicm">
-            <div class="box">
-              <div>
-                <a href="https://altar.com.pl/ai-case-management/" style="text-decoration: none; color: inherit;">
-                  <div class="img-box">
-                    <img src="images/aicm.png" alt="">
-                  </div>
-                  <div class="detail-box">
-                    <h5>
-                      AI Case Management
-                    </h5>
-                    <p>
-                      Rewolucyjne narzędzie do obsługi spraw klienckich, Twój nowy, wirtualny partner w biznesie!
-                    </p>
-                    <div class="options">
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-
-
-
-        </div>
+      <div class="clients-grid">
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/client1.png" alt="Altar" loading="lazy" /></div>
+          <h3>Firma Altar</h3>
+          <span class="client-tag" data-i18n="client1_tag">Producent oprogramowania</span>
+          <p data-i18n="client1_text">Usługi programistyczne w zakresie projektowania i rozwoju rozwiązań dla sektora Call Center.</p>
+        </article>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/pzb2.png" alt="Polski Związek Bokserski" loading="lazy" /></div>
+          <h3>Polski Związek Bokserski</h3>
+          <span class="client-tag" data-i18n="client2_tag">Organizacja sportowa</span>
+          <p data-i18n="client2_text">Aplikacje webowe i strony WWW, m.in. oficjalna strona Młodzieżowych Mistrzostw Świata.</p>
+        </article>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/piast.png" alt="Piast Chęciny" loading="lazy" /></div>
+          <h3>Piast Chęciny</h3>
+          <span class="client-tag" data-i18n="client3_tag">Klub sportowy</span>
+          <p data-i18n="client3_text">Nowoczesna strona WWW dla klubu sportowego Piast Chęciny.</p>
+        </article>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/fundacja.png" alt="Akademicka Fundacja Staropolska" loading="lazy" /></div>
+          <h3>Akademicka Fundacja Staropolska</h3>
+          <span class="client-tag" data-i18n="client4_tag">Szkoła wyższa</span>
+          <p data-i18n="client4_text">Projekt i wykonanie strony WWW wraz ze stronami powiązanych szkół i instytucji.</p>
+        </article>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/joanna.jpg" alt="Salon piękności Joanna Woźniczka" loading="lazy" /></div>
+          <h3>Salon piękności Joanna Woźniczka</h3>
+          <span class="client-tag" data-i18n="client5_tag">Beauty</span>
+          <p data-i18n="client5_text">Elegancka strona WWW z cennikiem i pełną ofertą usług salonu.</p>
+        </article>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/wixpol.png" alt="WIXPOL" loading="lazy" /></div>
+          <h3>WIXPOL</h3>
+          <span class="client-tag" data-i18n="client6_tag">Składy opału</span>
+          <p data-i18n="client6_text">Strona WWW z ofertą i danymi kontaktowymi dla składu opału WIXPOL.</p>
+        </article>
+        <a class="client-card client-card-link reveal" href="https://marmur.com.pl/" target="_blank" rel="noopener noreferrer">
+          <div class="client-logo"><img src="images/przywala.png" alt="Przywała Stones" loading="lazy" /></div>
+          <h3>Przywała Stones</h3>
+          <span class="client-tag" data-i18n="client7_tag">Kamieniarstwo</span>
+          <p data-i18n="client7_text">Strona WWW, produkcja contentu wideo na targi oraz wynajem hologramu do prezentacji oferty — blaty, schody i elementy z granitu i marmuru.</p>
+          <span class="client-visit">marmur.com.pl <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+        <a class="client-card client-card-link reveal" href="https://eventonyes.pl/" target="_blank" rel="noopener noreferrer">
+          <div class="client-logo"><img src="images/eventon.png" alt="EventOn" loading="lazy" /></div>
+          <h3>EventOn</h3>
+          <span class="client-tag" data-i18n="client8_tag">Eventy</span>
+          <p data-i18n="client8_text">Strona WWW dla firmy eventowej — dmuchane zjeżdżalnie, animacje i obsługa imprez plenerowych w całej Polsce.</p>
+          <span class="client-visit">eventonyes.pl <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+        <article class="client-card reveal">
+          <div class="client-logo"><img src="images/ziomax.png" alt="ZIO-MAX" loading="lazy" /></div>
+          <h3>ZIO-MAX</h3>
+          <span class="client-tag" data-i18n="client10_tag">Instalacje budowlane</span>
+          <p data-i18n="client10_text">Aplikacja do zarządzania magazynem oparta o technologię NFC — szybka inwentaryzacja i pełna kontrola stanów magazynowych.</p>
+        </article>
+        <a class="client-card client-card-link reveal" href="http://sptokarnia.szkolnastrona.pl/index.php?c=page&amp;id=231" target="_blank" rel="noopener noreferrer">
+          <div class="client-logo"><img src="images/sptokarnia.jpeg" alt="Szkoła Podstawowa im. J. Korczaka w Tokarni" loading="lazy" /></div>
+          <h3>SP im. J. Korczaka w Tokarni</h3>
+          <span class="client-tag" data-i18n="client9_tag">Edukacja</span>
+          <p data-i18n="client9_text">Materiały online dla Szkoły Podstawowej w Tokarni i Stowarzyszenia Korczakowskie Serca.</p>
+          <span class="client-visit">sptokarnia.szkolnastrona.pl <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
       </div>
     </div>
   </section>
 
-
-  <section class="client_section layout_padding-bottom" id="klienci">
-    <div class="container">
-      <div class="heading_container heading_center psudo_white_primary mb_45">
-        <h2>
-          Nasi klienci
-        </h2>
+  <!-- ===== Contact ===== -->
+  <section class="section section-dark" id="kontakt">
+    <div class="container contact-wrap">
+      <div class="section-head reveal">
+        <span class="section-kicker" data-i18n="contact_kicker">Kontakt</span>
+        <h2 data-i18n="contact_header">Skontaktuj się z nami!</h2>
+        <p data-i18n="contact_sub">Masz pomysł na stronę, aplikację albo chcesz wdrożyć AI? Napisz — odpowiemy najszybciej jak to możliwe.</p>
       </div>
-      <div class="carousel-wrap row ">
-        <div class="owl-carousel client_owl-carousel">
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Świadczymy usługi programistyczne dla firmy Altar w zakresie projektowania,rozwoju i tworzenia
-                  rozwiązań w sektorze Call Center.
-                </p>
-                <h6>
-                  Firma Altar
-                </h6>
-                <p>
-                  Producent oprogramowania
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/client1.png" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Dla Polskiego Związku Boskierskiego tworzymy aplikacje webowe oraz strony WWW, m.in stronę
-                  Młodzieżowych Mistrzostw Świata.
-                </p>
-                <h6>
-                  Polski Związek Bokserski
-                </h6>
-                <p>
-                  Organizacja sportowa
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/pzb2.png" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-
-
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Dla klubu sportowego Piast Chęciny stworzyliśmy stronę WWW.
-                </p>
-                <h6>
-                  Piast Chęciny
-                </h6>
-                <p>
-                  Klub sportowy
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/piast.png" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Projekt i wykonanie strony WWW wraz ze stronami powiązanych z Akademicką Fundacją Staropolską szkół
-                  oraz instytucji.
-                </p>
-                <h6>
-                  Akademicka Fundacja Staropolska
-                </h6>
-                <p>
-                  Szkoła wyższa
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/fundacja.png" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-
-
-
-
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Strona WWW dla salonu piękności Jonanna Woźniczka.
-                  Z cennikiem i zestawem usług.
-                </p>
-                <h6>
-                  Salon piękności Joanna Woźniczka
-                </h6>
-                <p>
-                  Beauty
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/joanna.jpg" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  Strona WWW dla salony piękności Jonanna Woźniczka.
-                  Z cennikiem i zestawem usług.
-                </p>
-                <h6>
-                  WIXPOL - skład opału
-                </h6>
-                <p>
-                  Składy opału
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="images/wixpol.png" alt="" class="box-img">
-              </div>
-            </div>
-          </div>
-
-
+      <form class="contact-form reveal" id="contact-form" novalidate>
+        <div class="form-row">
+          <input type="text" name="name" placeholder="Imię" aria-label="Imię" data-i18n-placeholder="form_name" required />
+          <input type="tel" name="phone" placeholder="Numer telefonu" aria-label="Numer telefonu" data-i18n-placeholder="form_phone" />
         </div>
-      </div>
+        <input type="email" name="email" placeholder="Adres e-mail" aria-label="Adres e-mail" data-i18n-placeholder="form_email" required />
+        <textarea name="message" rows="5" placeholder="Treść wiadomości" aria-label="Treść wiadomości" data-i18n-placeholder="form_message" required></textarea>
+        <button type="submit" class="btn btn-primary"><span data-i18n="form_send">Wyślij wiadomość</span> <i class="fa-solid fa-paper-plane"></i></button>
+        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 
-  <section class="book_section layout_padding" id="kontakt">
-    <div class="container">
-      <div class="heading_container">
-        <h2 id="kontakt_title">
-          Skontaktuj się z Nami !
-        </h2>
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <h4 data-i18n="footer_data">Nasze dane</h4>
+        <a href="tel:+48697022087"><i class="fa-solid fa-phone"></i> +48 697 022 087</a>
+        <a href="mailto:newadvanceapp@gmail.com"><i class="fa-solid fa-envelope"></i> newadvanceapp@gmail.com</a>
       </div>
-      <div class="row align-items-center">
-
-        <div class="col-md-6" id="form-column">
-          <div class="form_container">
-            <form action="">
-              <div>
-                <input type="text" class="form-control" placeholder="Imię" />
-              </div>
-              <div>
-                <input type="text" class="form-control" placeholder="Numer telefonu" />
-              </div>
-              <div>
-                <input type="email" class="form-control" placeholder="Adres Email" />
-              </div>
-              <div>
-                <input type="text" class="form-control" placeholder="Treść wiadomości" />
-              </div>
-              <div class="btn_box">
-                <button type="button">
-                  Wyślij wiadomość
-                </button>
-              </div>
-            </form>
-          </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer_social">Media społecznościowe</h4>
+        <p data-i18n="footer_social_text">Poznaj nas bliżej.</p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/newadvanceapps" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://www.linkedin.com/in/paweł-nowaczek-programista" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
         </div>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer_hours">Godziny otwarcia</h4>
+        <p data-i18n="footer_hours_text">Jesteśmy do Waszej dyspozycji, zawsze gdy tego potrzebujecie :)</p>
       </div>
     </div>
-  </section>
-
-  <footer class="footer_section">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 footer-col">
-          <div class="footer_contact">
-            <h4>
-              Nasze dane
-            </h4>
-            <div class="contact_link_box">
-              <a href="">
-                <i class="fa fa-phone" aria-hidden="true"></i>
-                <span>
-                  697 022 087
-                </span>
-              </a>
-              <a href="">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
-                <span>
-                  newadvanceapp@gmail.com
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 footer-col">
-          <div class="footer_detail">
-            <a href="" class="footer-logo">
-              Nasze media społecznościowe
-            </a>
-            <p>
-              Poznaj nas bliżej.
-            </p>
-            <div class="footer_social">
-              <a href="https://www.facebook.com/newadvanceapps">
-                <i class="fa fa-facebook" aria-hidden="true"></i>
-              </a>
-              <a href="www.linkedin.com/in/paweł-nowaczek-programista">
-                <i class="fa fa-linkedin" aria-hidden="true"></i>
-              </a>
-              <!--              <a href="">-->
-              <!--                <i class="fa fa-instagram" aria-hidden="true"></i>-->
-              <!--              </a>-->
-              <!--              <a href="">-->
-              <!--                <i class="fa fa-pinterest" aria-hidden="true"></i>-->
-              <!--              </a>-->
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 footer-col">
-          <h4>
-            Godziny otwarcia
-          </h4>
-          <p>
-            Jesteśmy do Waszej dyspozycji, zawsze gdy tego potrzebujecie :)
-          </p>
-        </div>
-      </div>
-      <div class="footer-info">
-        <p>
-          <span id="displayYear"></span>
-        </p>
-      </div>
+    <div class="footer-bottom">
+      <p>&copy; <span id="displayYear"></span> New Advance APP &middot; naapp.pl</p>
     </div>
   </footer>
-  <!-- footer section -->
 
-  <!-- jQery -->
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <!-- popper js -->
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
-    </script>
-  <!-- bootstrap js -->
-  <script src="js/bootstrap.js"></script>
-  <!-- owl slider -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
-  </script>
-  <!-- isotope js -->
-  <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
-  <!-- nice select -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
   <!-- custom js -->
   <script src="js/custom.js"></script>
   <!-- translation js -->
   <script src="js/translation.js"></script>
+
   <!-- Messenger Wtyczka czatu Code -->
   <div id="fb-root"></div>
 

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specyfikacja Techniczna – Strona Internetowa ZMiGRS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-size: 10.5pt;
+            color: #1a1a2e;
+            background: #ffffff;
+            line-height: 1.65;
+        }
+
+        @media print {
+            body { font-size: 10pt; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+            section { page-break-inside: avoid; }
+        }
+
+        /* ── Layout ── */
+        .document {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 50px 60px;
+        }
+
+        /* ── Cover header ── */
+        .cover {
+            border-bottom: 3px solid #0f3460;
+            padding-bottom: 30px;
+            margin-bottom: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+        }
+
+        .cover-title h1 {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .cover-title p {
+            font-size: 11pt;
+            color: #444;
+            font-weight: 300;
+        }
+
+        .cover-meta {
+            text-align: right;
+            font-size: 9pt;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .cover-meta strong {
+            display: block;
+            color: #0f3460;
+            font-size: 10pt;
+        }
+
+        /* ── Section headings ── */
+        section {
+            margin-bottom: 32px;
+        }
+
+        .section-heading {
+            font-size: 13pt;
+            font-weight: 700;
+            color: #0f3460;
+            border-left: 4px solid #0f3460;
+            padding-left: 10px;
+            margin-bottom: 14px;
+            letter-spacing: 0.01em;
+        }
+
+        .sub-heading {
+            font-size: 10.5pt;
+            font-weight: 600;
+            color: #16213e;
+            margin-top: 16px;
+            margin-bottom: 6px;
+        }
+
+        /* ── Paragraphs ── */
+        p { margin-bottom: 8px; }
+
+        /* ── Tables ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-size: 10pt;
+        }
+
+        th {
+            background: #0f3460;
+            color: white;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 9.5pt;
+        }
+
+        td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #dde3ee;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) td { background: #f4f6fb; }
+
+        /* ── Lists ── */
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        li { margin-bottom: 4px; }
+
+        /* ── Highlight boxes ── */
+        .box {
+            background: #eef2f9;
+            border-left: 4px solid #0f3460;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin: 12px 0;
+            font-size: 10pt;
+        }
+
+        .box.green  { background: #edf7f0; border-left-color: #2d7a4f; }
+        .box.orange { background: #fdf6ec; border-left-color: #c97a2a; }
+
+        /* ── Badge ── */
+        .badge {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            font-size: 8pt;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 30px;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        .badge.green  { background: #2d7a4f; }
+        .badge.orange { background: #c97a2a; }
+
+        /* ── Footer ── */
+        .doc-footer {
+            margin-top: 50px;
+            border-top: 1px solid #ccd3e0;
+            padding-top: 14px;
+            font-size: 8.5pt;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ── Print button ── */
+        .print-btn {
+            display: block;
+            margin: 0 auto 30px;
+            padding: 10px 30px;
+            background: #0f3460;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .print-btn:hover { background: #16213e; }
+    </style>
+</head>
+<body>
+
+<div class="document">
+
+    <!-- PRINT BUTTON (nie drukuje się) -->
+    <div class="no-print" style="text-align:center; margin-bottom:20px;">
+        <button class="print-btn" onclick="window.print()">Drukuj / Eksportuj do PDF</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         NAGŁÓWEK DOKUMENTU
+    ══════════════════════════════════════════════════ -->
+    <div class="cover">
+        <div class="cover-title">
+            <h1>Specyfikacja Techniczna<br>Strony Internetowej</h1>
+            <p>Związek Miast i Gmin Regionu Świętokrzyskiego</p>
+        </div>
+        <div class="cover-meta">
+            <strong>NAAPP New Advance APP</strong>
+            naapp.pl
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         1. WPROWADZENIE
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">1. Wprowadzenie i zakres dokumentu</h2>
+        <p>
+            Niniejszy dokument stanowi specyfikację techniczną do oferty na wykonanie i wdrożenie strony
+            internetowej dla Stowarzyszenia <strong>Związek Miast i Gmin Regionu Świętokrzyskiego</strong>
+            (ZMiGRS). Opisuje zastosowaną architekturę, stos technologiczny, model bezpieczeństwa
+            oraz przyjęte standardy jakości i dostępności.
+        </p>
+        <p>
+            Dokument przeznaczony jest dla osób decyzyjnych oraz specjalistów IT po stronie
+            Zamawiającego i obejmuje zarówno warstwę frontendową (interfejs użytkownika), jak
+            i integrację z systemem bazodanowym oraz usługami zewnętrznymi.
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         2. ARCHITEKTURA SYSTEMU
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">2. Architektura systemu</h2>
+
+        <h3 class="sub-heading">2.1 Model ogólny</h3>
+        <p>
+            Serwis internetowy oparty jest na architekturze <strong>Jamstack</strong> (static-first SPA –
+            Single Page Application). Podejście to polega na oddzieleniu warstwy prezentacji
+            (HTML/CSS/JavaScript) od warstwy danych (REST API), co przynosi wymierne korzyści
+            w zakresie bezpieczeństwa, wydajności i utrzymania.
+        </p>
+
+        <div class="box">
+            <strong>Kluczowa cecha architektury:</strong> brak serwera aplikacyjnego po stronie
+            frontendu. Strona internetowa to zbiór statycznych plików serwowanych przez serwer HTTP –
+            nie ma możliwości ataku na interpreter, bazy danych czy logikę serwerową poprzez
+            interfejs użytkownika.
+        </div>
+
+        <h3 class="sub-heading">2.2 Warstwy systemu</h3>
+        <table>
+            <tr>
+                <th>Warstwa</th>
+                <th>Technologia</th>
+                <th>Lokalizacja</th>
+            </tr>
+            <tr>
+                <td>Interfejs użytkownika (frontend)</td>
+                <td>HTML5, CSS3, JavaScript (ES2022+)</td>
+                <td>Serwer WWW (pliki statyczne)</td>
+            </tr>
+            <tr>
+                <td>Galeria multimediów</td>
+                <td>PhotoSwipe 5.3.7 (ESM)</td>
+                <td>CDN jsDelivr (cdn.jsdelivr.net)</td>
+            </tr>
+            <tr>
+                <td>Warstwa danych (backend)</td>
+                <td>Oracle APEX REST API (ORDS)</td>
+                <td>Zewnętrzny serwer Oracle (HTTPS)</td>
+            </tr>
+            <tr>
+                <td>Przechowywanie plików / galerii</td>
+                <td>Google Drive (lh3.googleusercontent.com)</td>
+                <td>Usługa chmurowa Google</td>
+            </tr>
+            <tr>
+                <td>Mapa lokalizacji</td>
+                <td>Google Maps Embed API</td>
+                <td>Usługa chmurowa Google</td>
+            </tr>
+        </table>
+
+        <h3 class="sub-heading">2.3 Nawigacja i routing</h3>
+        <p>
+            Serwis realizuje nawigację po stronie klienta (client-side routing) bez przeładowań
+            strony. Funkcja <code>showPage()</code> zarządza widocznością sekcji DOM, co eliminuje
+            zbędne żądania HTTP i zapewnia natychmiastowe przejścia między zakładkami. Wszystkie
+            zasoby niezbędne do wyświetlenia każdej sekcji są wczytywane przy pierwszym otwarciu
+            strony.
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         3. STOS TECHNOLOGICZNY
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">3. Stos technologiczny</h2>
+
+        <h3 class="sub-heading">3.1 Frontend – technologie podstawowe</h3>
+        <table>
+            <tr>
+                <th>Komponent</th>
+                <th>Standard / Wersja</th>
+                <th>Uwagi</th>
+            </tr>
+            <tr>
+                <td>Język znaczników</td>
+                <td>HTML5 (Living Standard)</td>
+                <td>Semantyczny markup, atrybuty dostępności</td>
+            </tr>
+            <tr>
+                <td>Arkusze stylów</td>
+                <td>CSS3 (W3C)</td>
+                <td>Własne – brak zależności od frameworków CSS</td>
+            </tr>
+            <tr>
+                <td>Logika klienta</td>
+                <td>Vanilla JavaScript ES2022+</td>
+                <td>Brak zewnętrznych frameworków (React, Vue itp.)</td>
+            </tr>
+            <tr>
+                <td>Czcionki systemowe</td>
+                <td>Segoe UI, Tahoma, Verdana (stack)</td>
+                <td>Bez zewnętrznych żądań do Google Fonts</td>
+            </tr>
+            <tr>
+                <td>Moduły JS</td>
+                <td>ES Modules (type="module")</td>
+                <td>Natywne wsparcie przeglądarek, bez bundlera</td>
+            </tr>
+        </table>
+
+        <h3 class="sub-heading">3.2 Biblioteki zewnętrzne</h3>
+        <table>
+            <tr>
+                <th>Biblioteka</th>
+                <th>Wersja</th>
+                <th>Przeznaczenie</th>
+                <th>Źródło</th>
+            </tr>
+            <tr>
+                <td>PhotoSwipe</td>
+                <td>5.3.7</td>
+                <td>Interaktywna galeria zdjęć w artykułach</td>
+                <td>jsDelivr CDN (SRI-weryfikowalny)</td>
+            </tr>
+        </table>
+
+        <div class="box orange">
+            <strong>Minimalizm zależności:</strong> serwis celowo nie korzysta z żadnego frameworka
+            JavaScript (Angular, React, Vue, jQuery itp.). Oznacza to brak całych klas luk
+            bezpieczeństwa związanych z łańcuchem dostaw oprogramowania (supply chain attacks)
+            oraz brak konieczności regularnego aktualizowania dziesiątek pakietów npm.
+        </div>
+
+        <h3 class="sub-heading">3.3 Integracja z Oracle APEX REST API (ORDS)</h3>
+        <p>
+            Dane dynamiczne (aktualności, uchwały, sprawozdania, załączniki) pobierane są
+            asynchronicznie z REST API opartego na Oracle REST Data Services (ORDS),
+            wchodzącego w skład platformy Oracle APEX. Komunikacja odbywa się wyłącznie
+            metodą <code>GET</code> za pośrednictwem protokołu HTTPS z szyfrowanym połączeniem TLS.
+        </p>
+        <p>
+            Obsługiwane endpointy REST:
+        </p>
+        <ul>
+            <li><code>/api/articles</code> – lista aktualności</li>
+            <li><code>/api/article/{id}</code> – pełna treść artykułu</li>
+            <li><code>/api/resolutions</code> – lista uchwał</li>
+            <li><code>/api/reports</code> – lista sprawozdań</li>
+            <li><code>/api/attachments/{type}/{id}</code> – wykaz załączników do pozycji</li>
+            <li><code>/api/attachments/{type}/file/{fileId}</code> – pobranie pliku</li>
+        </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         4. BEZPIECZEŃSTWO
+    ══════════════════════════════════════════════════ -->
+    <section class="page-break">
+        <h2 class="section-heading">4. Bezpieczeństwo</h2>
+
+        <h3 class="sub-heading">4.1 Brak serwerowej powierzchni ataku po stronie frontendu</h3>
+        <p>
+            Strona internetowa składa się wyłącznie ze statycznych plików (HTML, CSS, JS, grafiki).
+            Na serwerze WWW nie działa żaden interpreter skryptów serwerowych (PHP, Python, Node.js
+            itp.), baza danych ani silnik szablonów. W związku z tym wyeliminowane są całe klasy
+            podatności, m.in.:
+        </p>
+        <ul>
+            <li>SQL Injection (brak warstwy serwerowej z dostępem do bazy danych od strony frontendu)</li>
+            <li>Remote Code Execution przez interpretator serwerowy</li>
+            <li>Server-Side Request Forgery (SSRF)</li>
+            <li>Ataki na sesję serwerową (brak cookies sesyjnych / mechanizmu logowania publicznego)</li>
+        </ul>
+
+        <h3 class="sub-heading">4.2 Komunikacja sieciowa – HTTPS / TLS</h3>
+        <p>
+            Całość komunikacji między przeglądarką użytkownika a serwisem oraz serwisem
+            a zewnętrznymi API odbywa się wyłącznie z użyciem protokołu HTTPS (TLS 1.2 / TLS 1.3).
+            Zapewnia to:
+        </p>
+        <ul>
+            <li>Poufność danych w transmisji (szyfrowanie end-to-end)</li>
+            <li>Integralność przesyłanych treści (ochrona przed modyfikacją w ruchu)</li>
+            <li>Uwierzytelnienie serwera (certyfikat SSL/TLS)</li>
+        </ul>
+
+        <h3 class="sub-heading">4.3 Ochrona przed Cross-Site Scripting (XSS)</h3>
+        <p>
+            W miejscach, gdzie treści z API są wstawiane do DOM (aktualności, uchwały,
+            sprawozdania), stosowane są bezpieczne metody przypisania właściwości elementów DOM
+            (<code>element.textContent</code>, <code>element.title</code>, atrybuty danych)
+            zamiast bezpośredniego wstawiania surowego HTML. Tam gdzie wymagane jest użycie
+            <code>innerHTML</code> (np. treść artykułu pobrana z zaufanego API), dane pochodzą
+            z kontrolowanego backendu Oracle APEX.
+        </p>
+
+        <h3 class="sub-heading">4.4 Zarządzanie załącznikami i plikami</h3>
+        <p>
+            Pliki do pobrania (uchwały, sprawozdania, dokumenty statutowe) są przechowywane
+            po stronie backendu lub w dedykowanej usłudze chmurowej Google Drive. Strona
+            internetowa nie obsługuje przesyłania plików przez użytkowników – brak możliwości
+            wykonania ataku typu <em>malicious file upload</em>.
+        </p>
+
+        <h3 class="sub-heading">4.5 Polityka żądań zewnętrznych (referrer policy)</h3>
+        <p>
+            Osadzona mapa Google Maps posiada ustawiony atrybut
+            <code>referrerpolicy="no-referrer-when-downgrade"</code> zgodnie z rekomendacją W3C,
+            ograniczając zakres informacji o URL przekazywanych do zewnętrznych usług.
+        </p>
+
+        <h3 class="sub-heading">4.6 Brak persistencji danych po stronie klienta</h3>
+        <p>
+            Aplikacja nie korzysta z <code>localStorage</code>, <code>sessionStorage</code>,
+            IndexedDB ani plików cookies do przechowywania danych użytkownika. Brak mechanizmu
+            logowania dla użytkowników publicznych eliminuje ryzyko kradzieży sesji
+            (session hijacking).
+        </p>
+
+        <div class="box green">
+            <strong>Podsumowanie profilu ryzyka:</strong> zastosowana architektura static-first SPA
+            z REST API w modelu tylko-do-odczytu (read-only dla użytkowników publicznych) minimalizuje
+            powierzchnię ataku do minimum możliwego dla serwisu internetowego prezentującego
+            informacje publiczne.
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         5. WYDAJNOŚĆ
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">5. Wydajność i optymalizacja</h2>
+
+        <h3 class="sub-heading">5.1 Ładowanie zasobów</h3>
+        <p>
+            Strona ładuje się jako pojedynczy dokument HTML. Brak konieczności wczytywania
+            ciężkich frameworków JavaScript (plik <code>script.js</code> obsługuje całą logikę
+            aplikacji). Czas do pierwszej interakcji (Time to Interactive) jest zatem bardzo krótki.
+        </p>
+        <ul>
+            <li>Obrazy w galeriach ładowane z atrybutem <code>loading="lazy"</code> (natywne lazy loading)</li>
+            <li>PhotoSwipe ładowany dynamicznie jako moduł ES (import on demand) – tylko gdy użytkownik otwiera artykuł z galerią</li>
+            <li>Czcionki systemowe – zero zewnętrznych żądań do serwerów czcionek</li>
+            <li>Brak pakietyzacji npm/webpack – brak bloatware zależności</li>
+        </ul>
+
+        <h3 class="sub-heading">5.2 Sieć CDN dla zasobów zewnętrznych</h3>
+        <p>
+            Biblioteka PhotoSwipe serwowana jest z sieci CDN jsDelivr – jednej z największych
+            i najbardziej wydajnych sieci dystrybucji treści open-source, z węzłami w Polsce
+            i po całej Europie. Zapewnia to niskie opóźnienia i wysoką dostępność bez
+            obciążania własnego serwera.
+        </p>
+
+        <h3 class="sub-heading">5.3 Responsywność (RWD)</h3>
+        <p>
+            Interfejs jest w pełni responsywny i dostosowany do wszystkich rozdzielczości ekranu:
+        </p>
+        <table>
+            <tr>
+                <th>Breakpoint</th>
+                <th>Układ</th>
+            </tr>
+            <tr>
+                <td>Desktop (≥ 1024px)</td>
+                <td>Siatka 3-kolumnowa, nawigacja pozioma, mapa 500px</td>
+            </tr>
+            <tr>
+                <td>Tablet (768px – 1024px)</td>
+                <td>Siatka 2-kolumnowa dla zarządu</td>
+            </tr>
+            <tr>
+                <td>Mobile (&lt; 768px)</td>
+                <td>Układ jednkolumnowy, nawigacja 2×4, mapa 350px</td>
+            </tr>
+        </table>
+        <p style="margin-top:8px;">
+            Wdrożone media queries CSS zapewniają poprawne działanie na urządzeniach mobilnych,
+            tabletach i komputerach stacjonarnych bez konieczności instalowania dedykowanych
+            aplikacji mobilnych.
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         6. DOSTĘPNOŚĆ
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">6. Dostępność (Accessibility)</h2>
+        <p>
+            Projekt uwzględnia wytyczne WCAG 2.1 (Web Content Accessibility Guidelines) na
+            poziomie AA:
+        </p>
+        <ul>
+            <li>Obrazy posiadają atrybuty <code>alt</code> z opisami tekstowymi</li>
+            <li>Elementy interaktywne (przyciski, linki) posiadają atrybuty <code>title</code></li>
+            <li>Struktura nagłówkowa (<code>h1</code>–<code>h4</code>) jest hierarchiczna i semantyczna</li>
+            <li>Kontrast kolorów tekstu na tle spełnia wymagania WCAG 2.1 AA (stosunek ≥ 4,5:1)</li>
+            <li>Strona jest operowalna za pomocą klawiatury (focus management na elementach nawigacji)</li>
+            <li>Formularz kontaktowy posiada etykiety <code>&lt;label&gt;</code> powiązane z polami</li>
+            <li>Język dokumentu zadeklarowany jako <code>lang="pl"</code> (wsparcie czytników ekranu)</li>
+        </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         7. ZAWARTOŚĆ MERYTORYCZNA
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">7. Struktura i zawartość serwisu</h2>
+        <p>Serwis składa się z następujących sekcji dostępnych z poziomu jednej nawigacji:</p>
+        <table>
+            <tr>
+                <th>Sekcja</th>
+                <th>Źródło danych</th>
+                <th>Charakter treści</th>
+            </tr>
+            <tr>
+                <td>Związek (strona główna)</td>
+                <td>Statyczny HTML</td>
+                <td>Opis organizacji, statystyki kluczowe</td>
+            </tr>
+            <tr>
+                <td>Władze</td>
+                <td>Statyczny HTML</td>
+                <td>Zarząd (14 osób) + Komisja Rewizyjna (3 osoby)</td>
+            </tr>
+            <tr>
+                <td>Aktualności</td>
+                <td>Oracle APEX REST API</td>
+                <td>Artykuły z galerią zdjęć i datą publikacji</td>
+            </tr>
+            <tr>
+                <td>Członkowie</td>
+                <td>Statyczne tablice JS</td>
+                <td>99 gmin (linki do stron samorządowych)</td>
+            </tr>
+            <tr>
+                <td>Statut</td>
+                <td>Statyczny HTML + pliki</td>
+                <td>Treść wstępu i dokumenty do pobrania (.docx, .png)</td>
+            </tr>
+            <tr>
+                <td>Uchwały</td>
+                <td>Oracle APEX REST API</td>
+                <td>Lista uchwał z datami i załącznikami</td>
+            </tr>
+            <tr>
+                <td>Sprawozdania</td>
+                <td>Oracle APEX REST API</td>
+                <td>Lista sprawozdań z datami i załącznikami</td>
+            </tr>
+            <tr>
+                <td>Kontakt</td>
+                <td>Statyczny HTML</td>
+                <td>Dane kontaktowe, formularz, mapa Google Maps</td>
+            </tr>
+        </table>
+
+        <h3 class="sub-heading">7.1 System załączników</h3>
+        <p>
+            Uchwały i sprawozdania obsługują dynamiczne pobieranie załączników poprzez modal
+            okienkowy. System odpytuje API o listę plików powiązanych z daną pozycją
+            i prezentuje użytkownikowi nazwę, datę oraz przycisk pobrania dla każdego pliku.
+            Pobieranie odbywa się poprzez przekierowanie do bezpośredniego URL zasobu –
+            bez buforowania pliku w przeglądarce i bez ekspozycji tokenów autoryzacyjnych
+            po stronie klienta.
+        </p>
+
+        <h3 class="sub-heading">7.2 Panel administracyjny</h3>
+        <p>
+            Do zarządzania treścią (artykuły, uchwały, sprawozdania) dostarczony zostanie
+            dedykowany panel (<code>add_edit_article.html</code>) umożliwiający dodawanie
+            i edycję wpisów bez ingerencji w kod źródłowy strony. Panel komunikuje się
+            z tym samym Oracle APEX REST API z rozszerzonymi uprawnieniami zapisu.
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         8. KOMPATYBILNOŚĆ
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">8. Kompatybilność z przeglądarkami</h2>
+        <p>
+            Serwis korzysta wyłącznie z natywnych API przeglądarek dostępnych bez polyfilli
+            w każdej nowoczesnej przeglądarce. Minimalne wspierane wersje:
+        </p>
+        <table>
+            <tr>
+                <th>Przeglądarka</th>
+                <th>Minimalna wersja</th>
+            </tr>
+            <tr>
+                <td>Google Chrome</td>
+                <td>≥ 90</td>
+            </tr>
+            <tr>
+                <td>Mozilla Firefox</td>
+                <td>≥ 90</td>
+            </tr>
+            <tr>
+                <td>Microsoft Edge</td>
+                <td>≥ 90</td>
+            </tr>
+            <tr>
+                <td>Apple Safari</td>
+                <td>≥ 14</td>
+            </tr>
+            <tr>
+                <td>Przeglądarki mobilne (Chrome/Safari iOS)</td>
+                <td>≥ 2021</td>
+            </tr>
+        </table>
+        <p style="margin-top:8px;">
+            Zastosowanie ES Modules (natywne) oraz CSS Grid/Flexbox (powszechne wsparcie od 2018)
+            gwarantuje poprawne działanie na ponad 98% urządzeń używanych przez polskich
+            internautów według danych StatCounter (2024).
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         9. UTRZYMANIE I AKTUALIZACJE
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">9. Utrzymanie i aktualizacje</h2>
+
+        <h3 class="sub-heading">9.1 Niski koszt utrzymania</h3>
+        <p>
+            Brak zależności od frameworków JavaScript oraz menedżera pakietów (npm) oznacza
+            brak konieczności regularnego aktualizowania dziesiątek pakietów. Jedyna biblioteka
+            zewnętrzna (PhotoSwipe) jest dostarczana w pinned wersji z CDN i nie wymaga
+            ingerencji w kod przy braku znanych podatności.
+        </p>
+
+        <h3 class="sub-heading">9.2 Aktualizacja treści</h3>
+        <p>
+            Treści dynamiczne (aktualności, uchwały, sprawozdania) zarządzane są wyłącznie
+            przez panel administracyjny zintegrowany z bazą Oracle APEX – bez potrzeby
+            dostępu do kodu źródłowego strony. Treści statyczne (władze, członkowie, statut)
+            wymagają jednokrotnej interwencji programistycznej przy zmianie stanu faktycznego
+            (np. zmiana składu zarządu po wyborach).
+        </p>
+
+        <h3 class="sub-heading">9.3 Monitoring i dostępność</h3>
+        <p>
+            Dostępność serwisu zależy od dostępności serwera WWW (hostingu) oraz Oracle APEX API.
+            Zalecane jest wdrożenie monitoringu HTTP (np. UptimeRobot lub Pingdom) z alertami
+            e-mail/SMS dla administratorów. Statyczna warstwa frontendowa jest odporna na awarie
+            backendu – użytkownik zobaczy stronę z komunikatem o braku danych zamiast błędu
+            serwera.
+        </p>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         10. PODSUMOWANIE
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">10. Podsumowanie techniczne</h2>
+        <table>
+            <tr>
+                <th>Kryterium</th>
+                <th>Ocena</th>
+                <th>Uzasadnienie</th>
+            </tr>
+            <tr>
+                <td>Bezpieczeństwo</td>
+                <td><span class="badge green">Wysokie</span></td>
+                <td>Architektura static-first, brak serwera aplikacyjnego, HTTPS, read-only API</td>
+            </tr>
+            <tr>
+                <td>Wydajność</td>
+                <td><span class="badge green">Wysoka</span></td>
+                <td>Minimalne zależności, lazy loading, brak bundlera, CDN</td>
+            </tr>
+            <tr>
+                <td>Responsywność</td>
+                <td><span class="badge green">Pełna (RWD)</span></td>
+                <td>Obsługa mobile/tablet/desktop z CSS media queries</td>
+            </tr>
+            <tr>
+                <td>Dostępność</td>
+                <td><span class="badge">WCAG 2.1 AA</span></td>
+                <td>Semantyczny HTML, alt, label, lang, kontrast</td>
+            </tr>
+            <tr>
+                <td>Koszt utrzymania</td>
+                <td><span class="badge green">Niski</span></td>
+                <td>Brak npm/frameworków, panel CMS do treści dynamicznych</td>
+            </tr>
+            <tr>
+                <td>Kompatybilność</td>
+                <td><span class="badge green">≥ 98% urządzeń</span></td>
+                <td>Natywne API przeglądarek, ES Modules, CSS Grid</td>
+            </tr>
+            <tr>
+                <td>Skalowalność</td>
+                <td><span class="badge">Dobra</span></td>
+                <td>Backend Oracle APEX skaluje się niezależnie od frontendu</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         11. WYCENA
+    ══════════════════════════════════════════════════ -->
+    <section class="page-break">
+        <h2 class="section-heading">11. Wycena realizacji</h2>
+        <p>
+            Poniższa tabela przedstawia szczegółową wycenę poszczególnych elementów składowych
+            strony internetowej ZMiGRS. Ceny wyrażone są w wartościach netto (PLN).
+        </p>
+
+        <table style="margin-top:16px;">
+            <tr>
+                <th style="width:40px;">#</th>
+                <th>Element / Zakres prac</th>
+                <th>Opis</th>
+                <th style="text-align:right; white-space:nowrap;">Cena netto</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Analiza wymagań i projekt UX</td>
+                <td>Ustalenie struktury informacyjnej, mapowanie sekcji, makieta nawigacji SPA</td>
+                <td style="text-align:right; white-space:nowrap;">300,00 zł</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Projekt graficzny interfejsu</td>
+                <td>Opracowanie koncepcji wizualnej (glass morphism), dobór palety barw, typografii i layoutu responsywnego</td>
+                <td style="text-align:right; white-space:nowrap;">500,00 zł</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Implementacja frontendu (HTML/CSS/JS)</td>
+                <td>Kodowanie wszystkich 8 sekcji serwisu, nawigacja SPA, animacje, efekt parallax, ripple, toast</td>
+                <td style="text-align:right; white-space:nowrap;">1 100,00 zł</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Responsywność (RWD)</td>
+                <td>Dostosowanie layoutu do urządzeń mobilnych, tabletów i desktopów (3 breakpointy)</td>
+                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Integracja z Oracle APEX REST API</td>
+                <td>Podłączenie 6 endpointów (aktualności, artykuły, uchwały, sprawozdania, załączniki), obsługa błędów, formatowanie dat PL</td>
+                <td style="text-align:right; white-space:nowrap;">700,00 zł</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Galeria zdjęć (PhotoSwipe)</td>
+                <td>Integracja biblioteki PhotoSwipe 5, lazy loading obrazów z Google Drive, scrollowalny podgląd w artykule</td>
+                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>System załączników (modal)</td>
+                <td>Dynamiczne okno pobierania plików dla uchwał i sprawozdań z listy API</td>
+                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Panel administracyjny</td>
+                <td>Formularz dodawania i edycji artykułów / uchwał / sprawozdań z obsługą przesyłania załączników</td>
+                <td style="text-align:right; white-space:nowrap;">400,00 zł</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Testy, wdrożenie i dokumentacja</td>
+                <td>Testy cross-browser, walidacja HTML/CSS (W3C), wdrożenie na serwer docelowy, niniejsza specyfikacja techniczna</td>
+                <td style="text-align:right; white-space:nowrap;">400,00 zł</td>
+            </tr>
+            <tr style="background:#0f3460; color:white;">
+                <td colspan="3" style="font-weight:700; font-size:11pt; color:white;">RAZEM NETTO</td>
+                <td style="text-align:right; font-weight:700; font-size:13pt; color:white; white-space:nowrap;">4 000,00 zł</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="color:#555; font-size:9.5pt;">VAT (23%)</td>
+                <td style="text-align:right; color:#555; font-size:9.5pt; white-space:nowrap;">920,00 zł</td>
+            </tr>
+            <tr style="background:#eef2f9;">
+                <td colspan="3" style="font-weight:700;">RAZEM BRUTTO</td>
+                <td style="text-align:right; font-weight:700; white-space:nowrap;">4 920,00 zł</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         STOPKA
+    ══════════════════════════════════════════════════ -->
+    <div class="doc-footer">
+        <span>NAAPP New Advance APP &bull; naapp.pl</span>
+        <span>Dokument poufny – przeznaczony wyłącznie dla Zamawiającego</span>
+    </div>
+
+</div>
+</body>
+</html>
