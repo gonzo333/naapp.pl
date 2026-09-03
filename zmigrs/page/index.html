@@ -557,7 +557,9 @@
                     </div>
                     <div class="contact-form glass">
                         <h2>Napisz do nas:</h2>
-                        <form>
+                        <form id="contact-form">
+                            <input type="text" name="b_website" id="b_website" style="display:none !important;"
+                                tabindex="-1" autocomplete="off" />
                             <div class="form-group">
                                 <label for="name">Imie i nazwisko</label>
                                 <input type="text" id="name" name="name" placeholder="Anna Nowak" required />
@@ -621,6 +623,7 @@
             </footer>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.4/purify.min.js"></script>
     <script src="script.js"></script>
     <script type="module" src="lightbox.js"></script>
 </body>

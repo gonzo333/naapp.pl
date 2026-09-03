@@ -80,15 +80,42 @@
             dialogsInBody: true
         });
 
-        document.querySelector('.button-save').addEventListener('click', () => {
+        // Paste the same Google Apps Script URL here
+        const api_url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+        document.querySelector('.button-save').addEventListener('click', async (e) => {
+            e.preventDefault();
+
             // Grab values from the form
             const title = document.getElementById('title').value || 'Bez tytułu';
             const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
             const description = document.getElementById('description').value || '';
             const author = document.getElementById('author').value || '';
-            const content = document.getElementById('editor').value || '';
+            const content = $('#editor').summernote('code') || document.getElementById('editor').value || '';
 
-            // Construct the HTML content
+            // Send directly to Google Sheets if URL is configured
+            if (api_url && !api_url.includes('YOUR_SCRIPT_ID')) {
+                try {
+                    await fetch(api_url, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'addArticle',
+                            name: title,
+                            publication_date: date,
+                            description: description,
+                            author: author,
+                            content: content
+                        })
+                    });
+                    alert('Artykuł został pomyślnie dodany do Arkusza Google!');
+                } catch (err) {
+                    console.error('Błąd zapisu do Arkusza Google:', err);
+                }
+            }
+
+            // Construct the HTML content for local backup download
             const htmlContent = `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -120,10 +147,8 @@
             a.href = url;
             a.download = `${title.replace(/\s+/g, '_')}.html`;
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         });
-
     </script>
 </body>
 
