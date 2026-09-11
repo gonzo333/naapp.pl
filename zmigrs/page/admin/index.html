@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Redaktora</title>
+    <link rel="stylesheet" href="../style.css">
+    <!-- Google Identity Services client library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+
+    <!-- Authentication gate: visible prior to successful sign-in -->
+    <div id="login-gate" class="container glass"
+        style="max-width: 450px; margin: 100px auto; padding: 30px; text-align: center;">
+        <h2 style="color: white; margin-bottom: 20px;">Strefa Redakcyjna</h2>
+        <p style="color: #ddd; margin-bottom: 25px;">Zaloguj się kontem Google, aby otworzyć edytor.</p>
+        <div id="google-btn" style="display: flex; justify-content: center;"></div>
+        <div id="login-status" style="margin-top: 15px; color: #ffbb33;"></div>
+    </div>
+
+    <script>
+        const WORKER_URL = "https://zmigrs-api.newadvanceapp.workers.dev";
+        const GOOGLE_CLIENT_ID = "804171138601-ev6ve3mb2eir8n45le4no7igdgfmqsls.apps.googleusercontent.com";
+
+        // Initialize Google Sign-In on page load or restore valid existing session
+        window.onload = () => {
+            // Check for an active, unexpired Google ID token in session storage
+            const savedToken = sessionStorage.getItem("google_id_token");
+            if (savedToken) {
+                try {
+                    const payload = JSON.parse(atob(savedToken.split('.')[1]));
+                    if (Date.now() < (payload.exp * 1000) - 120000) {
+                        handleGoogleLogin({ credential: savedToken });
+                        return;
+                    }
+                } catch {}
+            }
+
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleLogin
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("google-btn"),
+                { theme: "outline", size: "large" }
+            );
+        };
+
+        /**
+         * Handles Google OAuth response, persists identity token, verifies permissions,
+         * and loads the authenticated editor markup into an isolated full-screen iframe.
+         * @param {Object} response - Google credential response object with ID token JWT
+         */
+        async function handleGoogleLogin(response) {
+            const idToken = response.credential;
+            sessionStorage.setItem("google_id_token", idToken);
+            const statusEl = document.getElementById("login-status");
+            statusEl.textContent = "Weryfikacja uprawnień i ładowanie edytora...";
+
+            try {
+                // Optional ?fileId=... query parameter to load a specific Drive file/template
+                const fileId = new URLSearchParams(window.location.search).get('fileId');
+                const fetchUrl = `${WORKER_URL}/content-editor${fileId ? `?fileId=${encodeURIComponent(fileId)}` : ''}`;
+
+                const res = await fetch(fetchUrl, {
+                    headers: {
+                        "Authorization": `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text().catch(() => "");
+                    throw new Error(errText || `Internal error (${res.status})`);
+                }
+
+                // Fetch raw HTML of the editor application from the Cloudflare Worker
+                const editorHtml = await res.text();
+
+                // Hide login gate upon successful authorization
+                document.getElementById("login-gate").style.display = "none";
+
+                // Mount editor into a full-screen iframe (isolated environment prevents script collisions)
+                let frame = document.getElementById("editor-frame");
+                if (!frame) {
+                    frame = document.createElement("iframe");
+                    frame.id = "editor-frame";
+                    frame.style.position = "fixed";
+                    frame.style.top = "0";
+                    frame.style.left = "0";
+                    frame.style.width = "100vw";
+                    frame.style.height = "100vh";
+                    frame.style.border = "none";
+                    frame.style.zIndex = "99999";
+                    frame.style.background = "#0f172a";
+                    document.body.appendChild(frame);
+                }
+
+                try {
+                    frame.contentWindow.sessionStorage.setItem("google_id_token", idToken);
+                } catch {}
+
+                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                frameDoc.open();
+                const baseTag = `<base href="${window.location.href}">`;
+                const fullHtml = editorHtml.includes("<head>")
+                    ? editorHtml.replace("<head>", `<head>${baseTag}`)
+                    : `${baseTag}${editorHtml}`;
+                frameDoc.write(fullHtml);
+                frameDoc.close();
+
+            } catch (err) {
+                statusEl.style.color = "#ff4444";
+                statusEl.textContent = "Error: " + err.message;
+            }
+        }
+    </script>
+</body>
+
+</html>

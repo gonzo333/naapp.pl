@@ -1,7 +1,8 @@
 let currentPage = "home";
 let api_url =
   // "https://script.google.com/macros/s/AKfycbw_SyqFrfO4WA9HjrX6TQf4HUhcMxpNCQuYaEI-Cwe6mB7D-toubQcZXMglLi0J1vg/exec";
-  "https://localhost:4000";
+  // "https://localhost:4000";
+  "https://zmigrs-api.newadvanceapp.workers.dev";
 const cities = [
   {
     name: "Ostrowiec Świętokrzyski",
@@ -116,14 +117,19 @@ const municipalities = [
   { name: "Złota", path: "https://gminazlota.pl" },
 ];
 
-// Pagination states to keep track of offsets and loading status for each content type. This allows us to manage infinite scroll and loading states separately for news, resolutions, and reports.
+// Pagination states to keep track of offsets and loading status for each content type.
+// This allows managing infinite scroll and loading states separately for news, resolutions, and reports.
 const paginationState = {
   news: { offset: 0, loading: false },
   resolutions: { offset: 0, loading: false },
   reports: { offset: 0, loading: false },
 };
 
-// Generate Members links from static tables for now. Will be moved to the database if requested.
+/**
+ * Generates and appends link buttons for municipality or city members into a target DOM container.
+ * @param {Array<{name: string, path: string}>} list - Array of member objects with name and URL.
+ * @param {string} containerId - Target DOM container element ID.
+ */
 function generateLinks(list, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -138,7 +144,11 @@ function generateLinks(list, containerId) {
   });
 }
 
-// Change the date MM/DD/YYYY to Polish format.
+/**
+ * Converts a date string into Polish localized long date format (e.g., "poniedziałek, 15 marca 2024").
+ * @param {string} dateString - ISO or parseable date string.
+ * @returns {string} Formatted localized date string, or empty string if input is empty.
+ */
 function formatDateToPolish(dateString) {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -152,7 +162,12 @@ function formatDateToPolish(dateString) {
   return new Intl.DateTimeFormat("pl-PL", options).format(date);
 }
 
-// Helper function to cache API calls in sessionStorage for 2 minutes to prevent HTTP 429 rate limiting
+/**
+ * Performs an HTTP GET request with client-side caching in sessionStorage to reduce API requests and avoid rate limits.
+ * @param {string} url - The URL endpoint to fetch.
+ * @param {number} [ttlMs=120000] - Time-to-live in milliseconds for cached response (default: 2 minutes).
+ * @returns {Promise<any>} Parsed JSON response.
+ */
 async function fetchWithCache(url, ttlMs = 120000) {
   const cacheKey = `zmigrs_cache_${url}`;
   try {
@@ -180,6 +195,10 @@ async function fetchWithCache(url, ttlMs = 120000) {
 
 let currentLoadingToast = null;
 
+/**
+ * Displays a global loading toast indicator with a spinning indicator and custom status text.
+ * @param {string} [message="Ładowanie danych..."] - Status message to display.
+ */
 function showLoadingToast(message = "Ładowanie danych...") {
   hideLoadingToast();
 
@@ -199,6 +218,9 @@ function showLoadingToast(message = "Ładowanie danych...") {
   currentLoadingToast = toast;
 }
 
+/**
+ * Hides and removes the active loading toast indicator with an exit fade animation.
+ */
 function hideLoadingToast() {
   if (currentLoadingToast) {
     const toast = currentLoadingToast;
@@ -211,6 +233,12 @@ function hideLoadingToast() {
   }
 }
 
+/**
+ * Configures an IntersectionObserver sentinel at the bottom of a list container to trigger infinite scroll pagination.
+ * @param {string} type - Content type identifier ('news', 'resolutions', 'reports').
+ * @param {string} sentinelId - DOM ID of the sentinel element observed.
+ * @param {string} containerId - Target DOM container ID where newly loaded items are appended.
+ */
 function setupInfiniteScroll(type, sentinelId, containerId) {
   const sentinel = document.getElementById(sentinelId);
   if (!sentinel) return;
@@ -232,7 +260,9 @@ function setupInfiniteScroll(type, sentinelId, containerId) {
   observer.observe(sentinel);
 }
 
-// Helper function to check if gallery has enough items to scroll and show or hide buttons if needed.
+/**
+ * Checks whether the horizontal gallery has overflowing content and shows/hides prev/next scroll buttons accordingly.
+ */
 function checkGalleryNavigation() {
   const container = document.getElementById("article-gallery-div");
   const prevBtn = document.querySelector(".prev-btn");
@@ -241,7 +271,7 @@ function checkGalleryNavigation() {
   if (!container || !prevBtn || !nextBtn) return;
   const hasItems = container.querySelectorAll("a").length > 0;
 
-  // If enough width to scroll, show buttons without layout reflow shift
+  // If gallery width exceeds visible client width, show scroll navigation buttons
   if (hasItems && container.scrollWidth > container.clientWidth) {
     prevBtn.style.visibility = "visible";
     prevBtn.style.opacity = "1";
@@ -255,7 +285,10 @@ function checkGalleryNavigation() {
   }
 }
 
-// Gallery scroll functionality, moves the gallery left or right by the width of one item.
+/**
+ * Scrolls the article photo gallery horizontally by the width of one thumbnail item.
+ * @param {number} direction - Direction multiplier (-1 for left/previous, 1 for right/next).
+ */
 function moveGallery(direction) {
   const container = document.getElementById("article-gallery-div");
   const itemWidth = container.querySelector("a").offsetWidth + 15;
@@ -266,7 +299,10 @@ function moveGallery(direction) {
   });
 }
 
-// Load full content of the article from Google Sheets.
+/**
+ * Loads and renders full article details from Cloudflare Worker API by ID, including metadata, sanitized content, and gallery attachments.
+ * @param {number|string} id - Article database ID.
+ */
 async function loadArticle(id) {
   showLoadingToast("Wczytywanie artykułu...");
   const articleContainer = document.getElementById("article-text-div");
@@ -364,7 +400,7 @@ async function loadArticle(id) {
     const authorItem = document.createElement("div");
     authorItem.className = "article-meta-item";
     const authorSpan = document.createElement("span");
-    authorSpan.textContent = "👤 Autor: ";
+    authorSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">person</span>Autor: ';
     const authorStrong = document.createElement("strong");
     authorStrong.textContent = author ? author.trim() : "Zarząd ZMiGRS";
     authorItem.appendChild(authorSpan);
@@ -375,7 +411,7 @@ async function loadArticle(id) {
       const srcItem = document.createElement("div");
       srcItem.className = "article-meta-item";
       const srcSpan = document.createElement("span");
-      srcSpan.textContent = "🌐 Źródło: ";
+      srcSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">link</span>Źródło: ';
       const srcStrong = document.createElement("strong");
       srcStrong.textContent = sourceTrimmed;
       srcItem.appendChild(srcSpan);
@@ -387,7 +423,7 @@ async function loadArticle(id) {
       const photosItem = document.createElement("div");
       photosItem.className = "article-meta-item";
       const photosSpan = document.createElement("span");
-      photosSpan.textContent = "📷 Zdjęcia: ";
+      photosSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">photo_camera</span>Zdjęcia: ';
       const photosStrong = document.createElement("strong");
       photosStrong.textContent = photosCreditTrimmed;
       photosItem.appendChild(photosSpan);
@@ -416,7 +452,11 @@ async function loadArticle(id) {
   }
 }
 
-// Helper function for array shuffling (Fisher-Yates Shuffle)
+/**
+ * Randomly shuffles an array in place using the Fisher-Yates (Knuth) algorithm.
+ * @param {Array} array - Array to shuffle.
+ * @returns {Array} Shuffled array reference.
+ */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -425,6 +465,14 @@ function shuffleArray(array) {
   return array;
 }
 
+/**
+ * Recursively queries attachments for an article from the Cloudflare Worker API,
+ * loads image dimensions with fallback proxy retry, and populates the PhotoSwipe gallery DOM container.
+ * @param {number|string} id - Article database ID.
+ * @param {HTMLElement} container - DOM element where image anchor tags are appended.
+ * @param {number} [offset=0] - Starting offset for pagination.
+ * @param {string} [folderId=""] - Google Drive folder ID containing attachments.
+ */
 async function fetchAttachmentsRecursive(
   id,
   container,
@@ -446,7 +494,7 @@ async function fetchAttachmentsRecursive(
           : fallbackUrl;
 
         const loader = new Image();
-        loader.referrerPolicy = "no-referrer"; // Trying to avoid 403 Forbidden on Google Drive
+        loader.referrerPolicy = "no-referrer"; // Avoid 403 Forbidden on Google Drive direct CDN
         let timer = setTimeout(() => {
           handleError();
         }, 4500);
@@ -463,7 +511,7 @@ async function fetchAttachmentsRecursive(
 
         const handleError = async () => {
           clearTimeout(timer);
-          // Fallback read via Apps Script API (Base64) if lh3 is blocked
+          // Fallback fetch via Cloudflare Worker proxy endpoint (Base64 data URI) if direct lh3 URL is blocked
           if (fileId && api_url) {
             try {
               const proxyData = await fetchWithCache(
@@ -612,7 +660,12 @@ async function fetchAttachmentsRecursive(
   }
 }
 
-// Helper function to render a beautiful glass notification card when a section is empty or an error occurs
+/**
+ * Creates and returns a glassmorphic notification container indicating an empty section or connection error.
+ * @param {string} [title="Przepraszamy, brak wpisów do wyświetlenia"] - Header text.
+ * @param {string} [message="W tej chwili ta sekcja nie zawiera jeszcze żadnych materiałów..."] - Descriptive message.
+ * @returns {HTMLDivElement} Rendered DOM card element.
+ */
 function createEmptyState(
   title = "Przepraszamy, brak wpisów do wyświetlenia",
   message = "W tej chwili ta sekcja nie zawiera jeszcze żadnych materiałów. Zajrzyj do nas ponownie za chwilę!",
@@ -623,8 +676,8 @@ function createEmptyState(
     "grid-column: 1 / -1; text-align: center; padding: 40px 25px; margin: 10px 0;";
 
   const iconDiv = document.createElement("div");
-  iconDiv.style.cssText = "font-size: 2.5rem; margin-bottom: 12px;";
-  iconDiv.textContent = "📑";
+  iconDiv.style.cssText = "margin-bottom: 12px;";
+  iconDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size: 3rem; color: #94a3b8;">folder_open</span>';
 
   const h3 = document.createElement("h3");
   h3.style.cssText = "margin-bottom: 10px; font-size: 20px; color: #ffffff;";
@@ -641,7 +694,12 @@ function createEmptyState(
   return card;
 }
 
-// Generate news from Google Sheets.
+/**
+ * Fetches paginated news articles from Cloudflare Worker API, creates interactive glass cards,
+ * sorts descending by publication date, and configures an infinite scroll sentinel.
+ * @param {string} containerId - Target DOM container element ID.
+ * @param {boolean} [isInitialLoad=true] - Whether to reset list offset and header on initial render.
+ */
 async function generateNews(containerId, isInitialLoad = true) {
   const container = document.getElementById(containerId);
   const state = paginationState.news;
@@ -752,6 +810,13 @@ async function generateNews(containerId, isInitialLoad = true) {
   }
 }
 
+/**
+ * Fetches and renders a paginated list of items for resolutions or reports from Cloudflare Worker API.
+ * Handles card rendering, attachment button trigger, date formatting, and infinite scroll.
+ * @param {string} type - Content type ('resolutions' or 'reports').
+ * @param {string} containerId - Target DOM container element ID.
+ * @param {boolean} [isInitialLoad=true] - Whether this is the initial page load or pagination append.
+ */
 async function generateDataList(type, containerId, isInitialLoad = true) {
   const container = document.getElementById(containerId);
   const state = paginationState[type];
@@ -865,6 +930,11 @@ async function generateDataList(type, containerId, isInitialLoad = true) {
   }
 }
 
+/**
+ * Fetches attachment file metadata from API and triggers direct browser download.
+ * @param {string} fileId - Google Drive file ID.
+ * @param {string} type - Content type associated with the file.
+ */
 async function downloadFile(fileId, type) {
   try {
     const res = await fetch(
@@ -885,6 +955,12 @@ async function downloadFile(fileId, type) {
   }
 }
 
+/**
+ * Opens the attachments modal dialog and loads all downloadable files associated with an item.
+ * @param {number|string} contentId - Database ID of the content item.
+ * @param {string} type - Content type identifier ('resolutions', 'reports', 'news').
+ * @param {string} [folderId=""] - Google Drive folder ID containing the files.
+ */
 async function openAttachmentModal(contentId, type, folderId = "") {
   showLoadingToast("Ładowanie załączników...");
   const modalButtons = document.getElementById("modal-buttons");
@@ -964,13 +1040,27 @@ async function openAttachmentModal(contentId, type, folderId = "") {
   await fetchAll();
 }
 
+/**
+ * Initializes and loads the resolutions feed.
+ * @param {string} containerId - Target DOM container ID.
+ */
 async function generateResolutions(containerId) {
   await generateDataList("resolutions", containerId, true);
 }
+
+/**
+ * Initializes and loads the reports feed.
+ * @param {string} containerId - Target DOM container ID.
+ */
 async function generateReports(containerId) {
   await generateDataList("reports", containerId, true);
 }
 
+/**
+ * Single Page Application (SPA) view router. Displays the specified page view and hides others.
+ * Updates navigation active state, repositions footer to current view, and scrolls to top.
+ * @param {string} pageId - DOM ID of the target page view container ('home', 'article', etc.).
+ */
 function showPage(pageId) {
   if (currentPage === pageId && pageId !== "article") {
     return;
@@ -1008,7 +1098,8 @@ function showPage(pageId) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Initialize footer position
+// ── APPLICATION BOOTSTRAP & EVENT LISTENERS ──
+// Initialize member lists, load initial section feeds, position footer, and bind modal listeners.
 window.addEventListener("DOMContentLoaded", () => {
   const footer = document.getElementById("footer");
   const homePage = document.getElementById("home");
@@ -1189,7 +1280,7 @@ if (contactForm) {
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = "✉️ Wysyłanie listu...";
+      submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Wysyłanie listu...';
     }
 
     const rawName = nameInput ? nameInput.value.trim() : "";
@@ -1246,7 +1337,7 @@ if (contactForm) {
         <div class="env-back"></div>
         <div class="env-paper">
           <div class="env-paper-header">
-            <span class="env-stamp">📬 Do zarządu ZMiGRS</span>
+            <span class="env-stamp"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: -2px; margin-right: 3px;">mail</span>Do zarządu ZMiGRS</span>
             <span class="env-date">${todayStr}</span>
           </div>
           <div class="env-line line-1"><strong>Od:</strong> <span class="val-name"></span></div>
@@ -1257,7 +1348,7 @@ if (contactForm) {
         </div>
         <div class="env-front"></div>
         <div class="env-top-flap"></div>
-        <div class="env-wax-seal">✉️ OPIECZĘTOWANE</div>
+        <div class="env-wax-seal"><span class="material-symbols-outlined" style="font-size: 15px; vertical-align: -2px; margin-right: 3px;">verified</span>OPIECZĘTOWANE</div>
       </div>
     `;
 
@@ -1377,7 +1468,7 @@ if (contactForm) {
       await delay(700);
 
       // STEP 3: WHITE ENVELOPE FLIES UP INTO THE SKY!
-      if (submitBtn) submitBtn.innerHTML = "🚀 Odlatuje...";
+      if (submitBtn) submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Odlatuje...';
       realEnvelope.classList.add("fly-away");
 
       await delay(700);
@@ -1394,7 +1485,7 @@ if (contactForm) {
         const successMsg = document.createElement("div");
         successMsg.className = "success-toast show";
         successMsg.innerHTML = `
-          <div style="font-size: 2.2rem; margin-bottom: 8px;">✅</div>
+          <div style="font-size: 2.5rem; margin-bottom: 8px;"><span class="material-symbols-outlined" style="font-size: 3rem; color: #4ade80;">check_circle</span></div>
           <div>
             <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #ffffff;">Dziękujemy!</div>
             <div style="color: #ffffff;">Twoje zapytanie ruszyło w drogę! Odezwiemy się niebawem.</div>
