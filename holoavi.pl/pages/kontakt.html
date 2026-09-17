@@ -1,0 +1,60 @@
+<section class="section">
+  <div class="container">
+    <h1 class="badge">> Formularz kontaktowy</h1>
+
+    <p style="margin-bottom: 20px">
+      Napisz do nas! Postaramy się odpowiedzieć najszybciej jak to tylko
+      możliwe!
+    </p>
+
+    <div class="form-wrapper">
+      <form id="contactForm" class="card" novalidate>
+        <div class="form-group">
+          <label for="imie">Jak masz na imie?</label>
+          <input type="text" id="imie" name="imie" title="" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email"
+            >Adres skrzynki pocztowej do kontaktu z Tobą?</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            title="Email kontaktowy np. jankowalski@gmail.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nrtel"
+            >Opcjonalnie: Pod jakim numerem możemy się do Ciebie
+            dodzwonić?</label
+          >
+          <input
+            type="tel"
+            id="nrtel"
+            name="nrtel"
+            title="Numer telefonu musi składać się z dokładnie 9 cyfr."
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="wiadomosc">W czym możemy Ci pomóc?</label>
+          <textarea
+            id="wiadomosc"
+            name="wiadomosc"
+            rows="5"
+            title="Treść zapytania"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="hologram-btn btn-primary">
+          Wyślij wiadomość
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,212 +1,466 @@
+// naapp.pl — i18n (PL / EN / ES / UK) using data-i18n attributes
+'use strict';
+
 const translations = {
-    en: {
-        www_header: "Websites",
-        www_text: "Stunning and ergonomic websites for small and medium businesses. Multiple project variants," +
-            " modern technologies, integration with Social Media, YouTube. Database management and admin panel support.",
-        web_app_header: "Web Applications",
-        web_app_text: "We create web applications for small and medium businesses, institutions, and sports clubs." +
-            " From design and event storming to ergonomic and functional web applications built using the latest technologies.",
-        apex_header: "APEX Application Generation",
-        apex_text: "    - Small applications for your business.\n" +
-            " Reports, statistics, schedules, dashboards.",
-        ai_header: "Artificial Intelligence Training",
-        ai_text: "Artificial intelligence in your business. Custom prompts and services tailored to specific" +
-            " business needs.",
-        other_header: "Other Services",
-        other_text: "Drone services: photography, video recording. Equipment rental: projector, projection screen.",
-        all_filter: "All",
-        app_filter: "Web Applications",
-        www_filter: "Websites",
-        other_filter: "Other Services",
-        apex_filter: "APEX Applications",
-        uslugi_all_header: "Scope of Services",
-        graph_header: "Graphic Designs",
-        graph_text: "We offer a custom graphic design for the website tailored to the client and their business. We" +
-            " are open to the client's ideas.",
-        angular_header: "Ergonomics and Aesthetics",
-        angular_text: "The appearance is developed using the Angular framework. Utilizing component libraries such" +
-            " as ng-zorro, Material, and Bootstrap.",
-        teach_header: "Tutoring - Training",
-        teach_text: "We offer individual tutoring and training in programming and application and website development" +
-            " (languages: JAVA, JAVASCRIPT, HTML...).",
-        tech_header: "Modern Technologies",
-        tech_text: "We use HTML5, CSS, JS, jQuery, and many other technologies to create our websites. We also create websites based on WordPress.",
-        social_header: "Social Media",
-        social_text: "We provide the option to integrate with social media platforms: Facebook, WhatsApp, Instagram." +
-            " We have several methods for integration with YouTube.",
-        security_header: "Performance and Security",
-        security_text: "A secure database and efficient applications that communicate with the database, written in" +
-            " JAVA, form the business logic of the developed applications.",
-        buisnes_header: "Performance and Security",
-        buisnes_text: "A secure database and efficient applications that communicate with the database, written in" +
-            " JAVA, form the business logic of the developed applications.",
-        drone_header: "Drone Services",
-        drone_text: "Filming and taking photos with a drone. The equipment we have is the Parrot ANNAFI-H063536." +
-            " Recordings and photos are in FULL HD quality.",
-        equipment_header: "Equipment Rental",
-        equipment_text: "We rent presentation equipment: projector - BenQ MH733 DLP (1920 x 1080), projector screen" +
-            " - Avtek Screen on a tripod, height 200 cm, width 200 cm.",
-        apex_off_header: "APEX Application Development",
-        apex_off_text: "We will create a fast, simple, affordable, and functional application for your company. All" +
-            " we need is your Excel file.",
-        ai_teach_header: "APEX Application Development",
-        ai_teach_text: "We will create a fast, simple, affordable, and functional application for your company. All" +
-            " we need is your Excel file.",
-        all_text: "Show all"
-    },
-    es: {
-        www_header: "Páginas web",
-        www_text: "Páginas web impresionantes y ergonómicas para pequeñas y medianas empresas. Varias opciones de" +
-            " proyecto, tecnologías modernas, integración con redes sociales, YouTube. Soporte para bases de datos y paneles de administración.",
-        web_app_header: "Aplicaciones web",
-        web_app_text: "Creamos aplicaciones web para pequeñas y medianas empresas, instituciones y clubes" +
-            " deportivos. Desde el diseño y la tormenta de ideas hasta aplicaciones web ergonómicas y funcionales, utilizando las tecnologías más recientes.",
-        apex_header: "Generación de aplicaciones APEX",
-        apex_text: "    - Aplicaciones pequeñas para tu negocio.\n" +
-            " Informes, estadísticas, calendarios, paneles de control.",
-        ai_header: "Capacitación en inteligencia artificial",
-        ai_text: "Inteligencia artificial en tu empresa. Prompts personalizados y servicios adaptados a las" +
-            " necesidades específicas de tu negocio.",
-        other_header: "Otros servicios",
-        other_text: "Servicios con drones: fotografía, grabación de videos. Alquiler de equipos: proyector, pantalla" +
-            " de proyección.",
-        all_filter: "Todos",
-        app_filter: "Aplicaciones Web",
-        www_filter: "Páginas Web",
-        other_filter: "Otros Servicios",
-        apex_filter: "Aplicaciones APEX",
-        uslugi_all_header: "Alcance de los servicios",
-        graph_header: "Diseños Gráficos",
-        graph_text: "Ofrecemos un diseño gráfico personalizado para la página web adaptado al cliente y su negocio." +
-            " Estamos abiertos a las ideas del cliente.",
-        angular_header: "Ergonomía y Estética",
-        angular_text: "La apariencia se desarrolla utilizando el framework Angular. Utilizando bibliotecas de" +
-            " componentes como ng-zorro, Material y Bootstrap.",
-        tech_header: "Tecnologías Modernas",
-        tech_text: "Utilizamos HTML5, CSS, JS, jQuery y muchas otras tecnologías para crear nuestras páginas web. También creamos sitios web basados en WordPress.",
-        teach_header: "Clases particulares - Formación",
-        teach_text: "Ofrecemos clases particulares y formación en programación y desarrollo de aplicaciones web" +
-            " (lenguajes: JAVA, JAVASCRIPT, HTML...).",
-        social_header: "Redes Sociales",
-        social_text: "Ofrecemos la posibilidad de integración con plataformas de redes sociales: Facebook, WhatsApp," +
-            " Instagram. Tenemos varios métodos de integración con YouTube.",
-        security_header: "Rendimiento y Seguridad",
-        security_text: "Una base de datos segura y aplicaciones eficientes que se comunican con la base de datos," +
-            " escritas en JAVA, constituyen la lógica empresarial de las aplicaciones.",
-        buisnes_header: "Rendimiento y Seguridad",
-        buisnes_text: "Una base de datos segura y aplicaciones eficientes que se comunican con la base de datos," +
-            " escritas en JAVA, constituyen la lógica empresarial de las aplicaciones desarrolladas.",
-        drone_header: "Servicios de Drones",
-        drone_text: "Grabación de videos y toma de fotos con un dron. El equipo del que disponemos es el Parrot" +
-            " ANNAFI-H063536. Las grabaciones y fotos son de calidad FULL HD.",
-        equipment_header: "Alquiler de Equipos",
-        equipment_text: "Alquilamos equipos para presentaciones: proyector - BenQ MH733 DLP (1920 x 1080), pantalla" +
-            " de proyector - Avtek Pantalla con trípode, altura 200 cm, ancho 200 cm.",
-        apex_off_header: "Desarrollo de Aplicaciones APEX",
-        apex_off_text: "Crearemos una aplicación rápida, sencilla, económica y funcional para tu empresa. Solo" +
-            " necesitamos tu archivo de Excel.",
-        ai_teach_header: "Desarrollo de Aplicaciones APEX",
-        ai_teach_text: "Crearemos una aplicación rápida, sencilla, económica y funcional para tu empresa. Solo" +
-            " necesitamos tu archivo de Excel.",
-        all_text: "Mostrar todo"
-    },
-    pl: {
-        www_header: "Strony WWW",
-        www_text: "Efektowne i ergonomiczne strony WWW dla małych i średnich firm. Wykonanie kilku wariantów" +
-            " projektu, nowoczesne technologie, integracja z Social Media, Youtube. Obsługa baz danych i paneli administracyjnych.",
-        web_app_header: "Aplikacje webowe",
-        web_app_text: "Tworzymy aplikacje webowe dla małych oraz średnich firm, instytucji, klubów sportowych. Od" +
-            " projektu, przez event " + "storming, po ergonomiczne i funkcjonalne aplikacje webowe, tworzone w" +
-            " najnowszych technologiach.",
-        apex_header: "Generowanie aplikacji APEX",
-        apex_text: "    - Drobne aplikacje dla twojego biznesu.\n" +
-            " Raporty, statystyki, terminarze, dashbaordy.",
-        ai_header: "Szkolenia ze sztucznej inteligencji",
-        ai_text: "Sztuczna inteligencja w twojej firmie. Dedykowane prompty, usługi skrojone pod konkretny biznes.",
-        other_header: "Pozostałe usługi",
-        other_text: "Usługi dronem. Robienie zdjęć, nagrywanie filmów. Wypożyczanie sprzętu: projektor, ekran " +
-            "projekcyjny.",
-        all_filter: "Wszystkie",
-        app_filter: "Aplikacje WEB",
-        www_filter: "Strony WWW",
-        other_filter: "Pozostałe usługi",
-        apex_filter: "Aplikacje APEX",
-        uslugi_all_header: "Zakres usług",
-        graph_header: "Projekty graficzne",
-        graph_text: "Proponujemy indywidualny projekt graficzny strony WWW dopasowany po Klienta i Jego Biznes." +
-            " Jesteśmy otwarci na pomysły Klienta.",
-        angular_header: "Ergonomia i estetyka",
-        angular_text: "Wygląd oprogramowany przy pomocy framework'a Angular. Z użyciem takich zestawu komponentów" +
-            " jak ng-zorro, material, bootstrap.",
-        tech_header: "Nowoczesne technologie",
-        tech_text: "Do tworzenia naszych stron używamy HTML5, CSS, JS, jQuery i wielu innych technologii. Tworzymy" +
-            " też strony oparte o wordpress.",
-        teach_header: "Korepetycje - szkolenia",
-        teach_text: "Udzielamy indywidualnych korepetycji oraz szkoleń z zakresu programowania oraz tworzenia aplikacji oraz stron www" +
-            "    (języki: JAVA, JAVASCRIPT, HTML...).",
-        social_header: "Social Media",
-        social_text: "Dajemy możliwość integracji z portalami społecznościowymi: facebook, whats'up, instagram. Mamy" +
-            " kilka sposobów integracji z Youtube.",
-        security_header: "Wydajność i bezpieczeństwo",
-        security_text: "Bezpieczna baza danych oraz wydajne komunikujące się z bazą danych aplikacje napisane w" +
-            " języku JAVA, stanowią logikę biznesową tworzonych aplikacji.",
-        buisnes_header: "Wydajność i bezpieczeństwo",
-        buisnes_text: "Bezpieczna baza danych oraz wydajne komunikujące się z bazą danych aplikacje napisane w" +
-            " języku JAVA, stanowią logikę biznesową tworzonych aplikacji.",
-        drone_header: "Usługi dronem",
-        drone_text: "Nagrywanie filmów oraz robienie zdjęć dronem. Sprzę jakim dysponujemy to Parrot" +
-            " ANNAFI-H063536. Nagrania i zdjęcia w jakości FULL HD.",
-        equipment_header: "Wypożyczalnia sprzętu",
-        equipment_text: "Wypożyczamy sprzęt do prezentacji: projektor - BenQ MH733 DLP (1920 x 1080), ekran do" +
-            " projektora - Avtek Ekran na statywie, wys 200cm, szer 200 cm.",
-        apex_off_header: "Tworzenie aplikacji APEX.",
-        apex_off_text: "Stworzymy szybką, prostą, tanią, funkcjonalną aplikację dla Twojej firmy, wystarczy nam twój excel.",
-        ai_teach_header: "Tworzenie aplikacji APEX.",
-        ai_teach_text: "Stworzymy szybką, prostą, tanią, funkcjonalną aplikację dla Twojej firmy, wystarczy nam twój excel.",
-        all_text: "Pokaż wszystkie"
-    }
+  pl: {
+    nav_home: 'Start',
+    nav_services: 'Usługi',
+    nav_systems: 'Systemy',
+    nav_clients: 'Klienci',
+    nav_contact: 'Kontakt',
+    hero_kicker: 'New Advance APP — software house',
+    hero1_title: 'Strony WWW',
+    hero1_text: 'Projektujemy szybkie, responsywne i efektowne strony WWW dla małych i średnich firm. Kilka wariantów projektu do wyboru, integracja z Social Media i YouTube, wygodne panele administracyjne.',
+    hero2_title: 'Aplikacje webowe',
+    hero2_text: 'Budujemy aplikacje webowe dla firm, instytucji i klubów sportowych — od warsztatów Event Storming, przez projekt UX, po wdrożenie w najnowszych technologiach.',
+    hero3_title: 'Aplikacje Oracle APEX',
+    hero3_text: 'Lekkie aplikacje biznesowe gotowe w kilka dni: raporty, statystyki, terminarze i dashboardy — dokładnie tam, gdzie kończy się Excel.',
+    hero4_title: 'Szkolenia i wdrożenia AI',
+    hero4_text: 'Wdrażamy sztuczną inteligencję w Twojej firmie. Dedykowane prompty, automatyzacje i szkolenia skrojone pod konkretny biznes.',
+    hero5_title: 'Hologramy i awatary AI',
+    hero5_text: 'Twoja marka w trzech wymiarach: hologramy 1:1 z HOLOAVI, awatary AI rozmawiające z klientami głosowo oraz wizytówki NFC — na eventy, targi, do recepcji i na Twoją stronę.',
+    hero_cta: 'Zobacz usługi',
+    hero_cta2: 'Porozmawiajmy',
+    services_kicker: 'Co robimy',
+    services_header: 'Zakres usług',
+    services_sub: 'Kompleksowo: od hologramów i awatarów AI, przez strony i aplikacje, po NFC oraz szkolenia z AI i cyberbezpieczeństwa.',
+    filter_all: 'Wszystkie',
+    filter_web: 'Aplikacje WEB',
+    filter_www: 'Strony WWW',
+    filter_apex: 'Aplikacje APEX',
+    filter_ai: 'Szkolenia i AI',
+    filter_holo: 'Hologramy i awatary',
+    svc_graph_title: 'Projekty graficzne',
+    svc_graph_text: 'Indywidualny projekt graficzny dopasowany do Twojej marki. Kilka wariantów do wyboru — jesteśmy otwarci na Twoje pomysły.',
+    svc_tech_title: 'Nowoczesne technologie',
+    svc_tech_text: 'Nowoczesny stack: HTML5, CSS3, JavaScript i sprawdzone frameworki. Tworzymy również szybkie strony oparte o WordPress.',
+    svc_social_title: 'Social Media',
+    svc_social_text: 'Integracja z Facebookiem, WhatsAppem i Instagramem oraz kilka sposobów osadzenia treści z YouTube — Twoja strona żyje razem z Twoimi kanałami.',
+    svc_ergo_title: 'Ergonomia i estetyka',
+    svc_ergo_text: 'Interfejsy budowane w Angularze z użyciem komponentów ng-zorro, Material i Bootstrap — spójne, dostępne i przyjemne w użyciu.',
+    svc_perf_title: 'Wydajność i bezpieczeństwo',
+    svc_perf_text: 'Logika biznesowa w Javie i bezpieczna baza danych — wydajne, stabilne i skalowalne aplikacje.',
+    svc_biz_title: 'Wymagania biznesowe',
+    svc_biz_text: '100% zrozumienia wymagań dzięki warsztatom Event Storming, stałej komunikacji i wymianie doświadczeń.',
+    svc_apex_title: 'Tworzenie aplikacji APEX',
+    svc_apex_text: 'Szybka, prosta i tania aplikacja dla Twojej firmy — wystarczy nam Twój Excel, resztą zajmiemy się my.',
+    svc_ai_title: 'Szkolenia i wdrożenia AI',
+    svc_ai_text: 'Nauczymy Twój zespół skutecznego promptowania i zautomatyzujemy powtarzalne procesy. Dedykowane prompty pod Twój biznes.',
+    svc_cyber_title: 'Szkolenia z cyberbezpieczeństwa',
+    svc_cyber_text: 'Praktyczne warsztaty dla zespołów: rozpoznawanie phishingu, bezpieczne hasła i MFA, ochrona danych oraz bezpieczne korzystanie z narzędzi AI w firmie.',
+    svc_nfccard_title: 'Wizytówki NFC',
+    svc_nfccard_text: 'Interaktywne wizytówki z tagiem NFC — jedno przyłożenie telefonu i klient trafia na Twoją stronę, PDF, prezentację lub wideo.',
+    svc_nfcboard_title: 'Tablice i naklejki NFC',
+    svc_nfcboard_text: 'Zawsze aktualne treści bez kosztów druku: regulaminy, przewodniki audio i wideo dla muzeów, urzędów, szkół i szlaków turystycznych.',
+    svc_holo_title: 'Hologramy 1:1 — HOLOAVI',
+    svc_holo_text: 'Wynajem urządzeń holograficznych na targi, konferencje i eventy: 4K Ultra HD, jasność ponad 1200 nitów, montaż, obsługa i produkcja contentu w pakiecie.',
+    svc_avatar_title: 'Awatary AI',
+    svc_avatar_text: 'Interaktywny asystent AI na Twoją stronę, do recepcji lub showroomu — rozmawia z klientami głosowo, odpowiada na pytania i zbiera kontakty.',
+    holo_kicker: 'Nasza marka hologramów i awatarów',
+    holo_title: 'Hologramy 1:1 i awatary AI, które sprzedają za Ciebie',
+    holo_text: 'Przyciągnij tłum na targach hologramem w skali 1:1 albo powitaj klientów interaktywnym awatarem AI — w recepcji, showroomie i na stronie WWW. Sprzęt, montaż, obsługa i produkcja contentu w jednym pakiecie.',
+    holo_cta: 'Poznaj HOLOAVI',
+    coop_kicker: 'Strategiczne partnerstwo z Altar',
+    coop_header: 'Systemy współtworzone z Altar',
+    coop_intro: 'Altar to nasz strategiczny partner technologiczny i lider rozwiązań contact center w Polsce. Od początku działalności współtworzymy systemy AI, które rewolucjonizują obsługę klienta w dużych organizacjach.',
+    coop1_text: 'Pełna, zautomatyzowana kontrola jakości contact center Twojej firmy — w każdej rozmowie, na każdym kanale.',
+    coop2_text: 'Wielokanałowa platforma contact center z obsługą procesową i mechanizmami AI do profesjonalnej obsługi klientów.',
+    coop3_text: 'Nowoczesne narzędzie do obsługi spraw klienckich — Twój wirtualny partner w biznesie.',
+    coop4_text: 'Inteligentny asystent AI oparty na wiedzy Twojej organizacji — bezpieczne odpowiedzi z firmowych dokumentów, modele lokalne lub chmurowe, otwarte API.',
+    coop_more: 'Dowiedz się więcej',
+    clients_kicker: 'Zaufali nam',
+    clients_header: 'Nasi klienci',
+    client1_tag: 'Producent oprogramowania',
+    client1_text: 'Usługi programistyczne w zakresie projektowania i rozwoju rozwiązań dla sektora Call Center.',
+    client2_tag: 'Organizacja sportowa',
+    client2_text: 'Aplikacje webowe i strony WWW, m.in. oficjalna strona Młodzieżowych Mistrzostw Świata.',
+    client3_tag: 'Klub sportowy',
+    client3_text: 'Nowoczesna strona WWW dla klubu sportowego Piast Chęciny.',
+    client4_tag: 'Szkoła wyższa',
+    client4_text: 'Projekt i wykonanie strony WWW wraz ze stronami powiązanych szkół i instytucji.',
+    client5_tag: 'Beauty',
+    client5_text: 'Elegancka strona WWW z cennikiem i pełną ofertą usług salonu.',
+    client6_tag: 'Składy opału',
+    client6_text: 'Strona WWW z ofertą i danymi kontaktowymi dla składu opału WIXPOL.',
+    client7_tag: 'Kamieniarstwo',
+    client7_text: 'Strona WWW, produkcja contentu wideo na targi oraz wynajem hologramu do prezentacji oferty — blaty, schody i elementy z granitu i marmuru.',
+    client8_tag: 'Eventy',
+    client8_text: 'Strona WWW dla firmy eventowej — dmuchane zjeżdżalnie, animacje i obsługa imprez plenerowych w całej Polsce.',
+    client9_tag: 'Edukacja',
+    client9_text: 'Materiały online dla Szkoły Podstawowej w Tokarni i Stowarzyszenia Korczakowskie Serca.',
+    client10_tag: 'Instalacje budowlane',
+    client10_text: 'Aplikacja do zarządzania magazynem oparta o technologię NFC — szybka inwentaryzacja i pełna kontrola stanów magazynowych.',
+    contact_kicker: 'Kontakt',
+    contact_header: 'Skontaktuj się z nami!',
+    contact_sub: 'Masz pomysł na stronę, aplikację, hologram albo chcesz wdrożyć AI? Napisz — odpowiemy najszybciej jak to możliwe.',
+    form_name: 'Imię',
+    form_phone: 'Numer telefonu',
+    form_email: 'Adres e-mail',
+    form_message: 'Treść wiadomości',
+    form_send: 'Wyślij wiadomość',
+    form_sent: 'Dziękujemy! Otwieramy Twój program pocztowy…',
+    footer_data: 'Nasze dane',
+    footer_social: 'Media społecznościowe',
+    footer_social_text: 'Poznaj nas bliżej.',
+    footer_hours: 'Godziny otwarcia',
+    footer_hours_text: 'Jesteśmy do Waszej dyspozycji, zawsze gdy tego potrzebujecie :)'
+  },
+
+  en: {
+    nav_home: 'Home',
+    nav_services: 'Services',
+    nav_systems: 'Systems',
+    nav_clients: 'Clients',
+    nav_contact: 'Contact',
+    hero_kicker: 'New Advance APP — software house',
+    hero1_title: 'Websites',
+    hero1_text: 'We design fast, responsive and eye-catching websites for small and medium businesses. Multiple design variants to choose from, Social Media and YouTube integration, convenient admin panels.',
+    hero2_title: 'Web Applications',
+    hero2_text: 'We build web applications for companies, institutions and sports clubs — from Event Storming workshops, through UX design, to deployment with the latest technologies.',
+    hero3_title: 'Oracle APEX Applications',
+    hero3_text: 'Lightweight business applications ready in days: reports, statistics, schedules and dashboards — exactly where Excel reaches its limits.',
+    hero4_title: 'AI Training & Implementation',
+    hero4_text: 'We bring artificial intelligence into your company. Dedicated prompts, automations and training tailored to your specific business.',
+    hero5_title: 'Holograms & AI Avatars',
+    hero5_text: 'Your brand in three dimensions: life-size 1:1 holograms by HOLOAVI, AI avatars that talk to your customers by voice, and NFC business cards — for events, trade fairs, receptions and your website.',
+    hero_cta: 'See our services',
+    hero_cta2: 'Let\'s talk',
+    services_kicker: 'What we do',
+    services_header: 'Scope of Services',
+    services_sub: 'End to end: from holograms and AI avatars, through websites and apps, to NFC and training in AI and cybersecurity.',
+    filter_all: 'All',
+    filter_web: 'Web Applications',
+    filter_www: 'Websites',
+    filter_apex: 'APEX Applications',
+    filter_ai: 'Training & AI',
+    filter_holo: 'Holograms & Avatars',
+    svc_graph_title: 'Graphic Designs',
+    svc_graph_text: 'An individual graphic design tailored to your brand. Several variants to choose from — we are open to your ideas.',
+    svc_tech_title: 'Modern Technologies',
+    svc_tech_text: 'A modern stack: HTML5, CSS3, JavaScript and proven frameworks. We also build fast WordPress-based websites.',
+    svc_social_title: 'Social Media',
+    svc_social_text: 'Integration with Facebook, WhatsApp and Instagram, plus several ways to embed YouTube content — your website lives together with your channels.',
+    svc_ergo_title: 'Ergonomics and Aesthetics',
+    svc_ergo_text: 'Interfaces built with Angular using ng-zorro, Material and Bootstrap components — consistent, accessible and pleasant to use.',
+    svc_perf_title: 'Performance and Security',
+    svc_perf_text: 'Business logic in Java and a secure database — efficient, stable and scalable applications.',
+    svc_biz_title: 'Business Requirements',
+    svc_biz_text: '100% understanding of requirements thanks to Event Storming workshops, constant communication and exchange of experience.',
+    svc_apex_title: 'APEX Application Development',
+    svc_apex_text: 'A fast, simple and affordable application for your company — all we need is your Excel file, we handle the rest.',
+    svc_ai_title: 'AI Training & Implementation',
+    svc_ai_text: 'We will teach your team effective prompting and automate repetitive processes. Dedicated prompts for your business.',
+    svc_cyber_title: 'Cybersecurity Training',
+    svc_cyber_text: 'Hands-on workshops for teams: phishing recognition, secure passwords and MFA, data protection and safe use of AI tools at work.',
+    svc_nfccard_title: 'NFC Business Cards',
+    svc_nfccard_text: 'Interactive business cards with an NFC tag — one phone tap and your client lands on your website, PDF, presentation or video.',
+    svc_nfcboard_title: 'NFC Boards & Stickers',
+    svc_nfcboard_text: 'Always up-to-date content with no printing costs: regulations, audio and video guides for museums, offices, schools and tourist trails.',
+    svc_holo_title: '1:1 Holograms — HOLOAVI',
+    svc_holo_text: 'Holographic device rental for trade fairs, conferences and events: 4K Ultra HD, brightness over 1200 nits, installation, support and content production included.',
+    svc_avatar_title: 'AI Avatars',
+    svc_avatar_text: 'An interactive AI assistant for your website, reception or showroom — talks to customers by voice, answers questions and collects leads.',
+    holo_kicker: 'Our hologram & avatar brand',
+    holo_title: '1:1 Holograms and AI Avatars that sell for you',
+    holo_text: 'Draw a crowd at trade fairs with a life-size hologram, or greet customers with an interactive AI avatar — at the reception desk, in the showroom and on your website. Hardware, installation, support and content production in one package.',
+    holo_cta: 'Discover HOLOAVI',
+    coop_kicker: 'Strategic partnership with Altar',
+    coop_header: 'Systems co-developed with Altar',
+    coop_intro: 'Altar is our strategic technology partner and a leading contact center solutions provider in Poland. Since day one, we have been co-developing AI systems that revolutionize customer service in large organizations.',
+    coop1_text: 'Full, automated quality control of your company\'s contact center — in every conversation, on every channel.',
+    coop2_text: 'A multichannel contact center platform with process handling and AI mechanisms for professional customer service.',
+    coop3_text: 'A modern tool for handling customer cases — your virtual business partner.',
+    coop4_text: 'An intelligent AI assistant based on your organization\'s knowledge — secure answers from company documents, local or cloud models, open API.',
+    coop_more: 'Learn more',
+    clients_kicker: 'They trusted us',
+    clients_header: 'Our Clients',
+    client1_tag: 'Software producer',
+    client1_text: 'Software development services in designing and developing solutions for the Call Center sector.',
+    client2_tag: 'Sports organization',
+    client2_text: 'Web applications and websites, including the official Youth World Championships website.',
+    client3_tag: 'Sports club',
+    client3_text: 'A modern website for the Piast Chęciny sports club.',
+    client4_tag: 'Higher education',
+    client4_text: 'Design and development of a website together with sites of affiliated schools and institutions.',
+    client5_tag: 'Beauty',
+    client5_text: 'An elegant website with a price list and the salon\'s full range of services.',
+    client6_tag: 'Fuel depots',
+    client6_text: 'A website with the offer and contact details for the WIXPOL fuel depot.',
+    client7_tag: 'Stonemasonry',
+    client7_text: 'A website, trade fair video content production and hologram rental for presenting the offer — countertops, stairs and elements made of granite and marble.',
+    client8_tag: 'Events',
+    client8_text: 'A website for an event company — inflatable slides, entertainment and outdoor event services across Poland.',
+    client9_tag: 'Education',
+    client9_text: 'Online materials for the Primary School in Tokarnia and the Korczakowskie Serca Association.',
+    client10_tag: 'Building installations',
+    client10_text: 'An NFC-based warehouse management application — fast stocktaking and full control over inventory levels.',
+    contact_kicker: 'Contact',
+    contact_header: 'Get in Touch!',
+    contact_sub: 'Got an idea for a website, an app, a hologram, or want to implement AI? Write to us — we will reply as soon as possible.',
+    form_name: 'Name',
+    form_phone: 'Phone number',
+    form_email: 'Email address',
+    form_message: 'Your message',
+    form_send: 'Send message',
+    form_sent: 'Thank you! Opening your email client…',
+    footer_data: 'Our details',
+    footer_social: 'Social media',
+    footer_social_text: 'Get to know us better.',
+    footer_hours: 'Opening hours',
+    footer_hours_text: 'We are at your disposal whenever you need us :)'
+  },
+
+  es: {
+    nav_home: 'Inicio',
+    nav_services: 'Servicios',
+    nav_systems: 'Sistemas',
+    nav_clients: 'Clientes',
+    nav_contact: 'Contacto',
+    hero_kicker: 'New Advance APP — software house',
+    hero1_title: 'Páginas web',
+    hero1_text: 'Diseñamos páginas web rápidas, responsivas y atractivas para pequeñas y medianas empresas. Varias variantes de diseño a elegir, integración con redes sociales y YouTube, cómodos paneles de administración.',
+    hero2_title: 'Aplicaciones web',
+    hero2_text: 'Creamos aplicaciones web para empresas, instituciones y clubes deportivos — desde talleres de Event Storming, pasando por el diseño UX, hasta la implementación con las últimas tecnologías.',
+    hero3_title: 'Aplicaciones Oracle APEX',
+    hero3_text: 'Aplicaciones de negocio ligeras listas en pocos días: informes, estadísticas, calendarios y paneles — justo donde Excel llega a su límite.',
+    hero4_title: 'Formación e implementación de IA',
+    hero4_text: 'Llevamos la inteligencia artificial a tu empresa. Prompts dedicados, automatizaciones y formación a medida de tu negocio.',
+    hero5_title: 'Hologramas y avatares de IA',
+    hero5_text: 'Tu marca en tres dimensiones: hologramas 1:1 de HOLOAVI, avatares de IA que hablan con tus clientes por voz y tarjetas NFC — para eventos, ferias, recepciones y tu página web.',
+    hero_cta: 'Ver servicios',
+    hero_cta2: 'Hablemos',
+    services_kicker: 'Qué hacemos',
+    services_header: 'Alcance de los servicios',
+    services_sub: 'De principio a fin: desde hologramas y avatares de IA, pasando por webs y aplicaciones, hasta NFC y formación en IA y ciberseguridad.',
+    filter_all: 'Todos',
+    filter_web: 'Aplicaciones Web',
+    filter_www: 'Páginas Web',
+    filter_apex: 'Aplicaciones APEX',
+    filter_ai: 'Formación e IA',
+    filter_holo: 'Hologramas y avatares',
+    svc_graph_title: 'Diseños gráficos',
+    svc_graph_text: 'Un diseño gráfico individual adaptado a tu marca. Varias variantes a elegir — estamos abiertos a tus ideas.',
+    svc_tech_title: 'Tecnologías modernas',
+    svc_tech_text: 'Un stack moderno: HTML5, CSS3, JavaScript y frameworks probados. También creamos páginas rápidas basadas en WordPress.',
+    svc_social_title: 'Redes sociales',
+    svc_social_text: 'Integración con Facebook, WhatsApp e Instagram, además de varias formas de incrustar contenido de YouTube — tu web vive junto a tus canales.',
+    svc_ergo_title: 'Ergonomía y estética',
+    svc_ergo_text: 'Interfaces construidas en Angular con componentes ng-zorro, Material y Bootstrap — coherentes, accesibles y agradables de usar.',
+    svc_perf_title: 'Rendimiento y seguridad',
+    svc_perf_text: 'Lógica de negocio en Java y una base de datos segura — aplicaciones eficientes, estables y escalables.',
+    svc_biz_title: 'Requisitos de negocio',
+    svc_biz_text: '100% de comprensión de los requisitos gracias a talleres de Event Storming, comunicación constante e intercambio de experiencias.',
+    svc_apex_title: 'Desarrollo de aplicaciones APEX',
+    svc_apex_text: 'Una aplicación rápida, sencilla y económica para tu empresa — solo necesitamos tu Excel, del resto nos encargamos nosotros.',
+    svc_ai_title: 'Formación e implementación de IA',
+    svc_ai_text: 'Enseñaremos a tu equipo a crear prompts eficaces y automatizaremos los procesos repetitivos. Prompts dedicados para tu negocio.',
+    svc_cyber_title: 'Formación en ciberseguridad',
+    svc_cyber_text: 'Talleres prácticos para equipos: detección de phishing, contraseñas seguras y MFA, protección de datos y uso seguro de herramientas de IA en la empresa.',
+    svc_nfccard_title: 'Tarjetas de visita NFC',
+    svc_nfccard_text: 'Tarjetas interactivas con etiqueta NFC — un toque del teléfono y tu cliente llega a tu web, PDF, presentación o vídeo.',
+    svc_nfcboard_title: 'Tableros y pegatinas NFC',
+    svc_nfcboard_text: 'Contenido siempre actualizado sin costes de impresión: reglamentos, guías de audio y vídeo para museos, oficinas, escuelas y rutas turísticas.',
+    svc_holo_title: 'Hologramas 1:1 — HOLOAVI',
+    svc_holo_text: 'Alquiler de dispositivos holográficos para ferias, conferencias y eventos: 4K Ultra HD, brillo de más de 1200 nits, montaje, soporte y producción de contenido incluidos.',
+    svc_avatar_title: 'Avatares de IA',
+    svc_avatar_text: 'Un asistente interactivo de IA para tu web, recepción o showroom — habla con los clientes por voz, responde preguntas y recoge contactos.',
+    holo_kicker: 'Nuestra marca de hologramas y avatares',
+    holo_title: 'Hologramas 1:1 y avatares de IA que venden por ti',
+    holo_text: 'Atrae a la multitud en las ferias con un holograma a escala real o recibe a tus clientes con un avatar interactivo de IA — en la recepción, el showroom y tu página web. Equipos, montaje, soporte y producción de contenido en un solo paquete.',
+    holo_cta: 'Descubre HOLOAVI',
+    coop_kicker: 'Colaboración estratégica con Altar',
+    coop_header: 'Sistemas co-desarrollados con Altar',
+    coop_intro: 'Altar es nuestro socio tecnológico estratégico y líder en soluciones de contact center en Polonia. Desde el principio co-desarrollamos sistemas de IA que revolucionan la atención al cliente en grandes organizaciones.',
+    coop1_text: 'Control de calidad completo y automatizado del contact center de tu empresa — en cada conversación, en cada canal.',
+    coop2_text: 'Una plataforma multicanal de contact center con gestión de procesos y mecanismos de IA para una atención profesional.',
+    coop3_text: 'Una herramienta moderna para gestionar casos de clientes — tu socio virtual de negocios.',
+    coop4_text: 'Un asistente inteligente de IA basado en el conocimiento de tu organización — respuestas seguras desde documentos corporativos, modelos locales o en la nube, API abierta.',
+    coop_more: 'Saber más',
+    clients_kicker: 'Confiaron en nosotros',
+    clients_header: 'Nuestros clientes',
+    client1_tag: 'Productor de software',
+    client1_text: 'Servicios de programación en el diseño y desarrollo de soluciones para el sector Call Center.',
+    client2_tag: 'Organización deportiva',
+    client2_text: 'Aplicaciones web y páginas web, incluida la página oficial del Campeonato Mundial Juvenil.',
+    client3_tag: 'Club deportivo',
+    client3_text: 'Una página web moderna para el club deportivo Piast Chęciny.',
+    client4_tag: 'Educación superior',
+    client4_text: 'Diseño y desarrollo de una página web junto con las páginas de escuelas e instituciones asociadas.',
+    client5_tag: 'Belleza',
+    client5_text: 'Una elegante página web con lista de precios y la oferta completa de servicios del salón.',
+    client6_tag: 'Depósitos de combustible',
+    client6_text: 'Página web con la oferta y los datos de contacto del depósito de combustible WIXPOL.',
+    client7_tag: 'Cantería',
+    client7_text: 'Página web, producción de contenido de vídeo para ferias y alquiler de un holograma para presentar la oferta — encimeras, escaleras y elementos de granito y mármol.',
+    client8_tag: 'Eventos',
+    client8_text: 'Página web para una empresa de eventos — toboganes hinchables, animación y organización de eventos al aire libre en toda Polonia.',
+    client9_tag: 'Educación',
+    client9_text: 'Materiales en línea para la Escuela Primaria de Tokarnia y la Asociación Korczakowskie Serca.',
+    client10_tag: 'Instalaciones de edificios',
+    client10_text: 'Aplicación de gestión de almacén basada en tecnología NFC — inventarios rápidos y control total de las existencias.',
+    contact_kicker: 'Contacto',
+    contact_header: '¡Contáctanos!',
+    contact_sub: '¿Tienes una idea para una web, una aplicación, un holograma o quieres implementar IA? Escríbenos — responderemos lo antes posible.',
+    form_name: 'Nombre',
+    form_phone: 'Número de teléfono',
+    form_email: 'Correo electrónico',
+    form_message: 'Contenido del mensaje',
+    form_send: 'Enviar mensaje',
+    form_sent: '¡Gracias! Abriendo tu cliente de correo…',
+    footer_data: 'Nuestros datos',
+    footer_social: 'Redes sociales',
+    footer_social_text: 'Conócenos mejor.',
+    footer_hours: 'Horario de apertura',
+    footer_hours_text: 'Estamos a tu disposición siempre que lo necesites :)'
+  },
+
+  uk: {
+    nav_home: 'Головна',
+    nav_services: 'Послуги',
+    nav_systems: 'Системи',
+    nav_clients: 'Клієнти',
+    nav_contact: 'Контакти',
+    hero_kicker: 'New Advance APP — software house',
+    hero1_title: 'Вебсайти',
+    hero1_text: 'Проєктуємо швидкі, адаптивні та ефектні вебсайти для малого та середнього бізнесу. Кілька варіантів дизайну на вибір, інтеграція із соцмережами та YouTube, зручні адміністративні панелі.',
+    hero2_title: 'Вебзастосунки',
+    hero2_text: 'Створюємо вебзастосунки для компаній, установ і спортивних клубів — від воркшопів Event Storming через UX-дизайн до впровадження за найновішими технологіями.',
+    hero3_title: 'Застосунки Oracle APEX',
+    hero3_text: 'Легкі бізнес-застосунки, готові за кілька днів: звіти, статистика, розклади та дашборди — саме там, де закінчується Excel.',
+    hero4_title: 'Навчання та впровадження ШІ',
+    hero4_text: 'Впроваджуємо штучний інтелект у вашій компанії. Індивідуальні промпти, автоматизації та навчання під конкретний бізнес.',
+    hero5_title: 'Голограми та ШІ-аватари',
+    hero5_text: 'Ваш бренд у трьох вимірах: голограми 1:1 від HOLOAVI, ШІ-аватари, що спілкуються з клієнтами голосом, та візитівки NFC — для подій, виставок, рецепцій і вашого сайту.',
+    hero_cta: 'Переглянути послуги',
+    hero_cta2: 'Поговорімо',
+    services_kicker: 'Що ми робимо',
+    services_header: 'Спектр послуг',
+    services_sub: 'Комплексно: від голограм і ШІ-аватарів через сайти та застосунки до NFC й навчання з ШІ та кібербезпеки.',
+    filter_all: 'Усі',
+    filter_web: 'Вебзастосунки',
+    filter_www: 'Вебсайти',
+    filter_apex: 'Застосунки APEX',
+    filter_ai: 'Навчання та ШІ',
+    filter_holo: 'Голограми та аватари',
+    svc_graph_title: 'Графічний дизайн',
+    svc_graph_text: 'Індивідуальний графічний дизайн, адаптований до вашого бренду. Кілька варіантів на вибір — ми відкриті до ваших ідей.',
+    svc_tech_title: 'Сучасні технології',
+    svc_tech_text: 'Сучасний стек: HTML5, CSS3, JavaScript і перевірені фреймворки. Також створюємо швидкі сайти на WordPress.',
+    svc_social_title: 'Соціальні мережі',
+    svc_social_text: 'Інтеграція з Facebook, WhatsApp та Instagram, а також кілька способів вбудувати контент з YouTube — ваш сайт живе разом із вашими каналами.',
+    svc_ergo_title: 'Ергономіка та естетика',
+    svc_ergo_text: 'Інтерфейси на Angular з компонентами ng-zorro, Material і Bootstrap — послідовні, доступні та приємні у використанні.',
+    svc_perf_title: 'Продуктивність і безпека',
+    svc_perf_text: 'Бізнес-логіка на Java та безпечна база даних — ефективні, стабільні та масштабовані застосунки.',
+    svc_biz_title: 'Бізнес-вимоги',
+    svc_biz_text: '100% розуміння вимог завдяки воркшопам Event Storming, постійній комунікації та обміну досвідом.',
+    svc_apex_title: 'Розробка застосунків APEX',
+    svc_apex_text: 'Швидкий, простий і недорогий застосунок для вашої компанії — нам достатньо вашого файлу Excel, решту зробимо ми.',
+    svc_ai_title: 'Навчання та впровадження ШІ',
+    svc_ai_text: 'Навчимо вашу команду ефективного промптингу та автоматизуємо повторювані процеси. Індивідуальні промпти для вашого бізнесу.',
+    svc_cyber_title: 'Навчання з кібербезпеки',
+    svc_cyber_text: 'Практичні воркшопи для команд: розпізнавання фішингу, безпечні паролі та MFA, захист даних і безпечне використання інструментів ШІ в компанії.',
+    svc_nfccard_title: 'Візитівки NFC',
+    svc_nfccard_text: 'Інтерактивні візитівки з NFC-тегом — один дотик телефона, і клієнт потрапляє на ваш сайт, PDF, презентацію або відео.',
+    svc_nfcboard_title: 'Таблиці та наліпки NFC',
+    svc_nfcboard_text: 'Завжди актуальний контент без витрат на друк: правила, аудіо- та відеогіди для музеїв, установ, шкіл і туристичних маршрутів.',
+    svc_holo_title: 'Голограми 1:1 — HOLOAVI',
+    svc_holo_text: 'Оренда голографічних пристроїв для виставок, конференцій та подій: 4K Ultra HD, яскравість понад 1200 ніт, монтаж, підтримка та виробництво контенту в пакеті.',
+    svc_avatar_title: 'ШІ-аватари',
+    svc_avatar_text: 'Інтерактивний ШІ-асистент для вашого сайту, рецепції чи шоуруму — спілкується з клієнтами голосом, відповідає на запитання та збирає контакти.',
+    holo_kicker: 'Наш бренд голограм та аватарів',
+    holo_title: 'Голограми 1:1 та ШІ-аватари, що продають за вас',
+    holo_text: 'Приверніть увагу на виставці голограмою в натуральну величину або привітайте клієнтів інтерактивним ШІ-аватаром — на рецепції, у шоурумі та на сайті. Обладнання, монтаж, підтримка та виробництво контенту в одному пакеті.',
+    holo_cta: 'Відкрийте HOLOAVI',
+    coop_kicker: 'Стратегічне партнерство з Altar',
+    coop_header: 'Системи, створені разом з Altar',
+    coop_intro: 'Altar — наш стратегічний технологічний партнер і лідер рішень contact center у Польщі. Від початку діяльності ми разом створюємо системи ШІ, які революціонізують обслуговування клієнтів у великих організаціях.',
+    coop1_text: 'Повний автоматизований контроль якості контакт-центру вашої компанії — у кожній розмові, на кожному каналі.',
+    coop2_text: 'Багатоканальна платформа контакт-центру з процесним управлінням та механізмами ШІ для професійного обслуговування клієнтів.',
+    coop3_text: 'Сучасний інструмент для обробки клієнтських справ — ваш віртуальний бізнес-партнер.',
+    coop4_text: 'Інтелектуальний ШІ-асистент на основі знань вашої організації — безпечні відповіді з корпоративних документів, локальні або хмарні моделі, відкритий API.',
+    coop_more: 'Дізнатися більше',
+    clients_kicker: 'Нам довірилися',
+    clients_header: 'Наші клієнти',
+    client1_tag: 'Виробник програмного забезпечення',
+    client1_text: 'Послуги з розробки у сфері проєктування та розвитку рішень для сектору Call Center.',
+    client2_tag: 'Спортивна організація',
+    client2_text: 'Вебзастосунки та сайти, зокрема офіційний сайт Молодіжного чемпіонату світу.',
+    client3_tag: 'Спортивний клуб',
+    client3_text: 'Сучасний вебсайт для спортивного клубу Piast Chęciny.',
+    client4_tag: 'Вища школа',
+    client4_text: 'Проєктування та створення сайту разом із сайтами пов’язаних шкіл та установ.',
+    client5_tag: 'Б’юті',
+    client5_text: 'Елегантний вебсайт із прайс-листом та повним переліком послуг салону.',
+    client6_tag: 'Склади палива',
+    client6_text: 'Вебсайт з пропозицією та контактами для складу палива WIXPOL.',
+    client7_tag: 'Каменярство',
+    client7_text: 'Вебсайт, виробництво відеоконтенту для виставок та оренда голограми для презентації пропозиції — стільниці, сходи та елементи з граніту й мармуру.',
+    client8_tag: 'Івенти',
+    client8_text: 'Вебсайт для івент-компанії — надувні гірки, анімації та обслуговування заходів просто неба по всій Польщі.',
+    client9_tag: 'Освіта',
+    client9_text: 'Онлайн-матеріали для початкової школи в Токарні та Асоціації Korczakowskie Serca.',
+    client10_tag: 'Будівельні інсталяції',
+    client10_text: 'Застосунок для управління складом на основі технології NFC — швидка інвентаризація та повний контроль складських запасів.',
+    contact_kicker: 'Контакти',
+    contact_header: 'Зв’яжіться з нами!',
+    contact_sub: 'Маєте ідею сайту, застосунку, голограми або хочете впровадити ШІ? Напишіть — відповімо якнайшвидше.',
+    form_name: 'Ім’я',
+    form_phone: 'Номер телефону',
+    form_email: 'Електронна пошта',
+    form_message: 'Текст повідомлення',
+    form_send: 'Надіслати повідомлення',
+    form_sent: 'Дякуємо! Відкриваємо ваш поштовий клієнт…',
+    footer_data: 'Наші дані',
+    footer_social: 'Соціальні мережі',
+    footer_social_text: 'Познайомтеся з нами ближче.',
+    footer_hours: 'Години роботи',
+    footer_hours_text: 'Ми до ваших послуг завжди, коли це потрібно :)'
+  }
 };
-document.querySelectorAll('.flag').forEach(flag => {
-    flag.addEventListener('click', function () {
-        const selectedLang = this.getAttribute('data-lang');
-        document.getElementById('www_header').textContent = translations[selectedLang].www_header;
-        document.getElementById('www_text').textContent = translations[selectedLang].www_text;
-        document.getElementById('web_app_header').textContent = translations[selectedLang].web_app_header;
-        document.getElementById('web_app_text').textContent = translations[selectedLang].web_app_text;
-        document.getElementById('apex_header').textContent = translations[selectedLang].apex_header;
-        document.getElementById('apex_text').textContent = translations[selectedLang].apex_text;
-        document.getElementById('ai_header').textContent = translations[selectedLang].ai_header;
-        document.getElementById('ai_text').textContent = translations[selectedLang].ai_text;
-        document.getElementById('other_header').textContent = translations[selectedLang].other_header;
-        document.getElementById('other_text').textContent = translations[selectedLang].other_text;
-        document.getElementById('all_filter').textContent = translations[selectedLang].all_filter;
-        document.getElementById('app_filter').textContent = translations[selectedLang].app_filter;
-        document.getElementById('www_filter').textContent = translations[selectedLang].www_filter;
-        document.getElementById('other_filter').textContent = translations[selectedLang].other_filter;
-        document.getElementById('apex_filter').textContent = translations[selectedLang].apex_filter;
-        document.getElementById('uslugi_all_header').textContent = translations[selectedLang].uslugi_all_header;
-        document.getElementById('graph_header').textContent = translations[selectedLang].graph_header;
-        document.getElementById('graph_text').textContent = translations[selectedLang].graph_text;
-        document.getElementById('angular_header').textContent = translations[selectedLang].angular_header;
-        document.getElementById('angular_text').textContent = translations[selectedLang].angular_text;
-        document.getElementById('tech_header').textContent = translations[selectedLang].tech_header;
-        document.getElementById('tech_text').textContent = translations[selectedLang].tech_text;
-        document.getElementById('teach_header').textContent = translations[selectedLang].teach_header;
-        document.getElementById('teach_text').textContent = translations[selectedLang].teach_text;
-        document.getElementById('social_header').textContent = translations[selectedLang].social_header;
-        document.getElementById('social_text').textContent = translations[selectedLang].social_text;
-        document.getElementById('security_header').textContent = translations[selectedLang].security_header;
-        document.getElementById('security_text').textContent = translations[selectedLang].security_text;
-        document.getElementById('buisnes_header').textContent = translations[selectedLang].buisnes_header;
-        document.getElementById('buisnes_text').textContent = translations[selectedLang].buisnes_text;
-        document.getElementById('drone_header').textContent = translations[selectedLang].drone_header;
-        document.getElementById('drone_text').textContent = translations[selectedLang].drone_text;
-        document.getElementById('equipment_header').textContent = translations[selectedLang].equipment_header;
-        document.getElementById('equipment_text').textContent = translations[selectedLang].equipment_text;
-        document.getElementById('apex_off_header').textContent = translations[selectedLang].apex_off_header;
-        document.getElementById('apex_off_text').textContent = translations[selectedLang].apex_off_text;
-        document.getElementById('ai_teach_header').textContent = translations[selectedLang].ai_teach_header;
-        document.getElementById('ai_teach_text').textContent = translations[selectedLang].ai_teach_text;
-        document.getElementById('all_text').textContent = translations[selectedLang].all_text;
-    });
+
+// expose for other scripts (e.g. contact form status message)
+window.naappTranslations = translations;
+
+function setLanguage(lang) {
+  const dict = translations[lang];
+  if (!dict) return;
+
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (dict[key] !== undefined) {
+      el.placeholder = dict[key];
+      el.setAttribute('aria-label', dict[key]);
+    }
+  });
+
+  document.querySelectorAll('.flag').forEach(flag =>
+    flag.classList.toggle('active', flag.dataset.lang === lang)
+  );
+
+  // texts changed length — recompute hero slides height
+  window.updateHeroHeight?.();
+
+  try {
+    localStorage.setItem('naapp-lang', lang);
+  } catch { /* storage unavailable */ }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.flag').forEach(flag => {
+    flag.addEventListener('click', () => setLanguage(flag.dataset.lang));
+  });
+
+  let saved = 'pl';
+  try {
+    saved = localStorage.getItem('naapp-lang') || 'pl';
+  } catch { /* storage unavailable */ }
+  setLanguage(saved);
 });

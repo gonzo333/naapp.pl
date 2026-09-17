@@ -1,0 +1,66 @@
+<section class="section">
+  <div class="container">
+    <h1 class="badge">> Przyciągnij uwagę tłumów</h1>
+    <h3>
+      Tworzymy zaawansowane symulacje i wynajmujemy hologramy na wydarzenia
+      premium.
+    </h3>
+
+    <div class="hologram-wrapper">
+      <div id="hologram-container">
+        <div class="hologram-hud">
+          <h3>STATUS:</h3>
+          <p id="status-text">Inicjalizacja...</p>
+        </div>
+
+        <div id="laser-line" class="laser-line"></div>
+
+        <img
+          id="avatar-static-img"
+          src="assets/animation-photo.png"
+          class="avatar-element avatar-static active scanning"
+          alt="Tworzenie awatara"
+        />
+
+        <video
+          id="avatar-talking-video"
+          class="avatar-element avatar-video"
+          playsinline
+          controlsList="nodownload nofullscreen noremoteplayback"
+          disablePictureInPicture
+        >
+          <source id="talking-source" type="video/webm" />
+        </video>
+
+        <video
+          id="avatar-idle-video"
+          class="avatar-element avatar-video"
+          muted
+          playsinline
+          controlsList="nodownload nofullscreen noremoteplayback"
+          disablePictureInPicture
+        >
+          <source id="idle-source" type="video/webm" />
+        </video>
+
+        <button
+          id="muteToggle"
+          class="mute-toggle-btn"
+          aria-label="Włącz dźwięk"
+        ></button>
+      </div>
+
+      <div class="hologram-cta-container">
+        <a href="#" class="hologram-btn btn-primary" data-page="uslugi.html">
+          <span>Sprawdź ofertę</span>
+        </a>
+        <a href="#" class="hologram-btn btn-secondary" data-page="kontakt.html">
+          <span>Kontakt i wycena</span>
+        </a>
+        <a href="#" class="hologram-btn btn-tertiary" data-page="o-nas.html">
+          <span>O nas &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,1 @@
+// Plik nieużywany - cała logika SPA znajduje się w index.tsx
