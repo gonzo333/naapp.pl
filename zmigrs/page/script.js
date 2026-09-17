@@ -163,6 +163,26 @@ function formatDateToPolish(dateString) {
 }
 
 /**
+ * Truncates text to a maximum length without cutting words in half.
+ * Cleans up trailing punctuation and adds an ellipsis if truncated.
+ * @param {string} text - Input text string.
+ * @param {number} [maxLength=150] - Maximum character limit.
+ * @returns {string} Clean truncated string.
+ */
+function truncateText(text, maxLength = 150) {
+  if (!text) return "";
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+  const sub = normalized.slice(0, maxLength);
+  const lastSpace = sub.lastIndexOf(" ");
+  const clean = (lastSpace > 20 ? sub.slice(0, lastSpace) : sub).replace(
+    /[,.;:!?\- ]+$/,
+    "",
+  );
+  return clean + "…";
+}
+
+/**
  * Performs an HTTP GET request with client-side caching in sessionStorage to reduce API requests and avoid rate limits.
  * @param {string} url - The URL endpoint to fetch.
  * @param {number} [ttlMs=120000] - Time-to-live in milliseconds for cached response (default: 2 minutes).
@@ -269,6 +289,16 @@ function checkGalleryNavigation() {
   const nextBtn = document.querySelector(".next-btn");
 
   if (!container || !prevBtn || !nextBtn) return;
+
+  const articleDiv = document.getElementById("article-div");
+  if (articleDiv && articleDiv.classList.contains("gallery-hero-grid")) {
+    prevBtn.style.visibility = "hidden";
+    prevBtn.style.opacity = "0";
+    nextBtn.style.visibility = "hidden";
+    nextBtn.style.opacity = "0";
+    return;
+  }
+
   const hasItems = container.querySelectorAll("a").length > 0;
 
   // If gallery width exceeds visible client width, show scroll navigation buttons
@@ -370,17 +400,30 @@ async function loadArticle(id) {
     headerEl.appendChild(divider);
     articleEl.appendChild(headerEl);
 
-    const bodyEl = document.createElement("div");
-    bodyEl.className = "article-body article-segment";
+    const hasContent = Boolean(
+      content &&
+      (content
+        .replace(/<[^>]*>/g, "")
+        .replace(/&nbsp;/g, "")
+        .trim().length > 0 ||
+        /<(img|iframe|video|audio)/i.test(content)),
+    );
 
-    if (description && description.trim()) {
-      const leadDiv = document.createElement("div");
-      leadDiv.className = "article-lead";
-      leadDiv.textContent = description;
-      bodyEl.appendChild(leadDiv);
-    }
+    const articleDiv = document.getElementById("article-div");
 
-    if (content && content.trim()) {
+    if (hasContent) {
+      if (articleDiv) articleDiv.classList.remove("gallery-hero-grid");
+
+      const bodyEl = document.createElement("div");
+      bodyEl.className = "article-body article-segment";
+
+      if (description && description.trim()) {
+        const leadDiv = document.createElement("div");
+        leadDiv.className = "article-lead";
+        leadDiv.textContent = description;
+        bodyEl.appendChild(leadDiv);
+      }
+
       const contentDiv = document.createElement("div");
       contentDiv.className = "article-content";
       contentDiv.innerHTML =
@@ -388,8 +431,19 @@ async function loadArticle(id) {
           ? DOMPurify.sanitize(content)
           : content;
       bodyEl.appendChild(contentDiv);
+      articleEl.appendChild(bodyEl);
+    } else {
+      // Empty content: switch article container to enlarged hero + grid gallery layout
+      if (articleDiv) articleDiv.classList.add("gallery-hero-grid");
+
+      // Display description if provided as a clean standalone lead without the empty body segment
+      if (description && description.trim()) {
+        const leadDiv = document.createElement("div");
+        leadDiv.className = "article-lead article-lead-standalone";
+        leadDiv.textContent = description;
+        articleEl.appendChild(leadDiv);
+      }
     }
-    articleEl.appendChild(bodyEl);
 
     const footerEl = document.createElement("footer");
     footerEl.className = "article-footer";
@@ -400,7 +454,8 @@ async function loadArticle(id) {
     const authorItem = document.createElement("div");
     authorItem.className = "article-meta-item";
     const authorSpan = document.createElement("span");
-    authorSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">person</span>Autor: ';
+    authorSpan.innerHTML =
+      '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">person</span>Autor: ';
     const authorStrong = document.createElement("strong");
     authorStrong.textContent = author ? author.trim() : "Zarząd ZMiGRS";
     authorItem.appendChild(authorSpan);
@@ -411,7 +466,8 @@ async function loadArticle(id) {
       const srcItem = document.createElement("div");
       srcItem.className = "article-meta-item";
       const srcSpan = document.createElement("span");
-      srcSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">link</span>Źródło: ';
+      srcSpan.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">link</span>Źródło: ';
       const srcStrong = document.createElement("strong");
       srcStrong.textContent = sourceTrimmed;
       srcItem.appendChild(srcSpan);
@@ -423,7 +479,8 @@ async function loadArticle(id) {
       const photosItem = document.createElement("div");
       photosItem.className = "article-meta-item";
       const photosSpan = document.createElement("span");
-      photosSpan.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">photo_camera</span>Zdjęcia: ';
+      photosSpan.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 3px;">photo_camera</span>Zdjęcia: ';
       const photosStrong = document.createElement("strong");
       photosStrong.textContent = photosCreditTrimmed;
       photosItem.appendChild(photosSpan);
@@ -440,7 +497,14 @@ async function loadArticle(id) {
     hideLoadingToast();
 
     if (folder_id || attachments_count > 0) {
-      fetchAttachmentsRecursive(id, galleryContainer, 0, folder_id).then(() => {
+      fetchAttachmentsRecursive(
+        id,
+        galleryContainer,
+        0,
+        folder_id,
+        [],
+        metaGroup,
+      ).then(() => {
         initLightbox();
       });
     } else {
@@ -449,6 +513,332 @@ async function loadArticle(id) {
   } catch (e) {
     console.error("Błąd ładowania artykułu:", e);
     hideLoadingToast();
+  }
+}
+
+/**
+ * Checks whether a given attachment file is an image.
+ * @param {Object} file - Attachment file metadata object.
+ * @returns {boolean} True if the file is an image, false otherwise.
+ */
+function isImageFile(file) {
+  if (!file) return false;
+  const mime = (file.mime_type || "").toLowerCase();
+  if (mime.startsWith("image/") || mime.includes("image")) return true;
+  const name = (file.file_name || file.file_path || "").toLowerCase();
+  const ext = name.split(".").pop().split("?")[0];
+  return [
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "gif",
+    "svg",
+    "bmp",
+    "avif",
+    "heic",
+    "tiff",
+    "ico",
+  ].includes(ext);
+}
+
+/**
+ * Checks whether a given attachment file is gallery media (image or video).
+ * @param {Object} file - Attachment file metadata object.
+ * @returns {boolean} True if the file is media (image or video), false otherwise.
+ */
+function isGalleryMedia(file) {
+  if (!file) return false;
+  if (isImageFile(file)) return true;
+  const mime = (file.mime_type || "").toLowerCase();
+  if (mime.startsWith("video/") || mime.includes("video")) return true;
+  const name = (file.file_name || file.file_path || "").toLowerCase();
+  const ext = name.split(".").pop().split("?")[0];
+  return ["mp4", "webm", "ogg", "mov", "avi", "mkv", "m4v"].includes(ext);
+}
+
+/**
+ * Returns a Google Material Symbols icon name based on file extension and MIME type.
+ * @param {string} [fileName=""] - File name or path.
+ * @param {string} [mimeType=""] - MIME type of the file.
+ * @returns {string} Material Symbols icon name.
+ */
+function getFileIcon(fileName = "", mimeType = "") {
+  const ext = (fileName || "").split(".").pop().toLowerCase().split("?")[0];
+  const mime = (mimeType || "").toLowerCase();
+  if (ext === "pdf" || mime.includes("pdf")) return "picture_as_pdf";
+  if (
+    ["doc", "docx", "odt", "rtf", "txt"].includes(ext) ||
+    mime.includes("word") ||
+    mime.includes("text")
+  )
+    return "description";
+  if (
+    ["xls", "xlsx", "ods", "csv"].includes(ext) ||
+    mime.includes("sheet") ||
+    mime.includes("excel") ||
+    mime.includes("csv")
+  )
+    return "table_chart";
+  if (
+    ["ppt", "pptx", "odp"].includes(ext) ||
+    mime.includes("presentation") ||
+    mime.includes("powerpoint")
+  )
+    return "slideshow";
+  if (
+    ["zip", "rar", "7z", "tar", "gz"].includes(ext) ||
+    mime.includes("zip") ||
+    mime.includes("compressed")
+  )
+    return "folder_zip";
+  if (
+    ["mp3", "wav", "flac", "m4a", "aac"].includes(ext) ||
+    mime.startsWith("audio/")
+  )
+    return "audio_file";
+  if (
+    ["mp4", "webm", "mov", "avi", "mkv", "m4v"].includes(ext) ||
+    mime.startsWith("video/")
+  )
+    return "video_file";
+  if (
+    ["jpg", "jpeg", "png", "webp", "gif", "svg", "bmp", "avif"].includes(
+      ext,
+    ) ||
+    mime.startsWith("image/")
+  )
+    return "image";
+  return "attach_file";
+}
+
+/**
+ * Renders or updates the document attachments button inside the article meta group.
+ * @param {number|string} id - Article database ID.
+ * @param {string} folderId - Google Drive folder ID containing attachments.
+ * @param {number} count - Number of document attachments found.
+ * @param {HTMLElement} metaGroup - DOM container for metadata badges.
+ */
+function renderArticleAttachmentsButton(id, folderId, count, metaGroup) {
+  if (!metaGroup || count <= 0) return;
+
+  let btn = metaGroup.querySelector(".article-meta-attach");
+  if (!btn) {
+    btn = document.createElement("a");
+    btn.href = "#";
+    btn.className = "article-meta-item article-meta-attach";
+    btn.setAttribute("role", "button");
+    btn.setAttribute("title", "Pokaż załączniki dokumentowe do artykułu");
+    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; margin-right: 4px;">attach_file</span>Załączniki: <strong>(${count})</strong>`;
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openAttachmentModal(id, "news", folderId || "", {
+        excludeMedia: true,
+        title: `Załączniki do artykułu (${count})`,
+      });
+    });
+    metaGroup.appendChild(btn);
+  } else {
+    const strong = btn.querySelector("strong");
+    if (strong) strong.textContent = `(${count})`;
+    btn.onclick = (e) => {
+      e.preventDefault();
+      openAttachmentModal(id, "news", folderId || "", {
+        excludeMedia: true,
+        title: `Załączniki do artykułu (${count})`,
+      });
+    };
+  }
+}
+
+/**
+ * Creates and initializes the gallery loading status badge inside the article meta group.
+ * @param {number} total - Estimated or exact total number of gallery images.
+ * @param {HTMLElement} metaGroup - DOM container for article metadata items.
+ * @param {HTMLElement} container - Gallery images container.
+ * @param {Function} tryLoadSingleImage - Function to attempt loading a single image.
+ * @returns {Object} Tracker object containing state and DOM references.
+ */
+function createGalleryTracker(total, metaGroup, container, tryLoadSingleImage) {
+  const badge = document.createElement("div");
+  badge.className = "article-meta-item article-meta-gallery status-loading";
+  badge.id = "article-gallery-badge";
+
+  const leadIcon = document.createElement("span");
+  leadIcon.className = "material-symbols-outlined gallery-lead-icon";
+  leadIcon.style.cssText =
+    "font-size: 16px; vertical-align: -3px; margin-right: 4px; opacity: 0.85;";
+  leadIcon.textContent = "photo_library";
+
+  const textSpan = document.createElement("span");
+  textSpan.className = "gallery-badge-text";
+  textSpan.innerHTML = `Galeria: <strong>0 z ${total}</strong>`;
+
+  const statusContainer = document.createElement("span");
+  statusContainer.className = "gallery-badge-status-container";
+  statusContainer.style.cssText =
+    "display: inline-flex; align-items: center; margin-left: 6px;";
+
+  const spinIcon = document.createElement("span");
+  spinIcon.className = "material-symbols-outlined gallery-badge-icon spinning";
+  spinIcon.style.cssText =
+    "font-size: 16px; color: #38bdf8; vertical-align: middle;";
+  spinIcon.title = "Wczytywanie zdjęć...";
+  spinIcon.textContent = "sync";
+  statusContainer.appendChild(spinIcon);
+
+  badge.appendChild(leadIcon);
+  badge.appendChild(textSpan);
+  badge.appendChild(statusContainer);
+
+  metaGroup.appendChild(badge);
+
+  return {
+    total: total,
+    loaded: 0,
+    failedItems: [],
+    badge: badge,
+    textSpan: textSpan,
+    statusContainer: statusContainer,
+    container: container,
+    tryLoadSingleImage: tryLoadSingleImage,
+    isRetrying: false,
+  };
+}
+
+/**
+ * Updates the gallery status badge text, icon, and visual state.
+ * @param {Object} tracker - Gallery loading tracker object.
+ * @param {'loading'|'success'|'error'} state - Current state of gallery loading.
+ */
+function updateGalleryStatusBadge(tracker, state) {
+  if (!tracker || !tracker.badge) return;
+
+  const { total, loaded, failedItems, badge, textSpan, statusContainer } =
+    tracker;
+
+  // Always keep counter text up to date
+  textSpan.innerHTML = `Galeria: <strong>${loaded} z ${total}</strong>`;
+
+  // Reset status classes
+  badge.classList.remove("status-loading", "status-success", "status-error");
+  statusContainer.replaceChildren();
+
+  if (state === "loading") {
+    badge.classList.add("status-loading");
+    badge.title = `Wczytywanie zdjęć: ${loaded} z ${total}`;
+
+    const spinIcon = document.createElement("span");
+    spinIcon.className =
+      "material-symbols-outlined gallery-badge-icon spinning";
+    spinIcon.style.cssText =
+      "font-size: 16px; color: #38bdf8; vertical-align: middle;";
+    spinIcon.title = "Wczytywanie zdjęć...";
+    spinIcon.textContent = "sync";
+    statusContainer.appendChild(spinIcon);
+  } else if (state === "success") {
+    badge.classList.add("status-success");
+    badge.title = "Wszystkie zdjęcia zostały załadowane";
+
+    const checkIcon = document.createElement("span");
+    checkIcon.className =
+      "material-symbols-outlined gallery-badge-icon gallery-badge-success-icon";
+    checkIcon.style.cssText =
+      "font-size: 16px; color: #10b981; vertical-align: middle;";
+    checkIcon.title = "Wszystkie zdjęcia zostały pomyślnie załadowane";
+    checkIcon.textContent = "check_circle";
+    statusContainer.appendChild(checkIcon);
+  } else if (state === "error") {
+    badge.classList.add("status-error");
+    const count = failedItems.length;
+    const msg = `Nie udało się załadować ${count} ${count === 1 ? "zdjęcia" : "zdjęć"}. Kliknij, aby ponowić próbę`;
+    badge.title = msg;
+
+    const retryBtn = document.createElement("button");
+    retryBtn.type = "button";
+    retryBtn.className = "gallery-retry-btn";
+    retryBtn.title = msg;
+    retryBtn.setAttribute("aria-label", msg);
+
+    const refreshIcon = document.createElement("span");
+    refreshIcon.className = "material-symbols-outlined gallery-badge-icon";
+    refreshIcon.style.cssText =
+      "font-size: 16px; color: #ef4444; vertical-align: middle;";
+    refreshIcon.textContent = "refresh";
+    retryBtn.appendChild(refreshIcon);
+
+    retryBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      retryFailedGalleryImages(tracker);
+    });
+
+    statusContainer.appendChild(retryBtn);
+  }
+}
+
+/**
+ * Retries loading any failed gallery images when user clicks the red reload icon.
+ * @param {Object} tracker - Gallery loading tracker object.
+ */
+async function retryFailedGalleryImages(tracker) {
+  if (
+    !tracker ||
+    tracker.isRetrying ||
+    !tracker.failedItems ||
+    tracker.failedItems.length === 0
+  ) {
+    return;
+  }
+
+  tracker.isRetrying = true;
+  updateGalleryStatusBadge(tracker, "loading");
+
+  const toRetry = [...tracker.failedItems];
+  tracker.failedItems = [];
+
+  for (const item of toRetry) {
+    let fileId = item.file_id;
+    if (!fileId && item.file_path) {
+      const match = item.file_path.match(/[-\w]{25,}/);
+      if (match) fileId = match[0];
+    }
+
+    const imgResult = await tracker.tryLoadSingleImage(fileId, item.file_path);
+
+    if (imgResult.success) {
+      tracker.loaded++;
+      const a = document.createElement("a");
+      a.href = imgResult.finalUrl;
+      a.dataset.pswpWidth = imgResult.width;
+      a.dataset.pswpHeight = imgResult.height;
+      a.style.animation = "galleryFadeIn 0.3s ease-out";
+
+      const img = document.createElement("img");
+      img.alt = item.file_name || "Zdjęcie";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.src = imgResult.finalUrl;
+
+      a.appendChild(img);
+      tracker.container.appendChild(a);
+      checkGalleryNavigation();
+    } else {
+      tracker.failedItems.push(item);
+    }
+
+    updateGalleryStatusBadge(tracker, "loading");
+  }
+
+  tracker.isRetrying = false;
+  if (typeof initLightbox === "function") {
+    initLightbox();
+  }
+
+  if (tracker.failedItems.length === 0) {
+    updateGalleryStatusBadge(tracker, "success");
+  } else {
+    updateGalleryStatusBadge(tracker, "error");
   }
 }
 
@@ -468,21 +858,48 @@ function shuffleArray(array) {
 /**
  * Recursively queries attachments for an article from the Cloudflare Worker API,
  * loads image dimensions with fallback proxy retry, and populates the PhotoSwipe gallery DOM container.
+ * Also discovers non-media attachments and triggers rendering of an attachment button if present.
  * @param {number|string} id - Article database ID.
  * @param {HTMLElement} container - DOM element where image anchor tags are appended.
  * @param {number} [offset=0] - Starting offset for pagination.
  * @param {string} [folderId=""] - Google Drive folder ID containing attachments.
+ * @param {Array} [nonMediaCollector=[]] - Array accumulating non-media attachment objects.
+ * @param {HTMLElement|null} [metaGroup=null] - DOM element where the attachment button is mounted.
+ * @param {Object|null} [galleryTracker=null] - Tracker object maintaining gallery loading status.
+ * @returns {Promise<Array>} Collected non-media attachments.
  */
 async function fetchAttachmentsRecursive(
   id,
   container,
   offset = 0,
   folderId = "",
+  nonMediaCollector = [],
+  metaGroup = null,
+  galleryTracker = null,
 ) {
   try {
     const data = await fetchWithCache(
       `${api_url}?action=attachments&type=news&id=${encodeURIComponent(id)}&folderId=${encodeURIComponent(folderId)}&offset=${offset}`,
     );
+
+    const items = data.items || [];
+
+    // Collect non-media attachments (PDF, DOC, XLS, ZIP, etc.)
+    for (const item of items) {
+      if (!isGalleryMedia(item)) {
+        nonMediaCollector.push(item);
+      }
+    }
+
+    // Immediately render or update document attachments button if found
+    if (metaGroup && nonMediaCollector.length > 0) {
+      renderArticleAttachmentsButton(
+        id,
+        folderId,
+        nonMediaCollector.length,
+        metaGroup,
+      );
+    }
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const failedItemsQueue = [];
@@ -555,14 +972,35 @@ async function fetchAttachmentsRecursive(
       });
     };
 
+    // Calculate image items and initialize gallery tracker if photos exist
+    const imageItems = items.filter(isImageFile);
+    if (!galleryTracker && metaGroup) {
+      let totalImages = imageItems.length;
+      if (data.hasMore && data.total) {
+        totalImages = Math.max(
+          imageItems.length,
+          data.total - nonMediaCollector.length,
+        );
+      }
+      if (totalImages > 0) {
+        galleryTracker = createGalleryTracker(
+          totalImages,
+          metaGroup,
+          container,
+          tryLoadSingleImage,
+        );
+      }
+    } else if (galleryTracker && !data.hasMore) {
+      galleryTracker.total = Math.max(
+        galleryTracker.total,
+        galleryTracker.loaded + imageItems.length,
+      );
+      updateGalleryStatusBadge(galleryTracker, "loading");
+    }
+
     // STEP 1: MAIN PASS (Flat 2-second delay between images)
-    for (const item of data.items || []) {
-      if (
-        !item.mime_type ||
-        (!item.mime_type.startsWith("image/") &&
-          !item.mime_type.includes("image"))
-      )
-        continue;
+    for (const item of items) {
+      if (!isImageFile(item)) continue;
 
       let fileId = item.file_id;
       if (!fileId && item.file_path) {
@@ -573,6 +1011,11 @@ async function fetchAttachmentsRecursive(
       const imgResult = await tryLoadSingleImage(fileId, item.file_path);
 
       if (imgResult.success) {
+        if (galleryTracker) {
+          galleryTracker.loaded++;
+          updateGalleryStatusBadge(galleryTracker, "loading");
+        }
+
         const a = document.createElement("a");
         a.href = imgResult.finalUrl;
         a.dataset.pswpWidth = imgResult.width;
@@ -621,6 +1064,11 @@ async function fetchAttachmentsRecursive(
           const imgResult = await tryLoadSingleImage(fileId, item.file_path);
 
           if (imgResult.success) {
+            if (galleryTracker) {
+              galleryTracker.loaded++;
+              updateGalleryStatusBadge(galleryTracker, "loading");
+            }
+
             const a = document.createElement("a");
             a.href = imgResult.finalUrl;
             a.dataset.pswpWidth = imgResult.width;
@@ -645,18 +1093,42 @@ async function fetchAttachmentsRecursive(
       }
     }
 
+    if (galleryTracker && failedItemsQueue.length > 0) {
+      galleryTracker.failedItems.push(...failedItemsQueue);
+    }
+
     if (data.hasMore) {
       await fetchAttachmentsRecursive(
         id,
         container,
-        offset + (data.items ? data.items.length : 0),
+        offset + items.length,
         folderId,
+        nonMediaCollector,
+        metaGroup,
+        galleryTracker,
       );
     } else {
       setTimeout(checkGalleryNavigation, 200);
+
+      // Conclude gallery tracker when all recursive pages finish
+      if (galleryTracker) {
+        galleryTracker.total =
+          galleryTracker.loaded + galleryTracker.failedItems.length;
+        if (galleryTracker.failedItems.length > 0) {
+          updateGalleryStatusBadge(galleryTracker, "error");
+        } else {
+          updateGalleryStatusBadge(galleryTracker, "success");
+        }
+      }
     }
+
+    return nonMediaCollector;
   } catch (e) {
     console.error("Błąd pobierania załączników graficznych:", e);
+    if (galleryTracker) {
+      updateGalleryStatusBadge(galleryTracker, "error");
+    }
+    return nonMediaCollector;
   }
 }
 
@@ -677,7 +1149,8 @@ function createEmptyState(
 
   const iconDiv = document.createElement("div");
   iconDiv.style.cssText = "margin-bottom: 12px;";
-  iconDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size: 3rem; color: #94a3b8;">folder_open</span>';
+  iconDiv.innerHTML =
+    '<span class="material-symbols-outlined" style="font-size: 3rem; color: #94a3b8;">folder_open</span>';
 
   const h3 = document.createElement("h3");
   h3.style.cssText = "margin-bottom: 10px; font-size: 20px; color: #ffffff;";
@@ -770,8 +1243,8 @@ async function generateNews(containerId, isInitialLoad = true) {
 
       if (description) {
         const descP = document.createElement("p");
-        descP.style.whiteSpace = "pre-line";
-        descP.textContent = description;
+        descP.className = "article-card-desc";
+        descP.textContent = truncateText(description, 150);
         card.appendChild(descP);
       }
 
@@ -960,8 +1433,17 @@ async function downloadFile(fileId, type) {
  * @param {number|string} contentId - Database ID of the content item.
  * @param {string} type - Content type identifier ('resolutions', 'reports', 'news').
  * @param {string} [folderId=""] - Google Drive folder ID containing the files.
+ * @param {Object} [options={}] - Optional configuration options.
+ * @param {boolean} [options.excludeMedia=false] - Whether to exclude media (images/videos) from the modal list.
+ * @param {Function} [options.filterFn=null] - Custom filter function for attachments: (file) => boolean.
+ * @param {string} [options.title=""] - Custom title for the modal dialog.
  */
-async function openAttachmentModal(contentId, type, folderId = "") {
+async function openAttachmentModal(
+  contentId,
+  type,
+  folderId = "",
+  options = {},
+) {
   showLoadingToast("Ładowanie załączników...");
   const modalButtons = document.getElementById("modal-buttons");
   modalButtons.replaceChildren();
@@ -970,28 +1452,37 @@ async function openAttachmentModal(contentId, type, folderId = "") {
     return;
   }
 
+  const modalTitle = document.querySelector("#modal .modal-content h4");
+  if (modalTitle) {
+    modalTitle.textContent = options.title || "Wybierz załącznik";
+  }
+
   document.getElementById("modal").style.display = "block";
   const loadingP = document.createElement("p");
   loadingP.textContent = "Ładowanie załączników...";
   modalButtons.appendChild(loadingP);
+
+  let totalRendered = 0;
 
   async function fetchAll(offset = 0) {
     try {
       const data = await fetchWithCache(
         `${api_url}?action=attachments&type=${type}&id=${encodeURIComponent(contentId)}&folderId=${encodeURIComponent(folderId)}&offset=${offset}`,
       );
-      const items = data.items || [];
-      modalButtons.replaceChildren(); // Clear loading text
+      let items = data.items || [];
+      if (offset === 0) {
+        modalButtons.replaceChildren(); // Clear loading text
+      }
 
-      if (items.length === 0) {
-        const emptyP = document.createElement("p");
-        emptyP.textContent = "Brak załączników do wyświetlenia.";
-        modalButtons.appendChild(emptyP);
-        hideLoadingToast();
-        return;
+      // Dynamic filtering applied ONLY if explicitly specified in options (keeps all existing calls unfiltered)
+      if (typeof options.filterFn === "function") {
+        items = items.filter(options.filterFn);
+      } else if (options.excludeMedia) {
+        items = items.filter((file) => !isGalleryMedia(file));
       }
 
       items.forEach((file, index) => {
+        totalRendered++;
         const {
           file_id: itemId,
           file_name: fileName,
@@ -1004,8 +1495,19 @@ async function openAttachmentModal(contentId, type, folderId = "") {
         btn.target = "_blank";
         btn.className = "link-button no-flex";
 
-        const label = fileName ? fileName : `Plik ${offset + index + 1}`;
-        btn.appendChild(document.createTextNode(label));
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "material-symbols-outlined";
+        iconSpan.style.cssText =
+          "font-size: 20px; vertical-align: middle; margin-right: 8px;";
+        iconSpan.textContent = getFileIcon(fileName, file.mime_type);
+        btn.appendChild(iconSpan);
+
+        const labelSpan = document.createElement("span");
+        labelSpan.style.verticalAlign = "middle";
+        labelSpan.textContent = fileName
+          ? fileName
+          : `Plik ${offset + index + 1}`;
+        btn.appendChild(labelSpan);
 
         const dateP = document.createElement("p");
         const dateSmall = document.createElement("small");
@@ -1024,20 +1526,27 @@ async function openAttachmentModal(contentId, type, folderId = "") {
       });
 
       if (data.hasMore) {
-        await fetchAll(offset + items.length);
+        await fetchAll(offset + (data.items ? data.items.length : 0));
       } else {
+        if (totalRendered === 0) {
+          const emptyP = document.createElement("p");
+          emptyP.textContent = "Brak załączników do wyświetlenia.";
+          modalButtons.appendChild(emptyP);
+        }
         hideLoadingToast();
       }
     } catch (error) {
       console.error("Błąd pobierania załączników:", error);
-      modalButtons.replaceChildren();
-      const errP = document.createElement("p");
-      errP.textContent = "Wystąpił błąd podczas pobierania załączników.";
-      modalButtons.appendChild(errP);
+      if (totalRendered === 0) {
+        modalButtons.replaceChildren();
+        const errP = document.createElement("p");
+        errP.textContent = "Wystąpił błąd podczas pobierania załączników.";
+        modalButtons.appendChild(errP);
+      }
       hideLoadingToast();
     }
   }
-  await fetchAll();
+  await fetchAll(0);
 }
 
 /**
@@ -1057,11 +1566,35 @@ async function generateReports(containerId) {
 }
 
 /**
+ * Closes the slide-in mobile/tablet navigation drawer.
+ */
+function closeMobileDrawer() {
+  const mainNav = document.getElementById("main-nav");
+  const navBackdrop = document.getElementById("nav-backdrop");
+  if (mainNav) mainNav.classList.remove("open");
+  if (navBackdrop) navBackdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+/**
+ * Opens the slide-in mobile/tablet navigation drawer.
+ */
+function openMobileDrawer() {
+  const mainNav = document.getElementById("main-nav");
+  const navBackdrop = document.getElementById("nav-backdrop");
+  if (mainNav) mainNav.classList.add("open");
+  if (navBackdrop) navBackdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+/**
  * Single Page Application (SPA) view router. Displays the specified page view and hides others.
  * Updates navigation active state, repositions footer to current view, and scrolls to top.
  * @param {string} pageId - DOM ID of the target page view container ('home', 'article', etc.).
  */
 function showPage(pageId) {
+  closeMobileDrawer();
+
   if (currentPage === pageId && pageId !== "article") {
     return;
   }
@@ -1112,6 +1645,26 @@ window.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => generateReports("reports-div"), 600);
 
   homePage.appendChild(footer);
+
+  // Mobile / Tablet drawer navigation event listeners
+  const mobileToggle = document.getElementById("mobile-menu-toggle");
+  const drawerCloseBtn = document.getElementById("drawer-close-btn");
+  const navBackdrop = document.getElementById("nav-backdrop");
+
+  if (mobileToggle) {
+    mobileToggle.addEventListener("click", openMobileDrawer);
+  }
+  if (drawerCloseBtn) {
+    drawerCloseBtn.addEventListener("click", closeMobileDrawer);
+  }
+  if (navBackdrop) {
+    navBackdrop.addEventListener("click", closeMobileDrawer);
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeMobileDrawer();
+    }
+  });
 
   document.getElementById("close-modal").onclick = () => {
     document.getElementById("modal").style.display = "none";
@@ -1280,7 +1833,8 @@ if (contactForm) {
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Wysyłanie listu...';
+      submitBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Wysyłanie listu...';
     }
 
     const rawName = nameInput ? nameInput.value.trim() : "";
@@ -1468,7 +2022,9 @@ if (contactForm) {
       await delay(700);
 
       // STEP 3: WHITE ENVELOPE FLIES UP INTO THE SKY!
-      if (submitBtn) submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Odlatuje...';
+      if (submitBtn)
+        submitBtn.innerHTML =
+          '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>Odlatuje...';
       realEnvelope.classList.add("fly-away");
 
       await delay(700);

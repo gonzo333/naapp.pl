@@ -27,13 +27,23 @@
     <!-- SINGLE NAVIGATION HEADER -->
     <header>
         <div class="container active">
-            <div class="logo" onclick="showPage('home')">
-                <img src="assets/images/logo-icon.png" alt="Herb Związeku Miast i Gmin Regionu Świętokrzyskiego"
-                    class="logo-icon" />
-                <span style="font-family: sans-serif; text-wrap: wrap">Związek Miast i Gmin Regionu
-                    Świętokrzyskiego</span>
+            <div class="header-top-bar">
+                <div class="logo" onclick="showPage('home')">
+                    <img src="assets/images/logo-icon.png" alt="Herb Związeku Miast i Gmin Regionu Świętokrzyskiego"
+                        class="logo-icon" />
+                    <span style="font-family: sans-serif; text-wrap: wrap">Związek Miast i Gmin Regionu
+                        Świętokrzyskiego</span>
+                </div>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Otwórz menu nawigacji">
+                    <span class="material-symbols-outlined">menu</span>
+                    <span>Menu</span>
+                </button>
             </div>
-            <nav class="glass">
+            <nav class="glass" id="main-nav">
+                <div class="drawer-header">
+                    <span class="drawer-title">Menu</span>
+                    <button class="drawer-close-btn" id="drawer-close-btn" type="button" aria-label="Zamknij menu">&times;</button>
+                </div>
                 <div class="nav-links">
                     <a href="#" onclick="showPage('home')" class="active">Związek</a>
                     <a href="#" onclick="showPage('authorities')">Władze</a>
@@ -45,6 +55,7 @@
                     <a href="#" onclick="showPage('contacts')">Kontakt</a>
                 </div>
             </nav>
+            <div class="nav-backdrop" id="nav-backdrop"></div>
         </div>
     </header>
 
