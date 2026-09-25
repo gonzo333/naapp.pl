@@ -61,9 +61,7 @@
             statusEl.textContent = "Weryfikacja uprawnień i ładowanie edytora...";
 
             try {
-                // Optional ?fileId=... query parameter to load a specific Drive file/template
-                const fileId = new URLSearchParams(window.location.search).get('fileId');
-                const fetchUrl = `${WORKER_URL}/content-editor${fileId ? `?fileId=${encodeURIComponent(fileId)}` : ''}`;
+                const fetchUrl = `${WORKER_URL}/content-editor`;
 
                 const res = await fetch(fetchUrl, {
                     headers: {

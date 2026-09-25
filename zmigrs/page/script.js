@@ -603,9 +603,7 @@ function getFileIcon(fileName = "", mimeType = "") {
   )
     return "video_file";
   if (
-    ["jpg", "jpeg", "png", "webp", "gif", "svg", "bmp", "avif"].includes(
-      ext,
-    ) ||
+    ["jpg", "jpeg", "png", "webp", "gif", "svg", "bmp", "avif"].includes(ext) ||
     mime.startsWith("image/")
   )
     return "image";
@@ -906,17 +904,24 @@ async function fetchAttachmentsRecursive(
 
     const tryLoadSingleImage = (fileId, fallbackUrl) => {
       return new Promise((resolve) => {
-        const currentUrl = fileId
-          ? `https://lh3.googleusercontent.com/d/${fileId}=w1200`
-          : fallbackUrl;
+        let currentUrl = fallbackUrl || "";
+        if (fileId && api_url) {
+          currentUrl = `${api_url}/files/${fileId}`;
+        } else if (fileId) {
+          currentUrl = `https://lh3.googleusercontent.com/d/${fileId}=w1200`;
+        }
 
         const loader = new Image();
-        loader.referrerPolicy = "no-referrer"; // Avoid 403 Forbidden on Google Drive direct CDN
         let timer = setTimeout(() => {
-          handleError();
-        }, 4500);
+          resolve({
+            success: false,
+            finalUrl: currentUrl,
+            width: 1600,
+            height: 900,
+          });
+        }, 8000);
 
-        const handleSuccess = () => {
+        loader.onload = () => {
           clearTimeout(timer);
           resolve({
             success: true,
@@ -926,38 +931,8 @@ async function fetchAttachmentsRecursive(
           });
         };
 
-        const handleError = async () => {
+        loader.onerror = () => {
           clearTimeout(timer);
-          // Fallback fetch via Cloudflare Worker proxy endpoint (Base64 data URI) if direct lh3 URL is blocked
-          if (fileId && api_url) {
-            try {
-              const proxyData = await fetchWithCache(
-                `${api_url}?action=image&id=${encodeURIComponent(fileId)}`,
-              );
-              if (proxyData?.dataUri) {
-                const proxyLoader = new Image();
-                proxyLoader.onload = () => {
-                  resolve({
-                    success: true,
-                    finalUrl: proxyData.dataUri,
-                    width: proxyLoader.naturalWidth || 1600,
-                    height: proxyLoader.naturalHeight || 900,
-                  });
-                };
-                proxyLoader.onerror = () => {
-                  resolve({
-                    success: false,
-                    finalUrl: currentUrl,
-                    width: 1600,
-                    height: 900,
-                  });
-                };
-                proxyLoader.src = proxyData.dataUri;
-                return;
-              }
-            } catch (err) {}
-          }
-
           resolve({
             success: false,
             finalUrl: currentUrl,
@@ -966,8 +941,6 @@ async function fetchAttachmentsRecursive(
           });
         };
 
-        loader.onload = handleSuccess;
-        loader.onerror = handleError;
         loader.src = currentUrl;
       });
     };
@@ -1036,18 +1009,15 @@ async function fetchAttachmentsRecursive(
         failedItemsQueue.push(item);
       }
 
-      await delay(2000);
+      await delay(100);
     }
 
-    // STEP 2: PROCESS FAILED ITEMS QUEUE (Two passes with 10s pause and 5s delay between files in random order)
+    // STEP 2: PROCESS FAILED ITEMS QUEUE (Two quick passes if any image fails)
     if (failedItemsQueue.length > 0) {
       for (let pass = 1; pass <= 2; pass++) {
         if (failedItemsQueue.length === 0) break;
 
-        console.warn(
-          `Próba #${pass} dla ${failedItemsQueue.length} nieudanych zdjęć. Wstrzymanie na 10 sekund...`,
-        );
-        await delay(10000);
+        await delay(1500);
 
         shuffleArray(failedItemsQueue);
 
@@ -1153,12 +1123,12 @@ function createEmptyState(
     '<span class="material-symbols-outlined" style="font-size: 3rem; color: #94a3b8;">folder_open</span>';
 
   const h3 = document.createElement("h3");
-  h3.style.cssText = "margin-bottom: 10px; font-size: 20px; color: #ffffff;";
+  h3.style.cssText = "margin-bottom: 10px; font-size: 1.25rem; color: #ffffff;";
   h3.textContent = title;
 
   const p = document.createElement("p");
   p.style.cssText =
-    "color: rgba(255, 255, 255, 0.85); font-size: 15px; max-width: 600px; margin: 0 auto; line-height: 1.6;";
+    "color: rgba(255, 255, 255, 0.85); font-size: 0.9375rem; max-width: 600px; margin: 0 auto; line-height: 1.6;";
   p.textContent = message;
 
   card.appendChild(iconDiv);
@@ -1167,110 +1137,533 @@ function createEmptyState(
   return card;
 }
 
+// ── ARTICLES: SEARCH, FILTERING, AND INFINITE SCROLL ──
+
+const NEWS_PAGE_SIZE = 6;
+
 /**
- * Fetches paginated news articles from Cloudflare Worker API, creates interactive glass cards,
- * sorts descending by publication date, and configures an infinite scroll sentinel.
- * @param {string} containerId - Target DOM container element ID.
- * @param {boolean} [isInitialLoad=true] - Whether to reset list offset and header on initial render.
+ * Global state for news search, filtering, and infinite scroll.
  */
-async function generateNews(containerId, isInitialLoad = true) {
-  const container = document.getElementById(containerId);
-  const state = paginationState.news;
-  if (!container || state.loading) return;
+const newsSearchState = {
+  allItems: [], // Complete collection of loaded articles
+  filteredItems: [], // Filtered results by query, year, and sorting
+  visibleCount: 6, // Count of currently rendered cards in DOM
+  query: "",
+  selectedYear: "all",
+  sortOrder: "date-desc",
+  isInitialized: false,
+  isLoading: false,
+};
 
-  // Reset on initial load
-  if (isInitialLoad) {
-    state.offset = 0;
-    container.innerHTML = `<h2 style="grid-column:1/-1">Aktualności:</h2>
-                               <div id="article-list-content" class="grid-list"></div>`;
-  }
+/**
+ * Sanitizes text to prevent Cross-Site Scripting (XSS) attacks.
+ * @param {string} str - Input text to sanitize.
+ * @returns {string} Sanitized safe HTML string.
+ */
+function escapeHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-  state.loading = true;
-  const contentDiv = document.getElementById("article-list-content");
+/**
+ * Normalizes search query text by stripping Polish diacritic characters.
+ * Converts accented characters to their base Latin forms (e.g., ą->a, ł->l, ś->s),
+ * allowing users to match articles regardless of whether diacritics were typed.
+ * @param {string} str - Input search text.
+ * @returns {string} Normalized lowercase string without diacritics.
+ */
+function normalizePolishText(str) {
+  if (!str) return "";
+  return String(str)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ł/g, "l")
+    .replace(/Ł/g, "l")
+    .trim();
+}
+
+/**
+ * Highlights matched keywords in text using <mark class="search-highlight"> tags.
+ * Accounts for variants both with and without Polish diacritics.
+ * @param {string} text - Original source text.
+ * @param {string} query - Active search query string.
+ * @returns {string} HTML string with highlighted keywords.
+ */
+function highlightSearchTerms(text, query) {
+  if (!text) return "";
+  if (!query || !query.trim()) return escapeHTML(text);
+
+  const rawWords = query
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 0);
+  if (rawWords.length === 0) return escapeHTML(text);
+
+  const charMap = {
+    a: "[aąAĄ]",
+    c: "[cćCĆ]",
+    e: "[eęEĘ]",
+    l: "[lłLŁ]",
+    n: "[nńNŃ]",
+    o: "[oóOÓ]",
+    s: "[sśSŚ]",
+    z: "[zźżZŹŻ]",
+  };
+
+  const patternParts = rawWords.map((word) => {
+    const normalized = normalizePolishText(word);
+    return normalized
+      .split("")
+      .map((ch) => charMap[ch] || ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("");
+  });
 
   try {
-    const data = await fetchWithCache(
-      `${api_url}?action=articles&offset=${state.offset}`,
-    );
-    const list = data.items || [];
+    const regex = new RegExp(`(${patternParts.join("|")})`, "gi");
+    const safeText = escapeHTML(text);
+    return safeText.replace(regex, '<mark class="search-highlight">$1</mark>');
+  } catch (err) {
+    return escapeHTML(text);
+  }
+}
 
-    // Additional safety: descending sort by publication date (newest entries first)
-    list.sort((a, b) => {
-      const dateA = a.publication_date
-        ? new Date(a.publication_date).getTime()
-        : 0;
-      const dateB = b.publication_date
-        ? new Date(b.publication_date).getTime()
-        : 0;
-      return dateB - dateA;
+/**
+ * Creates an article card DOM element with accessibility support and search term highlighting.
+ * @param {Object} item - Article data object from database/API.
+ * @param {string} query - Active search query string.
+ * @returns {HTMLElement} Rendered article card element.
+ */
+function createNewsCard(item, query = "") {
+  const { news_id, name, publication_date, author, description } = item;
+
+  const card = document.createElement("div");
+  card.className = "about-text glass clickable-card content-card-item";
+  card.setAttribute("role", "article");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", `Artykuł: ${name || "Brak tytułu"}`);
+  card.addEventListener("click", () => loadArticle(news_id));
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      loadArticle(news_id);
+    }
+  });
+
+  const h3 = document.createElement("h3");
+  const a = document.createElement("a");
+  a.href = "#article";
+  a.innerHTML = highlightSearchTerms(name || "Brak tytułu", query);
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    loadArticle(news_id);
+  });
+  h3.appendChild(a);
+  card.appendChild(h3);
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "card-meta";
+
+  if (publication_date) {
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "meta-date";
+    dateSpan.innerHTML = `<span class="material-symbols-outlined meta-icon" aria-hidden="true">calendar_today</span>${formatDateToPolish(publication_date)}`;
+    metaRow.appendChild(dateSpan);
+  }
+
+  const authorSpan = document.createElement("span");
+  authorSpan.className = "meta-author";
+  authorSpan.innerHTML = `<span class="material-symbols-outlined meta-icon" aria-hidden="true">person</span>${escapeHTML(author || "Zarząd ZMiGRS")}`;
+  metaRow.appendChild(authorSpan);
+
+  card.appendChild(metaRow);
+
+  if (description && description.trim()) {
+    const descP = document.createElement("p");
+    descP.className = "article-card-desc";
+    descP.innerHTML = highlightSearchTerms(
+      truncateText(description, 160),
+      query,
+    );
+    card.appendChild(descP);
+  }
+
+  const readMore = document.createElement("div");
+  readMore.className = "card-readmore";
+  readMore.innerHTML = `<span>Czytaj artykuł</span><span class="material-symbols-outlined readmore-arrow" aria-hidden="true">arrow_forward</span>`;
+  card.appendChild(readMore);
+
+  return card;
+}
+
+/**
+ * Filters and sorts articles, then renders the initial batch with infinite scroll support.
+ * @param {boolean} [resetPagination=true] - Whether to reset pagination counter back to NEWS_PAGE_SIZE.
+ */
+function applyNewsFilters(resetPagination = true) {
+  const { allItems, query, selectedYear, sortOrder } = newsSearchState;
+  const contentDiv = document.getElementById("article-list-content");
+  const statusEl = document.getElementById("news-search-status");
+  const clearBtn = document.getElementById("news-search-clear");
+
+  if (!contentDiv) return;
+
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? "inline-flex" : "none";
+  }
+
+  let filtered = allItems.slice();
+
+  // 1. Text search filtering by query
+  if (query) {
+    const queryTokens = normalizePolishText(query)
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+
+    filtered = filtered.filter((item) => {
+      const target = item._searchIndex || "";
+      return queryTokens.every((token) => target.includes(token));
+    });
+  }
+
+  // 2. Year filtering
+  if (selectedYear !== "all") {
+    filtered = filtered.filter(
+      (item) =>
+        item.publication_date && item.publication_date.startsWith(selectedYear),
+    );
+  }
+
+  // 3. Sorting
+  filtered.sort((a, b) => {
+    if (sortOrder === "date-asc") {
+      return (a.publication_date || "").localeCompare(b.publication_date || "");
+    }
+    if (sortOrder === "title-asc") {
+      return (a.name || "").localeCompare(b.name || "", "pl", {
+        sensitivity: "base",
+      });
+    }
+    if (sortOrder === "title-desc") {
+      return (b.name || "").localeCompare(a.name || "", "pl", {
+        sensitivity: "base",
+      });
+    }
+    // Default: newest first
+    return (b.publication_date || "").localeCompare(a.publication_date || "");
+  });
+
+  newsSearchState.filteredItems = filtered;
+
+  if (resetPagination) {
+    newsSearchState.visibleCount = NEWS_PAGE_SIZE;
+  }
+
+  // Remove previous sentinel element before re-rendering
+  const oldSentinel = document.getElementById("news-sentinel");
+  if (oldSentinel) oldSentinel.remove();
+
+  contentDiv.replaceChildren();
+
+  // Empty state when no matching results are found
+  if (filtered.length === 0) {
+    const emptyBox = document.createElement("div");
+    emptyBox.className = "empty-search-state glass";
+    emptyBox.innerHTML = `
+      <span class="material-symbols-outlined empty-search-icon" aria-hidden="true">search_off</span>
+      <h3>Nie znaleziono aktualności</h3>
+      <p>Żaden artykuł nie pasuje do wybranych kryteriów wyszukiwania${
+        query ? ` („<strong>${escapeHTML(query)}</strong>”)` : ""
+      }${selectedYear !== "all" ? ` w roku ${escapeHTML(selectedYear)}` : ""}.</p>
+      <button type="button" class="cta-button" onclick="resetNewsFilters()">Wyczyść filtry i pokaż wszystkie</button>
+    `;
+    contentDiv.appendChild(emptyBox);
+
+    if (statusEl) {
+      statusEl.innerHTML = `Znaleziono: <strong>0</strong> z ${allItems.length} aktualności`;
+    }
+    return;
+  }
+
+  // Render initial batch (Infinite Scroll)
+  const currentChunk = filtered.slice(0, newsSearchState.visibleCount);
+  const fragment = document.createDocumentFragment();
+  for (const item of currentChunk) {
+    const card = createNewsCard(item, query);
+    fragment.appendChild(card);
+  }
+  contentDiv.appendChild(fragment);
+
+  // If more articles remain to be loaded, insert the infinite scroll sentinel
+  if (newsSearchState.visibleCount < filtered.length) {
+    contentDiv.insertAdjacentHTML(
+      "afterend",
+      `<div id="news-sentinel" style="grid-column:1/-1; height:20px;"></div>`,
+    );
+    setupInfiniteScroll("news", "news-sentinel", "news-div");
+  }
+
+  // Update status bar
+  if (statusEl) {
+    const isFiltered = query.length > 0 || selectedYear !== "all";
+    const showing = Math.min(newsSearchState.visibleCount, filtered.length);
+    if (!isFiltered) {
+      if (showing < filtered.length) {
+        statusEl.innerHTML = `Wyświetlanie: <strong>${showing} z ${filtered.length}</strong> aktualności (przewiń w dół, aby wczytać kolejne)`;
+      } else {
+        statusEl.innerHTML = `Łącznie opublikowanych: <strong>${filtered.length}</strong> aktualności`;
+      }
+    } else {
+      let statusText = `Znaleziono: <strong>${filtered.length}</strong> z ${allItems.length} aktualności`;
+      if (query) {
+        statusText += ` dla frazy „<strong>${escapeHTML(query)}</strong>”`;
+      }
+      if (selectedYear !== "all") {
+        statusText += ` (rok: <strong>${escapeHTML(selectedYear)}</strong>)`;
+      }
+      if (showing < filtered.length) {
+        statusText += ` — widoczne ${showing}`;
+      }
+      statusEl.innerHTML = statusText;
+    }
+  }
+}
+
+/**
+ * Loads the next batch of articles for infinite scroll when the sentinel enters viewport.
+ */
+function appendNextNewsBatch() {
+  const { filteredItems, visibleCount, query } = newsSearchState;
+  const contentDiv = document.getElementById("article-list-content");
+  const statusEl = document.getElementById("news-search-status");
+
+  if (!contentDiv || visibleCount >= filteredItems.length) return;
+
+  const oldSentinel = document.getElementById("news-sentinel");
+  if (oldSentinel) oldSentinel.remove();
+
+  const nextBatch = filteredItems.slice(
+    visibleCount,
+    visibleCount + NEWS_PAGE_SIZE,
+  );
+  newsSearchState.visibleCount += nextBatch.length;
+
+  const fragment = document.createDocumentFragment();
+  for (const item of nextBatch) {
+    const card = createNewsCard(item, query);
+    fragment.appendChild(card);
+  }
+  contentDiv.appendChild(fragment);
+
+  // If more items remain, move the sentinel to the bottom
+  if (newsSearchState.visibleCount < filteredItems.length) {
+    contentDiv.insertAdjacentHTML(
+      "afterend",
+      `<div id="news-sentinel" style="grid-column:1/-1; height:20px;"></div>`,
+    );
+    setupInfiniteScroll("news", "news-sentinel", "news-div");
+  }
+
+  // Update status bar
+  if (statusEl) {
+    const isFiltered =
+      query.length > 0 || newsSearchState.selectedYear !== "all";
+    const showing = Math.min(
+      newsSearchState.visibleCount,
+      filteredItems.length,
+    );
+    if (!isFiltered) {
+      if (showing < filteredItems.length) {
+        statusEl.innerHTML = `Wyświetlanie: <strong>${showing} z ${filteredItems.length}</strong> aktualności (przewiń w dół, aby wczytać kolejne)`;
+      } else {
+        statusEl.innerHTML = `Łącznie opublikowanych: <strong>${filteredItems.length}</strong> aktualności`;
+      }
+    } else {
+      statusEl.innerHTML = `Znaleziono: <strong>${filteredItems.length}</strong> z ${newsSearchState.allItems.length} aktualności — widoczne ${showing}`;
+    }
+  }
+}
+
+/**
+ * Resets all search and filter controls to default values and scrolls to list top.
+ */
+function resetNewsFilters() {
+  const searchInput = document.getElementById("news-search-input");
+  const yearSelect = document.getElementById("news-year-filter");
+  const sortSelect = document.getElementById("news-sort-filter");
+
+  if (searchInput) searchInput.value = "";
+  if (yearSelect) yearSelect.value = "all";
+  if (sortSelect) sortSelect.value = "date-desc";
+
+  newsSearchState.query = "";
+  newsSearchState.selectedYear = "all";
+  newsSearchState.sortOrder = "date-desc";
+
+  applyNewsFilters(true);
+}
+window.resetNewsFilters = resetNewsFilters;
+window.applyNewsFilters = applyNewsFilters;
+
+/**
+ * Initializes event listeners for the news search bar, filters, and reset button.
+ */
+function initNewsSearch() {
+  if (newsSearchState.isInitialized) return;
+
+  const searchInput = document.getElementById("news-search-input");
+  const clearBtn = document.getElementById("news-search-clear");
+  const yearSelect = document.getElementById("news-year-filter");
+  const sortSelect = document.getElementById("news-sort-filter");
+  const resetBtn = document.getElementById("news-reset-filters");
+
+  let debounceTimer = null;
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        newsSearchState.query = e.target.value.trim();
+        applyNewsFilters(true);
+      }, 150);
     });
 
-    if (list.length === 0 && state.offset === 0) {
-      contentDiv.replaceChildren(
-        createEmptyState(
-          "Brak aktualności",
-          "Przepraszamy, nie znaleziono jeszcze żadnych opublikowanych aktualności. Zapraszamy ponownie za chwilę!",
-        ),
-      );
-      state.loading = false;
-      return;
-    }
-
-    for (const item of list) {
-      const { news_id, name, publication_date, author, description } = item;
-
-      const card = document.createElement("div");
-      card.className = "about-text glass clickable-card";
-      card.addEventListener("click", () => loadArticle(news_id));
-
-      const h3 = document.createElement("h3");
-      const a = document.createElement("a");
-      a.href = "#";
-      a.textContent = name || "Brak tytułu";
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        loadArticle(news_id);
-      });
-      h3.appendChild(a);
-      card.appendChild(h3);
-
-      const dateP = document.createElement("p");
-      const dateSmall = document.createElement("small");
-      dateSmall.textContent = formatDateToPolish(publication_date);
-      dateP.appendChild(dateSmall);
-      card.appendChild(dateP);
-
-      if (description) {
-        const descP = document.createElement("p");
-        descP.className = "article-card-desc";
-        descP.textContent = truncateText(description, 150);
-        card.appendChild(descP);
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchInput.value = "";
+        newsSearchState.query = "";
+        applyNewsFilters(true);
       }
+    });
+  }
 
-      const authorP = document.createElement("p");
-      authorP.textContent = author || "Zarząd ZMiGRS";
-      card.appendChild(authorP);
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (searchInput) {
+        searchInput.value = "";
+        searchInput.focus();
+      }
+      newsSearchState.query = "";
+      applyNewsFilters(true);
+    });
+  }
 
-      contentDiv.appendChild(card);
-    }
+  if (yearSelect) {
+    yearSelect.addEventListener("change", (e) => {
+      newsSearchState.selectedYear = e.target.value;
+      applyNewsFilters(true);
+    });
+  }
 
-    const oldSentinel = document.getElementById("news-sentinel");
-    if (oldSentinel) oldSentinel.remove();
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      newsSearchState.sortOrder = e.target.value;
+      applyNewsFilters(true);
+    });
+  }
 
-    // Update offset for the next batch
-    state.offset += list.length;
+  if (resetBtn) {
+    resetBtn.addEventListener("click", resetNewsFilters);
+  }
 
-    if (data.hasMore) {
-      contentDiv.insertAdjacentHTML(
-        "afterend",
-        `<div id="news-sentinel" style="grid-column:1/-1; height:20px;"></div>`,
+  newsSearchState.isInitialized = true;
+}
+
+/**
+ * Main function fetching news articles from the Cloudflare Worker API.
+ * Handles initial data loading, indexing for live search,
+ * and subsequent batches triggered by infinite scroll (isInitialLoad = false).
+ * @param {string} containerId - Target DOM container ID.
+ * @param {boolean} [isInitialLoad=true] - True for initial load, false for infinite scroll batches.
+ */
+async function generateNews(containerId, isInitialLoad = true) {
+  const contentDiv = document.getElementById("article-list-content");
+  const statusEl = document.getElementById("news-search-status");
+
+  // If triggered by infinite scroll sentinel: load next batch
+  if (!isInitialLoad) {
+    appendNextNewsBatch();
+    return;
+  }
+
+  initNewsSearch();
+
+  // If articles are already fetched in memory, render with active filters
+  if (newsSearchState.allItems.length > 0) {
+    applyNewsFilters(true);
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; animation: spin 1s linear infinite;">sync</span> Pobieranie aktualności z serwera...`;
+  }
+
+  try {
+    let offset = 0;
+    let hasMore = true;
+    const allFetched = [];
+
+    // Fetch data batches from API (so search has full dataset available)
+    while (hasMore) {
+      const data = await fetchWithCache(
+        `${api_url}?action=articles&offset=${offset}`,
       );
-      setupInfiniteScroll("news", "news-sentinel", containerId);
+      const list = data.items || [];
+      allFetched.push(...list);
+      offset += list.length;
+      hasMore = Boolean(data.hasMore && list.length > 0);
+      if (offset > 500) break; // Loop guard / safety cutoff
     }
+
+    // Index articles for instant client-side live search
+    for (const item of allFetched) {
+      const cleanContent = (item.content || "")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/g, " ");
+      item._searchIndex = normalizePolishText(
+        `${item.name || ""} ${item.description || ""} ${item.author || ""} ${cleanContent}`,
+      );
+    }
+
+    newsSearchState.allItems = allFetched;
+
+    // Dynamically populate publication year filter options
+    const yearSelect = document.getElementById("news-year-filter");
+    if (yearSelect) {
+      const years = [
+        ...new Set(
+          allFetched
+            .map((it) =>
+              it.publication_date ? it.publication_date.substring(0, 4) : null,
+            )
+            .filter((y) => y && /^\d{4}$/.test(y)),
+        ),
+      ]
+        .sort()
+        .reverse();
+
+      yearSelect.innerHTML = `<option value="all">Wszystkie lata (${allFetched.length})</option>`;
+      for (const y of years) {
+        const count = allFetched.filter(
+          (it) => it.publication_date && it.publication_date.startsWith(y),
+        ).length;
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = `Rok ${y} (${count})`;
+        yearSelect.appendChild(opt);
+      }
+    }
+
+    applyNewsFilters(true);
   } catch (e) {
-    console.error("Błąd ładowania newsów:", e);
-    if (state.offset === 0 && contentDiv) {
+    console.error("Błąd ładowania aktualności:", e);
+    if (contentDiv) {
       contentDiv.replaceChildren(
         createEmptyState(
           "Przepraszamy, wystąpił problem podczas ładowania aktualności",
@@ -1278,128 +1671,579 @@ async function generateNews(containerId, isInitialLoad = true) {
         ),
       );
     }
-  } finally {
-    state.loading = false;
+    if (statusEl) {
+      statusEl.textContent = "Błąd pobierania danych z serwera.";
+    }
+  }
+}
+
+// ── RESOLUTIONS & REPORTS: SEARCH, FILTERING, AND INFINITE SCROLL ──
+
+const resolutionsSearchState = {
+  allItems: [],
+  filteredItems: [],
+  visibleCount: 6,
+  query: "",
+  selectedYear: "all",
+  sortOrder: "date-desc",
+  isInitialized: false,
+  isLoading: false,
+};
+
+const reportsSearchState = {
+  allItems: [],
+  filteredItems: [],
+  visibleCount: 6,
+  query: "",
+  selectedYear: "all",
+  sortOrder: "date-desc",
+  isInitialized: false,
+  isLoading: false,
+};
+
+const dataSearchStates = {
+  news: newsSearchState,
+  resolutions: resolutionsSearchState,
+  reports: reportsSearchState,
+};
+
+const dataConfigs = {
+  resolutions: {
+    type: "resolutions",
+    title: "Uchwały",
+    titlePlural: "uchwały",
+    titleGenitive: "uchwał",
+    contentId: "resolutions-list-content",
+    containerId: "resolutions-div",
+    apiAction: "resolutions",
+  },
+  reports: {
+    type: "reports",
+    title: "Sprawozdania",
+    titlePlural: "sprawozdania",
+    titleGenitive: "sprawozdań",
+    contentId: "reports-list-content",
+    containerId: "reports-div",
+    apiAction: "reports",
+  },
+};
+
+/**
+ * Creates a card element for a resolution or report with attachment support and search highlighting.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
+ * @param {Object} item - Data item object.
+ * @param {string} [query=""] - Active search query string.
+ * @returns {HTMLElement} Rendered card DOM element.
+ */
+function createDataCard(type, item, query = "") {
+  const itemId =
+    item[`${type}_id`] || item[`${type.replace(/s$/, "")}_id`] || item.id;
+  const { name, description, attachments_count, folder_id, publication_date } =
+    item;
+  const hasAttachments = Boolean(
+    folder_id || (attachments_count && attachments_count > 0),
+  );
+
+  const card = document.createElement("div");
+  card.className = "about-text glass content-card-item";
+
+  if (hasAttachments) {
+    card.classList.add("clickable-card");
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    const typeLabel = type === "resolutions" ? "Uchwała" : "Sprawozdanie";
+    card.setAttribute(
+      "aria-label",
+      `${typeLabel}: ${name || "Brak nazwy"}. Kliknij, aby zobaczyć załączniki.`,
+    );
+
+    const openModalHandler = (e) => {
+      if (
+        e.target.closest("a") &&
+        !e.target.closest(".card-title-link, .card-attach-btn")
+      ) {
+        return;
+      }
+      e.preventDefault();
+      openAttachmentModal(itemId, type, folder_id || "");
+    };
+
+    card.addEventListener("click", openModalHandler);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openAttachmentModal(itemId, type, folder_id || "");
+      }
+    });
+  }
+
+  const h3 = document.createElement("h3");
+  if (hasAttachments) {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.className = "card-title-link";
+    a.innerHTML = highlightSearchTerms(name || "Brak nazwy", query);
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openAttachmentModal(itemId, type, folder_id || "");
+    });
+    h3.appendChild(a);
+  } else {
+    h3.innerHTML = highlightSearchTerms(name || "Brak nazwy", query);
+  }
+  card.appendChild(h3);
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "card-meta";
+
+  if (publication_date) {
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "meta-date";
+    dateSpan.innerHTML = `<span class="material-symbols-outlined meta-icon" aria-hidden="true">calendar_today</span>${formatDateToPolish(publication_date)}`;
+    metaRow.appendChild(dateSpan);
+  }
+
+  if (hasAttachments) {
+    const attachSpan = document.createElement("span");
+    attachSpan.className = "meta-author";
+    const countText = attachments_count ? ` (${attachments_count})` : "";
+    attachSpan.innerHTML = `<span class="material-symbols-outlined meta-icon" aria-hidden="true">attach_file</span>Załączniki${countText}`;
+    metaRow.appendChild(attachSpan);
+  }
+
+  card.appendChild(metaRow);
+
+  if (description && description.trim()) {
+    const descP = document.createElement("p");
+    descP.className = "article-card-desc";
+    descP.innerHTML = highlightSearchTerms(
+      truncateText(description, 200),
+      query,
+    );
+    card.appendChild(descP);
+  }
+
+  if (hasAttachments) {
+    const readMore = document.createElement("div");
+    readMore.className = "card-readmore card-attach-btn";
+    const countText = attachments_count ? ` (${attachments_count})` : "";
+    readMore.innerHTML = `<span>Pobierz załączniki${countText}</span><span class="material-symbols-outlined readmore-arrow" aria-hidden="true">arrow_forward</span>`;
+    card.appendChild(readMore);
+  }
+
+  return card;
+}
+
+/**
+ * Filters and sorts resolutions or reports, then renders a batch with infinite scroll support.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
+ * @param {boolean} [resetPagination=true] - Whether to reset pagination counter back to NEWS_PAGE_SIZE.
+ */
+function applyDataFilters(type, resetPagination = true) {
+  const config = dataConfigs[type];
+  const state = dataSearchStates[type];
+  if (!config || !state) return;
+
+  const { allItems, query, selectedYear, sortOrder } = state;
+  const contentDiv = document.getElementById(config.contentId);
+  const statusEl = document.getElementById(`${type}-search-status`);
+  const clearBtn = document.getElementById(`${type}-search-clear`);
+
+  if (!contentDiv) return;
+
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? "inline-flex" : "none";
+  }
+
+  let filtered = allItems.slice();
+
+  // 1. Text search filtering by query
+  if (query) {
+    const queryTokens = normalizePolishText(query)
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+
+    filtered = filtered.filter((item) => {
+      const target = item._searchIndex || "";
+      return queryTokens.every((token) => target.includes(token));
+    });
+  }
+
+  // 2. Year filtering
+  if (selectedYear !== "all") {
+    filtered = filtered.filter(
+      (item) =>
+        item.publication_date && item.publication_date.startsWith(selectedYear),
+    );
+  }
+
+  // 3. Sorting
+  filtered.sort((a, b) => {
+    if (sortOrder === "date-asc") {
+      return (a.publication_date || "").localeCompare(b.publication_date || "");
+    }
+    if (sortOrder === "title-asc") {
+      return (a.name || "").localeCompare(b.name || "", "pl", {
+        sensitivity: "base",
+      });
+    }
+    if (sortOrder === "title-desc") {
+      return (b.name || "").localeCompare(a.name || "", "pl", {
+        sensitivity: "base",
+      });
+    }
+    // Default: newest first
+    return (b.publication_date || "").localeCompare(a.publication_date || "");
+  });
+
+  state.filteredItems = filtered;
+
+  if (resetPagination) {
+    state.visibleCount = NEWS_PAGE_SIZE;
+  }
+
+  // Remove previous sentinel element before re-rendering
+  const oldSentinel = document.getElementById(`${type}-sentinel`);
+  if (oldSentinel) oldSentinel.remove();
+
+  contentDiv.replaceChildren();
+
+  // Empty state when no matching results are found
+  if (filtered.length === 0) {
+    const emptyBox = document.createElement("div");
+    emptyBox.className = "empty-search-state glass";
+
+    if (allItems.length === 0) {
+      emptyBox.innerHTML = `
+        <span class="material-symbols-outlined empty-search-icon" aria-hidden="true">folder_open</span>
+        <h3>Brak opublikowanych ${config.titleGenitive}</h3>
+        <p>W tej chwili w bazie nie ma jeszcze zarejestrowanych ${config.titleGenitive}. Zajrzyj do nas ponownie wkrótce!</p>
+      `;
+    } else {
+      emptyBox.innerHTML = `
+        <span class="material-symbols-outlined empty-search-icon" aria-hidden="true">search_off</span>
+        <h3>Nie znaleziono ${config.titleGenitive}</h3>
+        <p>Żaden wpis nie pasuje do wybranych kryteriów wyszukiwania${
+          query ? ` („<strong>${escapeHTML(query)}</strong>”)` : ""
+        }${selectedYear !== "all" ? ` w roku ${escapeHTML(selectedYear)}` : ""}.</p>
+        <button type="button" class="cta-button" onclick="reset${type.charAt(0).toUpperCase() + type.slice(1)}Filters()">Wyczyść filtry i pokaż wszystkie</button>
+      `;
+    }
+    contentDiv.appendChild(emptyBox);
+
+    if (statusEl) {
+      statusEl.innerHTML = `Znaleziono: <strong>0</strong> z ${allItems.length} ${config.titleGenitive}`;
+    }
+    return;
+  }
+
+  // Render batch (Infinite Scroll)
+  const currentChunk = filtered.slice(0, state.visibleCount);
+  const fragment = document.createDocumentFragment();
+  for (const item of currentChunk) {
+    const card = createDataCard(type, item, query);
+    fragment.appendChild(card);
+  }
+  contentDiv.appendChild(fragment);
+
+  // Insert infinite scroll sentinel
+  if (state.visibleCount < filtered.length) {
+    contentDiv.insertAdjacentHTML(
+      "afterend",
+      `<div id="${type}-sentinel" style="grid-column:1/-1; height:20px;"></div>`,
+    );
+    setupInfiniteScroll(type, `${type}-sentinel`, config.containerId);
+  }
+
+  // Update status bar
+  if (statusEl) {
+    const isFiltered = query.length > 0 || selectedYear !== "all";
+    const showing = Math.min(state.visibleCount, filtered.length);
+    if (!isFiltered) {
+      if (showing < filtered.length) {
+        statusEl.innerHTML = `Wyświetlanie: <strong>${showing} z ${filtered.length}</strong> ${config.titleGenitive} (przewiń w dół, aby wczytać kolejne)`;
+      } else {
+        statusEl.innerHTML = `Łącznie opublikowanych: <strong>${filtered.length}</strong> ${config.titleGenitive}`;
+      }
+    } else {
+      let statusText = `Znaleziono: <strong>${filtered.length}</strong> z ${allItems.length} ${config.titleGenitive}`;
+      if (query) {
+        statusText += ` dla frazy „<strong>${escapeHTML(query)}</strong>”`;
+      }
+      if (selectedYear !== "all") {
+        statusText += ` (rok: <strong>${escapeHTML(selectedYear)}</strong>)`;
+      }
+      if (showing < filtered.length) {
+        statusText += ` — widoczne ${showing}`;
+      }
+      statusEl.innerHTML = statusText;
+    }
   }
 }
 
 /**
- * Fetches and renders a paginated list of items for resolutions or reports from Cloudflare Worker API.
- * Handles card rendering, attachment button trigger, date formatting, and infinite scroll.
- * @param {string} type - Content type ('resolutions' or 'reports').
- * @param {string} containerId - Target DOM container element ID.
- * @param {boolean} [isInitialLoad=true] - Whether this is the initial page load or pagination append.
+ * Loads the next batch of resolutions or reports for infinite scroll.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
  */
-async function generateDataList(type, containerId, isInitialLoad = true) {
-  const container = document.getElementById(containerId);
-  const state = paginationState[type];
-  if (!container || state.loading) return;
+function appendNextDataBatch(type) {
+  const config = dataConfigs[type];
+  const state = dataSearchStates[type];
+  if (!config || !state) return;
 
-  const listContentId = `${type}-list-content`;
+  const { filteredItems, visibleCount, query } = state;
+  const contentDiv = document.getElementById(config.contentId);
+  const statusEl = document.getElementById(`${type}-search-status`);
 
-  if (isInitialLoad) {
-    state.offset = 0;
-    const title = type === "resolutions" ? "Uchwały" : "Sprawozdania";
-    container.innerHTML = `<h2 style="grid-column:1/-1">${title}:</h2>
-                               <div id="${listContentId}" class="grid-list"></div>`;
+  if (!contentDiv || visibleCount >= filteredItems.length) return;
+
+  const oldSentinel = document.getElementById(`${type}-sentinel`);
+  if (oldSentinel) oldSentinel.remove();
+
+  const nextBatch = filteredItems.slice(
+    visibleCount,
+    visibleCount + NEWS_PAGE_SIZE,
+  );
+  state.visibleCount += nextBatch.length;
+
+  const fragment = document.createDocumentFragment();
+  for (const item of nextBatch) {
+    const card = createDataCard(type, item, query);
+    fragment.appendChild(card);
+  }
+  contentDiv.appendChild(fragment);
+
+  if (state.visibleCount < filteredItems.length) {
+    contentDiv.insertAdjacentHTML(
+      "afterend",
+      `<div id="${type}-sentinel" style="grid-column:1/-1; height:20px;"></div>`,
+    );
+    setupInfiniteScroll(type, `${type}-sentinel`, config.containerId);
   }
 
-  const contentDiv = document.getElementById(listContentId);
-  state.loading = true;
-
-  try {
-    const data = await fetchWithCache(
-      `${api_url}?action=${type}&offset=${state.offset}`,
-    );
-    const list = data.items || [];
-
-    if (list.length === 0 && state.offset === 0) {
-      const sectionName = type === "resolutions" ? "uchwał" : "sprawozdań";
-      contentDiv.replaceChildren(
-        createEmptyState(
-          `Brak ${sectionName}`,
-          `Przepraszamy, nie znaleziono jeszcze żadnych opublikowanych ${sectionName}. Zapraszamy ponownie za chwilę!`,
-        ),
-      );
-      state.loading = false;
-      return;
+  if (statusEl) {
+    const isFiltered = query.length > 0 || state.selectedYear !== "all";
+    const showing = Math.min(state.visibleCount, filteredItems.length);
+    if (!isFiltered) {
+      if (showing < filteredItems.length) {
+        statusEl.innerHTML = `Wyświetlanie: <strong>${showing} z ${filteredItems.length}</strong> ${config.titleGenitive} (przewiń w dół, aby wczytać kolejne)`;
+      } else {
+        statusEl.innerHTML = `Łącznie opublikowanych: <strong>${filteredItems.length}</strong> ${config.titleGenitive}`;
+      }
+    } else {
+      statusEl.innerHTML = `Znaleziono: <strong>${filteredItems.length}</strong> z ${state.allItems.length} ${config.titleGenitive} — widoczne ${showing}`;
     }
+  }
+}
 
-    list.forEach((item) => {
-      const itemId = item[`${type}_id`] || item.id;
-      const {
-        name,
-        description,
-        attachments_count,
-        folder_id,
-        publication_date,
-      } = item;
-      const hasAttachments = folder_id || attachments_count > 0;
+/**
+ * Resets all search and filter controls for resolutions or reports to defaults.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
+ */
+function resetDataFilters(type) {
+  const state = dataSearchStates[type];
+  if (!state) return;
 
-      const card = document.createElement("div");
-      card.className = "about-text glass";
+  const searchInput = document.getElementById(`${type}-search-input`);
+  const yearSelect = document.getElementById(`${type}-year-filter`);
+  const sortSelect = document.getElementById(`${type}-sort-filter`);
 
-      const h3 = document.createElement("h3");
-      const a = document.createElement("a");
-      a.title = name || "";
-      a.textContent = name || "";
-      h3.appendChild(a);
-      card.appendChild(h3);
+  if (searchInput) searchInput.value = "";
+  if (yearSelect) yearSelect.value = "all";
+  if (sortSelect) sortSelect.value = "date-desc";
 
-      if (description) {
-        const descP = document.createElement("p");
-        descP.textContent = description;
-        card.appendChild(descP);
-      }
+  state.query = "";
+  state.selectedYear = "all";
+  state.sortOrder = "date-desc";
 
-      if (hasAttachments) {
-        const attachP = document.createElement("p");
-        const attachA = document.createElement("a");
-        attachA.href = "#";
-        attachA.className = "link-button";
-        attachA.textContent = "Załączniki";
-        attachA.addEventListener("click", (e) => {
-          e.preventDefault();
-          openAttachmentModal(itemId, type, folder_id || "");
-        });
-        attachP.appendChild(attachA);
-        card.appendChild(attachP);
-      }
+  applyDataFilters(type, true);
+}
 
-      const dateP = document.createElement("p");
-      const dateSmall = document.createElement("small");
-      dateSmall.textContent = formatDateToPolish(publication_date);
-      dateP.appendChild(dateSmall);
-      card.appendChild(dateP);
+function resetResolutionsFilters() {
+  resetDataFilters("resolutions");
+}
+function resetReportsFilters() {
+  resetDataFilters("reports");
+}
 
-      contentDiv.appendChild(card);
+function applyResolutionsFilters(resetPagination = true) {
+  applyDataFilters("resolutions", resetPagination);
+}
+function applyReportsFilters(resetPagination = true) {
+  applyDataFilters("reports", resetPagination);
+}
+
+window.resetResolutionsFilters = resetResolutionsFilters;
+window.resetReportsFilters = resetReportsFilters;
+window.applyResolutionsFilters = applyResolutionsFilters;
+window.applyReportsFilters = applyReportsFilters;
+
+/**
+ * Initializes search bar and filter event listeners for resolutions or reports.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
+ */
+function initDataSearch(type) {
+  const state = dataSearchStates[type];
+  if (!state || state.isInitialized) return;
+
+  const searchInput = document.getElementById(`${type}-search-input`);
+  const clearBtn = document.getElementById(`${type}-search-clear`);
+  const yearSelect = document.getElementById(`${type}-year-filter`);
+  const sortSelect = document.getElementById(`${type}-sort-filter`);
+  const resetBtn = document.getElementById(`${type}-reset-filters`);
+
+  let debounceTimer = null;
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        state.query = e.target.value.trim();
+        applyDataFilters(type, true);
+      }, 150);
     });
 
-    const sentinelId = `${type}-sentinel`;
-    const oldSentinel = document.getElementById(sentinelId);
-    if (oldSentinel) oldSentinel.remove();
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchInput.value = "";
+        state.query = "";
+        applyDataFilters(type, true);
+      }
+    });
+  }
 
-    state.offset += list.length;
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (searchInput) {
+        searchInput.value = "";
+        searchInput.focus();
+      }
+      state.query = "";
+      applyDataFilters(type, true);
+    });
+  }
 
-    if (data.hasMore) {
-      container.insertAdjacentHTML(
-        "beforeend",
-        `<div id="${sentinelId}" style="grid-column:1/-1; height:10px;"></div>`,
+  if (yearSelect) {
+    yearSelect.addEventListener("change", (e) => {
+      state.selectedYear = e.target.value;
+      applyDataFilters(type, true);
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      state.sortOrder = e.target.value;
+      applyDataFilters(type, true);
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => resetDataFilters(type));
+  }
+
+  state.isInitialized = true;
+}
+
+/**
+ * Fetches and manages resolutions or reports from Cloudflare Worker API.
+ * Handles initial loading, live search indexing, and infinite scroll pagination.
+ * @param {'resolutions'|'reports'} type - Content resource type ('resolutions' or 'reports').
+ * @param {string} containerId - Target DOM container ID.
+ * @param {boolean} [isInitialLoad=true] - True for initial load, false for infinite scroll batches.
+ */
+async function generateDataList(type, containerId, isInitialLoad = true) {
+  const config = dataConfigs[type];
+  const state = dataSearchStates[type];
+  if (!config || !state) return;
+
+  const contentDiv = document.getElementById(config.contentId);
+  const statusEl = document.getElementById(`${type}-search-status`);
+
+  // If triggered by infinite scroll: load next batch
+  if (!isInitialLoad) {
+    appendNextDataBatch(type);
+    return;
+  }
+
+  initDataSearch(type);
+
+  // If data is already in memory, render with active filters
+  if (state.allItems.length > 0) {
+    applyDataFilters(type, true);
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -3px; animation: spin 1s linear infinite;">sync</span> Pobieranie ${config.titleGenitive} z serwera...`;
+  }
+
+  try {
+    let offset = 0;
+    let hasMore = true;
+    const allFetched = [];
+
+    // Fetch data batches from API (for complete live search capability)
+    while (hasMore) {
+      const data = await fetchWithCache(
+        `${api_url}?action=${config.apiAction}&offset=${offset}`,
       );
-      setupInfiniteScroll(type, sentinelId, containerId);
+      const list = data.items || [];
+      allFetched.push(...list);
+      offset += list.length;
+      hasMore = Boolean(data.hasMore && list.length > 0);
+      if (offset > 500) break; // Loop guard / safety cutoff
     }
+
+    // Index items for rapid live search with Polish diacritics normalization
+    for (const item of allFetched) {
+      item._searchIndex = normalizePolishText(
+        `${item.name || ""} ${item.description || ""}`,
+      );
+    }
+
+    state.allItems = allFetched;
+
+    // Dynamically populate publication year filter options
+    const yearSelect = document.getElementById(`${type}-year-filter`);
+    if (yearSelect) {
+      const years = [
+        ...new Set(
+          allFetched
+            .map((it) =>
+              it.publication_date ? it.publication_date.substring(0, 4) : null,
+            )
+            .filter((y) => y && /^\d{4}$/.test(y)),
+        ),
+      ]
+        .sort()
+        .reverse();
+
+      yearSelect.innerHTML = `<option value="all">Wszystkie lata (${allFetched.length})</option>`;
+      for (const y of years) {
+        const count = allFetched.filter(
+          (it) => it.publication_date && it.publication_date.startsWith(y),
+        ).length;
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = `Rok ${y} (${count})`;
+        yearSelect.appendChild(opt);
+      }
+    }
+
+    applyDataFilters(type, true);
   } catch (e) {
-    console.error(`Błąd ${type}:`, e);
-    if (state.offset === 0 && contentDiv) {
+    console.error(`Błąd ładowania ${config.titleGenitive}:`, e);
+    if (contentDiv) {
       contentDiv.replaceChildren(
         createEmptyState(
-          "Przepraszamy, wystąpił problem podczas ładowania danych",
-          "Nie udało się połączyć z serwerem. Spróbuj odświeżyć stronę lub zajrzyj do nas za chwilę.",
+          `Przepraszamy, wystąpił problem podczas ładowania ${config.titleGenitive}`,
+          "Nie udało się pobrać danych z serwera. Spróbuj odświeżyć stronę lub zajrzyj do nas za chwilę.",
         ),
       );
     }
-  } finally {
-    state.loading = false;
+    if (statusEl) {
+      statusEl.textContent = "Błąd pobierania danych z serwera.";
+    }
   }
 }
 
@@ -1588,12 +2432,113 @@ function openMobileDrawer() {
 }
 
 /**
+ * Initializes the accessibility toolbar (WCAG 2.1 AA):
+ * - High contrast mode (black and yellow)
+ * - Font size adjustment (A, A+, A++)
+ * - Background motion / animation pause
+ * - Persisting and restoring state from localStorage
+ */
+function initAccessibilityToolbar() {
+  const contrastBtn = document.getElementById("a11y-contrast");
+  const fontNormalBtn = document.getElementById("a11y-font-normal");
+  const fontMediumBtn = document.getElementById("a11y-font-medium");
+  const fontLargeBtn = document.getElementById("a11y-font-large");
+  const motionBtn = document.getElementById("a11y-motion");
+
+  // 1. High contrast mode
+  const isHighContrast = localStorage.getItem("a11y_contrast") === "true";
+  if (isHighContrast) {
+    document.body.classList.add("high-contrast");
+    if (contrastBtn) {
+      contrastBtn.setAttribute("aria-pressed", "true");
+      contrastBtn.classList.add("active");
+    }
+  }
+
+  if (contrastBtn) {
+    contrastBtn.addEventListener("click", () => {
+      const active = document.body.classList.toggle("high-contrast");
+      contrastBtn.setAttribute("aria-pressed", active ? "true" : "false");
+      contrastBtn.classList.toggle("active", active);
+      localStorage.setItem("a11y_contrast", active ? "true" : "false");
+    });
+  }
+
+  // 2. Font size adjustment
+  const updateFontButtons = (size) => {
+    [fontNormalBtn, fontMediumBtn, fontLargeBtn].forEach((btn) => {
+      if (btn) btn.classList.remove("active");
+    });
+    if (size === "large" && fontLargeBtn) fontLargeBtn.classList.add("active");
+    else if (size === "medium" && fontMediumBtn)
+      fontMediumBtn.classList.add("active");
+    else if (fontNormalBtn) fontNormalBtn.classList.add("active");
+  };
+
+  const setFontSize = (size) => {
+    document.documentElement.classList.remove("font-size-md", "font-size-lg");
+    document.body.classList.remove("font-size-md", "font-size-lg");
+    if (size === "medium") {
+      document.documentElement.classList.add("font-size-md");
+      document.body.classList.add("font-size-md");
+      localStorage.setItem("a11y_font", "medium");
+    } else if (size === "large") {
+      document.documentElement.classList.add("font-size-lg");
+      document.body.classList.add("font-size-lg");
+      localStorage.setItem("a11y_font", "large");
+    } else {
+      localStorage.setItem("a11y_font", "normal");
+    }
+    updateFontButtons(size);
+  };
+
+  const savedFont = localStorage.getItem("a11y_font") || "normal";
+  if (savedFont !== "normal") {
+    setFontSize(savedFont);
+  }
+
+  if (fontNormalBtn)
+    fontNormalBtn.addEventListener("click", () => setFontSize("normal"));
+  if (fontMediumBtn)
+    fontMediumBtn.addEventListener("click", () => setFontSize("medium"));
+  if (fontLargeBtn)
+    fontLargeBtn.addEventListener("click", () => setFontSize("large"));
+
+  // 3. Pause motion / background animations
+  const isReducedMotion = localStorage.getItem("a11y_motion") === "true";
+  if (isReducedMotion) {
+    document.body.classList.add("reduced-motion");
+    if (motionBtn) {
+      motionBtn.setAttribute("aria-pressed", "true");
+      motionBtn.classList.add("active");
+    }
+  }
+
+  if (motionBtn) {
+    motionBtn.addEventListener("click", () => {
+      const active = document.body.classList.toggle("reduced-motion");
+      motionBtn.setAttribute("aria-pressed", active ? "true" : "false");
+      motionBtn.classList.toggle("active", active);
+      localStorage.setItem("a11y_motion", active ? "true" : "false");
+      if (active) {
+        document.querySelectorAll(".shape").forEach((shape) => {
+          shape.style.transform = "";
+        });
+      }
+    });
+  }
+}
+
+/**
  * Single Page Application (SPA) view router. Displays the specified page view and hides others.
- * Updates navigation active state, repositions footer to current view, and scrolls to top.
+ * Updates navigation active state, repositions footer to current view, syncs URL hash, and scrolls to top.
  * @param {string} pageId - DOM ID of the target page view container ('home', 'article', etc.).
  */
 function showPage(pageId) {
   closeMobileDrawer();
+
+  const targetEl = document.getElementById(pageId);
+  if (!targetEl) return;
 
   if (currentPage === pageId && pageId !== "article") {
     return;
@@ -1610,12 +2555,14 @@ function showPage(pageId) {
   });
 
   // Show selected page
-  document.getElementById(pageId).classList.add("active");
+  targetEl.classList.add("active");
 
-  // Update navigation
-  document.querySelectorAll(".nav-links a").forEach((link) => {
+  // Update navigation links across header, drawer and footer
+  document.querySelectorAll(".nav-links a, .footer-links a").forEach((link) => {
     link.classList.remove("active");
-    if (link.getAttribute("onclick") === `showPage('${pageId}')`) {
+    const oc = link.getAttribute("onclick") || "";
+    const href = link.getAttribute("href") || "";
+    if (oc.includes(`'${pageId}'`) || href === `#${pageId}`) {
       link.classList.add("active");
     }
   });
@@ -1624,16 +2571,34 @@ function showPage(pageId) {
 
   // Move footer to the active page
   const footer = document.getElementById("footer");
-  const activePage = document.getElementById(pageId);
-  activePage.appendChild(footer);
+  if (footer) {
+    targetEl.appendChild(footer);
+  }
+
+  // Sync browser URL hash for bookmarking and back button navigation
+  if (window.location.hash !== `#${pageId}` && pageId !== "article") {
+    history.pushState(null, "", `#${pageId}`);
+  }
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// Handle browser Back / Forward navigation buttons
+window.addEventListener("popstate", () => {
+  const hash = window.location.hash.replace(/^#/, "");
+  if (hash && document.getElementById(hash)) {
+    showPage(hash);
+  } else if (!hash) {
+    showPage("home");
+  }
+});
+
 // ── APPLICATION BOOTSTRAP & EVENT LISTENERS ──
 // Initialize member lists, load initial section feeds, position footer, and bind modal listeners.
 window.addEventListener("DOMContentLoaded", () => {
+  initAccessibilityToolbar();
+
   const footer = document.getElementById("footer");
   const homePage = document.getElementById("home");
   generateLinks(cities, "cities");
@@ -1644,7 +2609,17 @@ window.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => generateResolutions("resolutions-div"), 300);
   setTimeout(() => generateReports("reports-div"), 600);
 
-  homePage.appendChild(footer);
+  // Check if user navigated directly with a URL hash (e.g. #bip, #accessibility, #rodo)
+  const initialHash = window.location.hash.replace(/^#/, "");
+  if (
+    initialHash &&
+    document.getElementById(initialHash) &&
+    initialHash !== "home"
+  ) {
+    showPage(initialHash);
+  } else {
+    homePage.appendChild(footer);
+  }
 
   // Mobile / Tablet drawer navigation event listeners
   const mobileToggle = document.getElementById("mobile-menu-toggle");
@@ -1678,8 +2653,9 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-// Add interactive parallax effect to background shapes
+// Add interactive parallax effect to background shapes (active only when motion is enabled)
 document.addEventListener("mousemove", (e) => {
+  if (document.body.classList.contains("reduced-motion")) return;
   const shapes = document.querySelectorAll(".shape");
   const x = e.clientX / window.innerWidth;
   const y = e.clientY / window.innerHeight;
@@ -1690,14 +2666,6 @@ document.addEventListener("mousemove", (e) => {
     const yPos = (y - 0.5) * speed * 20;
     shape.style.transform = `translate(${xPos}px, ${yPos}px)`;
   });
-});
-
-// Add scroll-based animations
-window.addEventListener("scroll", () => {
-  const scrolled = window.pageYOffset;
-  const parallax = document.querySelector(".bg-shapes");
-  const speed = scrolled * 0.5;
-  parallax.style.transform = `translateY(${speed}px)`;
 });
 
 // Add click ripple effect to glass elements (excluding gallery, images, buttons, and links)
@@ -1824,6 +2792,27 @@ if (contactForm) {
       markError(messageInput, "Proszę wpisać treść wiadomości.");
     }
 
+    // Validate GDPR Consent Checkbox (Legal requirement to confirm acknowledgement of the information clause)
+    const rodoConsent = document.getElementById("rodo_consent");
+    if (rodoConsent && !rodoConsent.checked) {
+      markError(
+        rodoConsent,
+        "Wymagane jest potwierdzenie zapoznania się z klauzulą informacyjną RODO.",
+      );
+    }
+
+    // Validate Cloudflare Turnstile token
+    const turnstileToken =
+      contactForm.querySelector('[name="cf-turnstile-response"]')?.value ||
+      (window.turnstile ? window.turnstile.getResponse() : "");
+    const turnstileWidget = contactForm.querySelector(".cf-turnstile");
+    if (!turnstileToken && turnstileWidget) {
+      markError(
+        turnstileWidget,
+        "Proszę zaczekać na zakończenie weryfikacji antyspamowej.",
+      );
+    }
+
     // If there are errors, halt submission
     if (hasErrors) return;
 
@@ -1881,6 +2870,7 @@ if (contactForm) {
       mouse_interacted: userInteractedWithMouse,
       cores: navigator.hardwareConcurrency || "unknown",
       ram_gb: navigator.deviceMemory || "unknown",
+      consent_rodo: true,
     };
 
     // CREATE 3D WHITE ENVELOPE IN THE CENTER OF THE SCREEN
@@ -1990,9 +2980,8 @@ if (contactForm) {
     let sendSuccess = true;
     try {
       if (api_url && !api_url.includes("YOUR_SCRIPT_ID")) {
-        await fetch(api_url, {
+        const response = await fetch(api_url, {
           method: "POST",
-          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "contact",
@@ -2001,14 +2990,28 @@ if (contactForm) {
             subject: subject,
             message: message,
             b_website: b_website,
+            turnstile_token: turnstileToken,
             metadata: JSON.stringify(metadata),
             client_timestamp: new Date().toISOString(),
           }),
         });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(
+            errData.error || `Błąd serwera (status ${response.status})`,
+          );
+        }
       }
     } catch (err) {
       console.error("Błąd wysyłania formularza kontaktowego:", err);
       sendSuccess = false;
+    }
+
+    if (window.turnstile) {
+      try {
+        window.turnstile.reset();
+      } catch {}
     }
 
     await delay(300);
@@ -2043,7 +3046,7 @@ if (contactForm) {
         successMsg.innerHTML = `
           <div style="font-size: 2.5rem; margin-bottom: 8px;"><span class="material-symbols-outlined" style="font-size: 3rem; color: #4ade80;">check_circle</span></div>
           <div>
-            <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #ffffff;">Dziękujemy!</div>
+            <div style="font-size: 1.125rem; font-weight: 700; margin-bottom: 4px; color: #ffffff;">Dziękujemy!</div>
             <div style="color: #ffffff;">Twoje zapytanie ruszyło w drogę! Odezwiemy się niebawem.</div>
           </div>
         `;
@@ -2088,7 +3091,7 @@ if (contactForm) {
         errorToast.innerHTML = `
           <div style="font-size: 2.2rem; margin-bottom: 8px;">Uwaga!</div>
           <div>
-            <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #ffffff;">Nie udało się wysłać</div>
+            <div style="font-size: 1.125rem; font-weight: 700; margin-bottom: 4px; color: #ffffff;">Nie udało się wysłać</div>
             <div style="color: #ffffff;">Wystąpił problem z połączeniem. Przywróciliśmy wpisane dane - spróbuj ponownie.</div>
           </div>
         `;

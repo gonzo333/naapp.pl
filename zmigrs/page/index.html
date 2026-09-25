@@ -6,16 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Związek Miast i Gmin Regionu Świętokrzyskiego</title>
 
+    <meta name="description" content="Oficjalny serwis Związku Miast i Gmin Regionu Świętokrzyskiego. Aktualności, uchwały, sprawozdania, statut i baza gmin członkowskich." />
+    <meta property="og:title" content="Związek Miast i Gmin Regionu Świętokrzyskiego" />
+    <meta property="og:description" content="Oficjalny portal Związku Miast i Gmin Regionu Świętokrzyskiego zrzeszającego 100 gmin regionu." />
+    <meta property="og:type" content="website" />
+
     <link rel="stylesheet" href="style.css" />
 
     <!-- Google Material Symbols (Icons) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <link href="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.min.css" rel="stylesheet" />
+    <!-- Cloudflare Turnstile (Anti-spam protection) -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
-    <div class="bg-shapes">
+    <!-- WCAG SKIP LINK: Keyboard shortcut to skip to main content -->
+    <a href="#main-content" class="skip-link">Przejdź do treści głównej</a>
+
+    <!-- ACCESSIBILITY TOOLBAR (WCAG 2.1 AA) -->
+    <aside class="a11y-toolbar" role="region" aria-label="Narzędzia ułatwień dostępu">
+        <div class="container a11y-toolbar-inner">
+            <div class="a11y-group">
+                <span class="a11y-label">Ułatwienia dostępu:</span>
+                <button type="button" class="a11y-btn" id="a11y-contrast" aria-pressed="false" title="Włącz wysoki kontrast (czarno-żółty)">
+                    <span class="material-symbols-outlined">contrast</span>
+                    <span class="a11y-btn-text">Wysoki kontrast</span>
+                </button>
+                <div class="a11y-font-group" role="group" aria-label="Wybór rozmiaru tekstu">
+                    <span class="a11y-sublabel">Czcionka:</span>
+                    <button type="button" class="a11y-btn font-btn active" id="a11y-font-normal" aria-label="Standardowy rozmiar tekstu" title="Standardowy rozmiar">A</button>
+                    <button type="button" class="a11y-btn font-btn" id="a11y-font-medium" aria-label="Powiększony tekst 120%" title="Powiększony tekst (120%)">A+</button>
+                    <button type="button" class="a11y-btn font-btn" id="a11y-font-large" aria-label="Duży tekst 140%" title="Duży tekst (140%)">A++</button>
+                </div>
+                <button type="button" class="a11y-btn" id="a11y-motion" aria-pressed="false" title="Zatrzymaj ruch i animacje tła">
+                    <span class="material-symbols-outlined">motion_photos_off</span>
+                    <span class="a11y-btn-text">Zatrzymaj ruch</span>
+                </button>
+            </div>
+            <div class="a11y-links">
+                <a href="#accessibility" onclick="showPage('accessibility'); return false;" class="a11y-link">
+                    <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: -2px;">accessibility_new</span>
+                    Deklaracja dostępności
+                </a>
+                <a href="#bip" onclick="showPage('bip'); return false;" class="bip-top-icon-link" title="Biuletyn Informacji Publicznej" aria-label="Biuletyn Informacji Publicznej">
+                    <svg class="bip-icon-svg" viewBox="0 0 54 28" width="46" height="24" aria-hidden="true">
+                        <rect width="54" height="28" rx="4" fill="#b91c1c" />
+                        <rect x="2" y="2" width="50" height="24" rx="2" fill="none" stroke="#ffffff" stroke-width="1.2" />
+                        <text x="27" y="19" fill="#ffffff" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="14" text-anchor="middle" letter-spacing="1">bip</text>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="bg-shapes" aria-hidden="true">
         <div class="shape"></div>
         <div class="shape"></div>
         <div class="shape"></div>
@@ -25,39 +71,41 @@
     </div>
 
     <!-- SINGLE NAVIGATION HEADER -->
-    <header>
+    <header role="banner">
         <div class="container active">
             <div class="header-top-bar">
-                <div class="logo" onclick="showPage('home')">
-                    <img src="assets/images/logo-icon.png" alt="Herb Związeku Miast i Gmin Regionu Świętokrzyskiego"
+                <div class="logo" onclick="showPage('home')" onkeydown="if(event.key==='Enter'||event.key===' '){showPage('home');event.preventDefault();}" role="button" tabindex="0" aria-label="Strona główna - Związek Miast i Gmin Regionu Świętokrzyskiego">
+                    <img src="assets/images/logo-icon.png" alt="Herb Związku Miast i Gmin Regionu Świętokrzyskiego"
                         class="logo-icon" />
                     <span style="font-family: sans-serif; text-wrap: wrap">Związek Miast i Gmin Regionu
                         Świętokrzyskiego</span>
                 </div>
-                <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Otwórz menu nawigacji">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Otwórz menu nawigacji" aria-expanded="false" aria-controls="main-nav">
                     <span class="material-symbols-outlined">menu</span>
                     <span>Menu</span>
                 </button>
             </div>
-            <nav class="glass" id="main-nav">
+            <nav class="glass" id="main-nav" role="navigation" aria-label="Główne menu serwisu">
                 <div class="drawer-header">
-                    <span class="drawer-title">Menu</span>
+                    <span class="drawer-title">Menu serwisu</span>
                     <button class="drawer-close-btn" id="drawer-close-btn" type="button" aria-label="Zamknij menu">&times;</button>
                 </div>
                 <div class="nav-links">
-                    <a href="#" onclick="showPage('home')" class="active">Związek</a>
-                    <a href="#" onclick="showPage('authorities')">Władze</a>
-                    <a href="#" onclick="showPage('news')">Aktualności</a>
-                    <a href="#" onclick="showPage('members')">Członkowie</a>
-                    <a href="#" onclick="showPage('statutes')">Statut</a>
-                    <a href="#" onclick="showPage('resolutions')">Uchwały</a>
-                    <a href="#" onclick="showPage('reports')">Sprawozdania</a>
-                    <a href="#" onclick="showPage('contacts')">Kontakt</a>
+                    <a href="#home" onclick="showPage('home'); return false;" class="active">Związek</a>
+                    <a href="#authorities" onclick="showPage('authorities'); return false;">Władze</a>
+                    <a href="#news" onclick="showPage('news'); return false;">Aktualności</a>
+                    <a href="#members" onclick="showPage('members'); return false;">Członkowie</a>
+                    <a href="#statutes" onclick="showPage('statutes'); return false;">Statut</a>
+                    <a href="#resolutions" onclick="showPage('resolutions'); return false;">Uchwały</a>
+                    <a href="#reports" onclick="showPage('reports'); return false;">Sprawozdania</a>
+                    <a href="#contacts" onclick="showPage('contacts'); return false;">Kontakt</a>
                 </div>
             </nav>
             <div class="nav-backdrop" id="nav-backdrop"></div>
         </div>
     </header>
+
+    <main id="main-content" role="main">
 
     <!-- HOME PAGE -->
     <div id="home" class="page active">
@@ -378,7 +426,64 @@
     <div id="news" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero" id="news-div"></section>
+                <section class="hero content-section" id="news-div">
+                    <div class="content-header">
+                        <h2>Aktualności</h2>
+                        <p class="section-subtitle">Komunikaty, relacje z posiedzeń i bieżące informacje z życia Związku</p>
+                    </div>
+
+                    <!-- ARTICLE SEARCH AND FILTERING -->
+                    <div class="search-card glass" role="search" aria-label="Wyszukiwarka artykułów">
+                        <div class="search-row">
+                            <div class="search-input-box">
+                                <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+                                <input
+                                    type="search"
+                                    id="news-search-input"
+                                    class="search-input"
+                                    placeholder="Wyszukaj w aktualnościach (np. Chęciny, dotacja, posiedzenie)..."
+                                    aria-label="Wyszukaj artykuły po słowach kluczowych"
+                                    autocomplete="off"
+                                />
+                                <button type="button" id="news-search-clear" class="search-clear-btn" aria-label="Wyczyść wpisaną frazę" title="Wyczyść pole wyszukiwania" style="display: none;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <div class="select-wrap">
+                                    <label for="news-year-filter" class="filter-label">Rok:</label>
+                                    <select id="news-year-filter" class="filter-select" aria-label="Filtruj według roku publikacji">
+                                        <option value="all">Wszystkie lata</option>
+                                    </select>
+                                </div>
+
+                                <div class="select-wrap">
+                                    <label for="news-sort-filter" class="filter-label">Sortowanie:</label>
+                                    <select id="news-sort-filter" class="filter-select" aria-label="Sortuj artykuły">
+                                        <option value="date-desc">Od najnowszych</option>
+                                        <option value="date-asc">Od najstarszych</option>
+                                        <option value="title-asc">Tytuł A-Z</option>
+                                        <option value="title-desc">Tytuł Z-A</option>
+                                    </select>
+                                </div>
+
+                                <button type="button" id="news-reset-filters" class="reset-btn" title="Resetuj filtry" aria-label="Resetuj wszystkie filtry">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                    <span>Resetuj</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="search-meta-bar">
+                            <div id="news-search-status" class="search-status" aria-live="polite">
+                                Wczytywanie aktualności...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="article-list-content" class="grid-list"></div>
+                </section>
             </div>
         </div>
     </div>
@@ -387,11 +492,23 @@
     <div id="article" class="page">
         <div class="container">
             <div class="content-wrapper glass" id="article-div">
+                <nav class="article-top-nav" aria-label="Nawigacja artykułu">
+                    <button type="button" class="article-back-btn" onclick="showPage('news')" aria-label="Wróć do listy aktualności">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Wróć do aktualności</span>
+                    </button>
+                </nav>
                 <div id="article-text-div"></div>
                 <div class="gallery-wrapper">
                     <button class="prev-btn" onclick="moveGallery(-1)">&#10094;</button>
                     <div id="article-gallery-div" class="gallery-container"></div>
                     <button class="next-btn" onclick="moveGallery(1)">&#10095;</button>
+                </div>
+                <div class="article-bottom-nav">
+                    <button type="button" class="article-back-btn" onclick="showPage('news')" aria-label="Wróć do listy aktualności">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Wróć do aktualności</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -490,8 +607,63 @@
     <div id="resolutions" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero" id="resolutions-div">
-                    <h2 style="grid-column: 1/-1">Uchwały:</h2>
+                <section class="hero content-section" id="resolutions-div">
+                    <div class="content-header">
+                        <h2>Uchwały</h2>
+                        <p class="section-subtitle">Rejestr uchwał Walnego Zebrania Członków oraz Zarządu Stowarzyszenia</p>
+                    </div>
+
+                    <!-- RESOLUTION SEARCH AND FILTERING -->
+                    <div class="search-card glass" role="search" aria-label="Wyszukiwarka uchwał">
+                        <div class="search-row">
+                            <div class="search-input-box">
+                                <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+                                <input
+                                    type="search"
+                                    id="resolutions-search-input"
+                                    class="search-input"
+                                    placeholder="Wyszukaj w uchwałach (np. budżet, statut, składki, 2024)..."
+                                    aria-label="Wyszukaj uchwały po słowach kluczowych"
+                                    autocomplete="off"
+                                />
+                                <button type="button" id="resolutions-search-clear" class="search-clear-btn" aria-label="Wyczyść wpisaną frazę" title="Wyczyść pole wyszukiwania" style="display: none;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <div class="select-wrap">
+                                    <label for="resolutions-year-filter" class="filter-label">Rok:</label>
+                                    <select id="resolutions-year-filter" class="filter-select" aria-label="Filtruj według roku uchwalenia">
+                                        <option value="all">Wszystkie lata</option>
+                                    </select>
+                                </div>
+
+                                <div class="select-wrap">
+                                    <label for="resolutions-sort-filter" class="filter-label">Sortowanie:</label>
+                                    <select id="resolutions-sort-filter" class="filter-select" aria-label="Sortuj uchwały">
+                                        <option value="date-desc">Od najnowszych</option>
+                                        <option value="date-asc">Od najstarszych</option>
+                                        <option value="title-asc">Tytuł A-Z</option>
+                                        <option value="title-desc">Tytuł Z-A</option>
+                                    </select>
+                                </div>
+
+                                <button type="button" id="resolutions-reset-filters" class="reset-btn" title="Resetuj filtry" aria-label="Resetuj wszystkie filtry">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                    <span>Resetuj</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="search-meta-bar">
+                            <div id="resolutions-search-status" class="search-status" aria-live="polite">
+                                Wczytywanie uchwał...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="resolutions-list-content" class="grid-list"></div>
                 </section>
             </div>
         </div>
@@ -501,8 +673,63 @@
     <div id="reports" class="page">
         <div class="container">
             <div class="content-wrapper">
-                <section class="hero" id="reports-div">
-                    <h2 style="grid-column: 1/-1">Sprawozdania:</h2>
+                <section class="hero content-section" id="reports-div">
+                    <div class="content-header">
+                        <h2>Sprawozdania</h2>
+                        <p class="section-subtitle">Sprawozdania merytoryczne i finansowe z działalności organów Związku</p>
+                    </div>
+
+                    <!-- REPORT SEARCH AND FILTERING -->
+                    <div class="search-card glass" role="search" aria-label="Wyszukiwarka sprawozdań">
+                        <div class="search-row">
+                            <div class="search-input-box">
+                                <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+                                <input
+                                    type="search"
+                                    id="reports-search-input"
+                                    class="search-input"
+                                    placeholder="Wyszukaj w sprawozdaniach (np. finansowe, bilans, komisja)..."
+                                    aria-label="Wyszukaj sprawozdania po słowach kluczowych"
+                                    autocomplete="off"
+                                />
+                                <button type="button" id="reports-search-clear" class="search-clear-btn" aria-label="Wyczyść wpisaną frazę" title="Wyczyść pole wyszukiwania" style="display: none;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <div class="select-wrap">
+                                    <label for="reports-year-filter" class="filter-label">Rok:</label>
+                                    <select id="reports-year-filter" class="filter-select" aria-label="Filtruj według roku publikacji">
+                                        <option value="all">Wszystkie lata</option>
+                                    </select>
+                                </div>
+
+                                <div class="select-wrap">
+                                    <label for="reports-sort-filter" class="filter-label">Sortowanie:</label>
+                                    <select id="reports-sort-filter" class="filter-select" aria-label="Sortuj sprawozdania">
+                                        <option value="date-desc">Od najnowszych</option>
+                                        <option value="date-asc">Od najstarszych</option>
+                                        <option value="title-asc">Tytuł A-Z</option>
+                                        <option value="title-desc">Tytuł Z-A</option>
+                                    </select>
+                                </div>
+
+                                <button type="button" id="reports-reset-filters" class="reset-btn" title="Resetuj filtry" aria-label="Resetuj wszystkie filtry">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                    <span>Resetuj</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="search-meta-bar">
+                            <div id="reports-search-status" class="search-status" aria-live="polite">
+                                Wczytywanie sprawozdań...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reports-list-content" class="grid-list"></div>
                 </section>
             </div>
         </div>
@@ -580,6 +807,18 @@
                                 <p>www.zmigrs.kielce.com.pl</p>
                             </div>
                         </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <span class="material-symbols-outlined">badge</span>
+                            </div>
+                            <div class="contact-item-text">
+                                <h4>Dane rejestrowe stowarzyszenia:</h4>
+                                <p>KRS: 0000003041 &bull; NIP: 9591474087 &bull; REGON: 292394840</p>
+                                <p>e-Doręczenia: AE:PL-67891-45230-URSKL-21</p>
+                                <p>Skrytka ePUAP: /ZMiGRS/skrytka</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="contact-form glass">
                         <h2>Napisz do nas:</h2>
@@ -587,34 +826,47 @@
                             <input type="text" name="b_website" id="b_website" style="display:none !important;"
                                 tabindex="-1" autocomplete="off" />
                             <div class="form-group">
-                                <label for="name">Imie i nazwisko</label>
-                                <input type="text" id="name" name="name" placeholder="Anna Nowak" required />
+                                <label for="name">Imię i nazwisko <span class="required-star" aria-hidden="true">*</span></label>
+                                <input type="text" id="name" name="name" placeholder="np. Jan Kowalski" required />
                             </div>
                             <div class="form-group">
-                                <label for="email">Adres email</label>
-                                <input type="email" id="email" name="email" placeholder="anna.nowak@gmail.com"
+                                <label for="email">Adres email <span class="required-star" aria-hidden="true">*</span></label>
+                                <input type="email" id="email" name="email" placeholder="np. jan.kowalski@domena.pl"
                                     required />
                             </div>
                             <div class="form-group">
-                                <label for="subject">Temat</label>
-                                <input type="text" id="subject" name="subject" placeholder="Współpraca międzygminna" />
+                                <label for="subject">Temat wiadomości</label>
+                                <input type="text" id="subject" name="subject" placeholder="np. Współpraca międzygminna / Pytanie do biura" />
                             </div>
                             <div class="form-group">
-                                <label for="message">Wiadomość</label>
-                                <textarea id="message" name="message" placeholder="Chcemy nawiązać współpracę..."
+                                <label for="message">Treść wiadomości <span class="required-star" aria-hidden="true">*</span></label>
+                                <textarea id="message" name="message" placeholder="Treść Twojego zapytania..."
                                     required></textarea>
                             </div>
-                            <button type="submit" class="cta-button">Wyślij</button>
+                            <div class="form-group form-checkbox-group">
+                                <label class="checkbox-label" for="rodo_consent">
+                                    <input type="checkbox" id="rodo_consent" name="rodo_consent" required />
+                                    <span>Oświadczam, że zapoznałem(-am) się z <a href="#rodo" onclick="showPage('rodo'); return false;" class="text-link">Klauzulą informacyjną RODO</a> i wyrażam zgodę na przetwarzanie moich danych osobowych w celu obsługi zapytania. <span class="required-star" aria-hidden="true">*</span></span>
+                                </label>
+                            </div>
+                            <div class="form-group form-turnstile-group">
+                                <div class="cf-turnstile" data-sitekey="0x4AAAAAAFDPRQ_ad6vM68UI" data-theme="dark"></div>
+                            </div>
+                            <button type="submit" class="cta-button">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: -3px; margin-right: 4px;">send</span>
+                                Wyślij wiadomość
+                            </button>
                         </form>
                     </div>
                 </section>
 
                 <section class="contact-map-section">
                     <div class="contact-map glass">
-                        <h2>Lokalizacja</h2>
+                        <h2>Lokalizacja biura</h2>
                         <div class="map-container">
                             <div class="map-placeholder">
                                 <iframe class="responsive-map"
+                                    title="Lokalizacja biura Związku Miast i Gmin Regionu Świętokrzyskiego w Świętokrzyskim Urzędzie Wojewódzkim w Kielcach"
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2517.6116186360427!2d20.6293465!3d50.8753895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471827eb0b28a041%3A0xd7a89a609fc7f87!2zxZp3acSZdG9rcnp5c2tpIFVyesSFZCBXb2pld8OzZHpraQ!5e0!3m2!1spl!2spl!4v1769105799335!5m2!1spl!2spl"
                                     style="border: 0" allowfullscreen="" loading="lazy"
                                     referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -626,24 +878,315 @@
         </div>
     </div>
 
+    <!-- PUBLIC INFORMATION BULLETIN (BIP) PAGE -->
+    <div id="bip" class="page">
+        <div class="container">
+            <div class="content-wrapper">
+                <section class="about-content">
+                    <div class="about-text glass bip-header-card">
+                        <div class="bip-title-row">
+                            <span class="bip-flag-large">BIP</span>
+                            <div>
+                                <h2>Biuletyn Informacji Publicznej</h2>
+                                <p class="bip-sub">Związek Miast i Gmin Regionu Świętokrzyskiego</p>
+                            </div>
+                        </div>
+                        <p>
+                            Strona główna urzędowego publikatora teleinformatycznego – Biuletynu Informacji Publicznej
+                            Stowarzyszenia Związek Miast i Gmin Regionu Świętokrzyskiego, utworzona zgodnie z przepisami
+                            Ustawy z dnia 6 września 2001 r. o dostępie do informacji publicznej (Dz. U. z 2022 r. poz. 902).
+                        </p>
+                    </div>
+
+                    <div class="bip-grid">
+                        <div class="about-text glass">
+                            <h3>1. Dane identyfikacyjne podmiotu</h3>
+                            <ul class="formal-list">
+                                <li><strong>Nazwa:</strong> Stowarzyszenie Związek Miast i Gmin Regionu Świętokrzyskiego</li>
+                                <li><strong>Siedziba:</strong> al. IX Wieków Kielc 3, 25-516 Kielce (Świętokrzyski Urząd Wojewódzki, bud. B, pok. 2)</li>
+                                <li><strong>KRS:</strong> 0000003041 (Sąd Rejonowy w Kielcach, X Wydział Gospodarczy KRS)</li>
+                                <li><strong>NIP:</strong> 9591474087</li>
+                                <li><strong>REGON:</strong> 292394840</li>
+                                <li><strong>Adres do e-Doręczeń:</strong> AE:PL-67891-45230-URSKL-21</li>
+                                <li><strong>Skrytka ePUAP:</strong> /ZMiGRS/skrytka</li>
+                                <li><strong>E-mail oficjalny:</strong> biuro@zmigrs.kielce.com.pl</li>
+                                <li><strong>Telefon do biura:</strong> (+48) 41 342 16 50</li>
+                            </ul>
+                        </div>
+
+                        <div class="about-text glass">
+                            <h3>2. Organy Stowarzyszenia i Władze</h3>
+                            <p>Organami statutowymi Związku Miast i Gmin Regionu Świętokrzyskiego są:</p>
+                            <ul class="formal-list">
+                                <li><strong>Walne Zebranie Członków</strong> – najwyższy organ uchwałodawczy reprezentujący 100 gmin województwa świętokrzyskiego.</li>
+                                <li><strong>Zarząd Stowarzyszenia</strong> – 14-osobowy organ wykonawczy pod przewodnictwem Prezesa Roberta Jaworskiego.</li>
+                                <li><strong>Komisja Rewizyjna</strong> – 3-osobowy organ kontroli wewnętrznej pod przewodnictwem Wojciecha Ślefarskiego.</li>
+                            </ul>
+                            <p>
+                                <a href="#authorities" onclick="showPage('authorities'); return false;" class="link-button inline-btn">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; margin-right: 4px;">groups</span>
+                                    Zobacz pełny skład władz
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="about-text glass">
+                            <h3>3. Rejestry, Akty Prawne i Dokumenty</h3>
+                            <p>Dostęp do oficjalnych dokumentów regulujących funkcjonowanie związku:</p>
+                            <div class="quick-links-group">
+                                <a href="#statutes" onclick="showPage('statutes'); return false;" class="link-button no-flex">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">gavel</span>
+                                    Statut Stowarzyszenia
+                                </a>
+                                <a href="#resolutions" onclick="showPage('resolutions'); return false;" class="link-button no-flex">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">description</span>
+                                    Rejestr Uchwał Walnego Zebrania i Zarządu
+                                </a>
+                                <a href="#reports" onclick="showPage('reports'); return false;" class="link-button no-flex">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">analytics</span>
+                                    Sprawozdania merytoryczne i finansowe
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="about-text glass">
+                            <h3>4. Dostęp do Informacji Publicznej na Wniosek</h3>
+                            <p>
+                                Informacje publiczne nieudostępnione w Biuletynie Informacji Publicznej są udostępniane na wniosek
+                                zainteresowanego, zgodnie z art. 10 Ustawy o dostępie do informacji publicznej.
+                            </p>
+                            <ul class="formal-list">
+                                <li><strong>Termin udostępnienia:</strong> bez zbędnej zwłoki, nie później niż w terminie 14 dni od dnia złożenia wniosku.</li>
+                                <li><strong>Sposób złożenia:</strong> pisemnie na adres biura, drogą elektroniczną (e-mail: biuro@zmigrs.kielce.com.pl), przez e-Doręczenia lub skrytkę ePUAP.</li>
+                                <li><strong>Opłaty:</strong> dostęp do informacji publicznej jest bezpłatny (chyba że podmiot ponosi dodatkowe koszty związane z przekształceniem formy lub nośnika).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESSIBILITY DECLARATION PAGE -->
+    <div id="accessibility" class="page">
+        <div class="container">
+            <div class="content-wrapper">
+                <section class="about-content">
+                    <div class="about-text glass">
+                        <h2>Deklaracja Dostępności Cyfrowej</h2>
+                        <p class="doc-lead">
+                            Związek Miast i Gmin Regionu Świętokrzyskiego zobowiązuje się zapewnić dostępność swojej strony internetowej
+                            zgodnie z przepisami <strong>Ustawy z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych</strong>
+                            (Dz. U. z 2023 r. poz. 1440).
+                        </p>
+                        <p>Niniejsze oświadczenie w sprawie dostępności ma zastosowanie do serwisu internetowego ZMiGRS.</p>
+
+                        <div class="formal-subbox">
+                            <ul class="formal-list">
+                                <li><strong>Data publikacji strony internetowej:</strong> 2022-01-15</li>
+                                <li><strong>Data ostatniej istotnej aktualizacji:</strong> 2026-03-10</li>
+                                <li><strong>Data sporządzenia Deklaracji:</strong> 2024-03-20</li>
+                                <li><strong>Data ostatniego przeglądu Deklaracji:</strong> 2026-09-24</li>
+                            </ul>
+                        </div>
+
+                        <h3>Stan dostępności cyfrowej</h3>
+                        <p>
+                            Strona internetowa jest <strong>częściowo zgodna</strong> z ustawą z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych
+                            i aplikacji mobilnych podmiotów publicznych z powodu poniższych niezgodności lub wyłączeń.
+                        </p>
+
+                        <h3>Niedostępne elementy i wyłączenia</h3>
+                        <ul class="formal-list">
+                            <li>Część archiwalnych dokumentów do pobrania w formacie PDF i skanów (pochodzących z lat 2001–2021) nie posiada pełnej struktury tekstowej OCR – są one sukcesywnie konwertowane i uzupełniane.</li>
+                            <li>Niektóre archiwalne galerie zdjęć w artykułach mogą nie posiadać szczegółowych opisów alternatywnych (atrybutów alt).</li>
+                            <li>Część materiałów zewnętrznych lub map interaktywnych dostarczanych przez podmioty trzecie może nie być w pełni obsługiwana za pomocą wyłącznie klawiatury.</li>
+                        </ul>
+
+                        <h3>Przygotowanie deklaracji dostępności</h3>
+                        <p>
+                            Deklarację sporządzono na podstawie samooceny przeprowadzonej przez podmiot publiczny oraz audytu wewnętrznego
+                            przeprowadzonego z użyciem narzędzi walidujących (WAVE, Axe) oraz czytnika ekranu NVDA.
+                        </p>
+
+                        <h3>Ułatwienia na stronie (Standard WCAG 2.1 AA)</h3>
+                        <ul class="formal-list">
+                            <li><strong>Pasek narzędzi dostępności:</strong> możliwość włączenia trybu wysokiego kontrastu (czarno-żółtego) o współczynniku kontrastu przewyższającym 7:1.</li>
+                            <li><strong>Zmiana rozmiaru tekstu:</strong> 3-stopniowy wybór wielkości czcionki (A / A+ / A++).</li>
+                            <li><strong>Zatrzymanie ruchu:</strong> możliwość wyłączenia animacji tła i ruchomych elementów dla osób wrażliwych na ruch.</li>
+                            <li><strong>Skrót klawiaturowy "Skip link":</strong> bezpośrednie przejście do treści głównej po naciśnięciu klawisza Tab.</li>
+                            <li><strong>Dostępność z klawiatury:</strong> pełna nawigacja po serwisie za pomocą klawisza Tab i Enter.</li>
+                            <li><strong>Widoczny fokus:</strong> wyraźne obramowanie aktywnych elementów interaktywnych.</li>
+                        </ul>
+
+                        <h3>Informacje zwrotne i dane kontaktowe</h3>
+                        <p>
+                            W przypadku problemów z dostępnością strony internetowej prosimy o kontakt. Osobą odpowiedzialną jest
+                            <strong>Pani Aneta Sławek – Dyrektor Biura Stowarzyszenia</strong>.
+                        </p>
+                        <ul class="formal-list">
+                            <li><strong>E-mail kontaktowy:</strong> <a href="mailto:biuro@zmigrs.kielce.com.pl" class="text-link">biuro@zmigrs.kielce.com.pl</a></li>
+                            <li><strong>Telefon:</strong> <a href="tel:+48413421650" class="text-link">(+48) 41 342 16 50</a></li>
+                            <li><strong>Adres korespondencyjny:</strong> al. IX Wieków Kielc 3, 25-516 Kielce (Świętokrzyski Urząd Wojewódzki, bud. B, pok. 2)</li>
+                        </ul>
+                        <p>Tą samą drogą można składać wnioski o udostępnienie informacji niedostępnej oraz składać żądania zapewnienia dostępności.</p>
+
+                        <h3>Procedura wnioskowo-skargowa</h3>
+                        <p>
+                            Każdy ma prawo do wystąpienia z żądaniem zapewnienia dostępności cyfrowej strony internetowej lub jej elementu.
+                            Można także zażądać udostępnienia informacji za pomocą alternatywnego sposobu dostępu (np. odczytanie dokumentu).
+                        </p>
+                        <p>
+                            Żądanie powinno zawierać: dane osoby zgłaszającej żądanie, wskazanie strony lub elementu oraz preferowany sposób kontaktu.
+                            Podmiot publiczny powinien zrealizować żądanie niezwłocznie, nie później niż w ciągu 7 dni od dnia wystąpienia.
+                            Jeżeli dotrzymanie tego terminu nie jest możliwe, podmiot niezwłocznie informuje o tym wnoszącego żądanie, podając termin realizacji (nie dłuższy niż 2 miesiące).
+                        </p>
+                        <p>
+                            W przypadku odmowy zapewnienia dostępności można złożyć skargę do organu nadzorczego podmiotu oraz do
+                            <strong>Rzecznika Praw Obywatelskich</strong> (<a href="https://www.rpo.gov.pl" target="_blank" rel="noopener noreferrer" class="text-link">www.rpo.gov.pl</a>).
+                        </p>
+
+                        <h3>Dostępność architektoniczna siedziby</h3>
+                        <p><strong>Świętokrzyski Urząd Wojewódzki w Kielcach, budynek "B", parter, pokój nr 2, al. IX Wieków Kielc 3, 25-516 Kielce:</strong></p>
+                        <ul class="formal-list">
+                            <li><strong>Wejście do budynku:</strong> główne wejście do budynku Świętokrzyskiego Urzędu Wojewódzkiego od strony al. IX Wieków Kielc jest przystosowane dla osób poruszających się na wózkach (podjazd z poręczami oraz automatycznie otwierane drzwi).</li>
+                            <li><strong>Biuro Stowarzyszenia:</strong> zlokalizowane jest na parterze w budynku "B", w pokoju nr 2. Ciągi komunikacyjne są szerokie, bezprogowe i wolne od barier architektonicznych.</li>
+                            <li><strong>Windy:</strong> budynek wyposażony jest w windy dostosowane do potrzeb osób z niepełnosprawnościami, posiadające komunikaty głosowe oraz przyciski w alfabecie Braille'a.</li>
+                            <li><strong>Toalety:</strong> na parterze budynku znajduje się toaleta przystosowana dla osób z niepełnosprawnościami ruchowymi.</li>
+                            <li><strong>Miejsca parkingowe:</strong> przed budynkiem Urzędu Wojewódzkiego wyznaczono 4 oznakowane miejsca parkingowe dla pojazdów osób z niepełnosprawnościami.</li>
+                            <li><strong>Wstęp z psem asystującym:</strong> do biura oraz wszystkich ogólnodostępnych pomieszczeń urzędu można wejść z psem asystującym i psem przewodnikiem.</li>
+                            <li><strong>Tłumacz języka migowego:</strong> istnieje możliwość skorzystania z pomocy tłumacza polskiego języka migowego (PJM) na miejscu lub online po uprzednim zgłoszeniu na min. 3 dni robocze przed planowaną wizytą.</li>
+                        </ul>
+
+                        <h3>Aplikacje mobilne</h3>
+                        <p>Stowarzyszenie Związek Miast i Gmin Regionu Świętokrzyskiego nie posiada odrębnych dedykowanych aplikacji mobilnych. Strona internetowa jest w pełni responsywna (RWD) i dostosowana do urządzeń mobilnych.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- GDPR & PRIVACY POLICY PAGE -->
+    <div id="rodo" class="page">
+        <div class="container">
+            <div class="content-wrapper">
+                <section class="about-content">
+                    <div class="about-text glass">
+                        <h2>Klauzula Informacyjna RODO i Polityka Prywatności</h2>
+                        <p class="doc-lead">
+                            Zgodnie z art. 13 ust. 1 i 2 Rozporządzenia Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r.
+                            w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie swobodnego przepływu takich danych
+                            oraz uchylenia dyrektywy 95/46/WE (ogólne rozporządzenie o ochronie danych – <strong>RODO</strong>), informujemy o zasadach przetwarzania
+                            Twoich danych osobowych:
+                        </p>
+
+                        <h3>1. Administrator Danych Osobowych (ADO)</h3>
+                        <p>
+                            Administratorem Twoich danych osobowych jest <strong>Stowarzyszenie Związek Miast i Gmin Regionu Świętokrzyskiego</strong>,
+                            z siedzibą: al. IX Wieków Kielc 3, 25-516 Kielce (Świętokrzyski Urząd Wojewódzki, bud. B, pok. 2),
+                            KRS: 0000003041, NIP: 9591474087, REGON: 292394840.
+                        </p>
+
+                        <h3>2. Inspektor Ochrony Danych (IOD)</h3>
+                        <p>
+                            W sprawach dotyczących przetwarzania Twoich danych osobowych oraz realizacji praw przysługujących na mocy RODO
+                            możesz skontaktować się z wyznaczonym Inspektorem Ochrony Danych:
+                        </p>
+                        <ul class="formal-list">
+                            <li>pocztą elektroniczną na adres: <a href="mailto:iod@zmigrs.kielce.com.pl" class="text-link">iod@zmigrs.kielce.com.pl</a></li>
+                            <li>pisemnie na adres siedziby Administratora z dopiskiem "Inspektor Ochrony Danych".</li>
+                        </ul>
+
+                        <h3>3. Cele i podstawy prawne przetwarzania danych</h3>
+                        <p>Twoje dane osobowe przetwarzane są w następujących celach:</p>
+                        <ul class="formal-list">
+                            <li><strong>Obsługa zapytań i korespondencji:</strong> w celu udzielenia odpowiedzi na wiadomość przesłaną za pośrednictwem formularza kontaktowego, poczty tradycyjnej lub poczty e-mail – na podstawie art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes Administratora polegający na obsłudze korespondencji i komunikacji z interesariuszami) lub art. 6 ust. 1 lit. a RODO (Twoja dobrowolna zgoda);</li>
+                            <li><strong>Ochrona przed spamem i cyberbezpieczeństwo serwisu:</strong> przetwarzanie podstawowych parametrów technicznych i telemetrycznych (język przeglądarki, strefa czasowa, rozdzielczość ekranu, wskaźniki interakcji z formularzem) w celu detekcji fałszywych zapytań, zautomatyzowanych botów i nadużyć – na podstawie art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes Administratora w zw. z motywem 47 RODO dotyczący zapewnienia bezpieczeństwa sieci i informacji);</li>
+                            <li><strong>Realizacja celów statutowych Stowarzyszenia:</strong> wspieranie idei samorządu terytorialnego i obrona wspólnych interesów gmin członkowskich – na podstawie art. 6 ust. 1 lit. c i e RODO;</li>
+                            <li><strong>Dochodzenie lub obrona przed roszczeniami:</strong> na podstawie art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes Administratora).</li>
+                        </ul>
+
+                        <h3>4. Okres przechowywania danych</h3>
+                        <p>
+                            Dane osobowe przetwarzane w celu obsługi zapytania będą przechowywane przez okres niezbędny do udzielenia wyczerpującej odpowiedzi
+                            i zakończenia sprawy, a następnie przez czas wynikający z przepisów ustawy z dnia 14 lipca 1983 r. o narodowym zasobie archiwalnym
+                            i archiwach oraz Jednolitego Rzeczowego Wykazu Akt obowiązującego w jednostce.
+                        </p>
+
+                        <h3>5. Odbiorcy danych osobowych</h3>
+                        <p>Twoje dane mogą być przekazywane wyłącznie:</p>
+                        <ul class="formal-list">
+                            <li>podmiotom uprawnionym do ich otrzymania na podstawie obowiązujących przepisów prawa (np. organy kontrolne, sądy);</li>
+                            <li>podmiotom przetwarzającym dane w imieniu Administratora na podstawie zawartych umów powierzenia przetwarzania danych (m.in. dostawcy usług teleinformatycznych, poczty elektronicznej, hostingu serwisu).</li>
+                        </ul>
+                        <p>Administrator nie przekazuje Twoich danych osobowych do państw trzecich (poza Europejski Obszar Gospodarczy) ani do organizacji międzynarodowych.</p>
+
+                        <h3>6. Prawa osób, których dane dotyczą</h3>
+                        <p>Posiadasz prawo do:</p>
+                        <ul class="formal-list">
+                            <li>dostępu do treści swoich danych osobowych oraz otrzymania ich kopii (art. 15 RODO);</li>
+                            <li>sprostowania (poprawienia) nieprawidłowych lub niekompletnych danych (art. 16 RODO);</li>
+                            <li>usunięcia danych („prawo do bycia zapomnianym”) w przypadkach przewidzianych w art. 17 RODO;</li>
+                            <li>ograniczenia przetwarzania danych osobowych (art. 18 RODO);</li>
+                            <li>wniesienia sprzeciwu wobec przetwarzania opartego na art. 6 ust. 1 lit. f RODO (art. 21 RODO);</li>
+                            <li>cofnięcia zgody w dowolnym momencie (jeśli przetwarzanie odbywa się na podstawie zgody), bez wpływu na zgodność z prawem przetwarzania dokonanego przed jej cofnięciem.</li>
+                        </ul>
+
+                        <h3>7. Prawo wniesienia skargi do organu nadzorczego</h3>
+                        <p>
+                            W przypadku uznania, że przetwarzanie Twoich danych osobowych narusza przepisy ogólnego rozporządzenia o ochronie danych (RODO),
+                            przysługuje Ci prawo wniesienia skargi do organu nadzorczego:
+                            <strong>Prezes Urzędu Ochrony Danych Osobowych (PUODO)</strong>, ul. Stawki 2, 00-193 Warszawa, tel. 22 531 03 00, infolinia: 606-950-000.
+                        </p>
+
+                        <h3>8. Informacja o wymogu / dobrowolności podania danych</h3>
+                        <p>
+                            Podanie danych osobowych (imię, nazwisko, adres e-mail) w formularzu kontaktowym jest dobrowolne,
+                            jednakże ich niepodanie uniemożliwi przesłanie zapytania i udzielenie odpowiedzi.
+                        </p>
+
+                        <h3>9. Zautomatyzowane podejmowanie decyzji i profilowanie</h3>
+                        <p>Twoje dane osobowe nie podlegają zautomatyzowanemu podejmowaniu decyzji, w tym profilowaniu.</p>
+
+                        <h3>10. Polityka plików cookies i pamięci przeglądarki</h3>
+                        <p>
+                            Serwis internetowy wykorzystuje wyłącznie niezbędne pliki sesyjne oraz lokalną pamięć podręczną przeglądarki
+                            (sessionStorage oraz localStorage) w celu:
+                        </p>
+                        <ul class="formal-list">
+                            <li>zapamiętania preferencji ułatwień dostępu (wysoki kontrast, rozmiar czcionki, zatrzymanie animacji);</li>
+                            <li>optymalizacji wydajności pobierania danych publicznych (artykuły, uchwały, sprawozdania) z bezpiecznego API.</li>
+                        </ul>
+                        <p>Serwis nie stosuje cookies śledzących, analitycznych stron trzecich ani cookies marketingowych.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    </main>
+
     <!-- SINGLE FOOTER -->
     <div id="footer" class="active">
         <div class="container a">
-            <footer class="glass">
+            <footer class="glass" role="contentinfo">
                 <div class="footer-content">
                     <div class="footer-links">
-                        <a href="#" onclick="showPage('home')" class="active">Związek</a>
-                        <a href="#" onclick="showPage('authorities')">Władze</a>
-                        <a href="#" onclick="showPage('news')">Aktualności</a>
-                        <a href="#" onclick="showPage('members')">Członkowie</a>
-                        <a href="#" onclick="showPage('statutes')">Statut</a>
-                        <a href="#" onclick="showPage('resolutions')">Uchwały</a>
-                        <a href="#" onclick="showPage('reports')">Sprawozdania</a>
-                        <a href="#" onclick="showPage('contacts')">Kontakt</a>
+                        <a href="#home" onclick="showPage('home'); return false;" class="active">Związek</a>
+                        <a href="#authorities" onclick="showPage('authorities'); return false;">Władze</a>
+                        <a href="#news" onclick="showPage('news'); return false;">Aktualności</a>
+                        <a href="#members" onclick="showPage('members'); return false;">Członkowie</a>
+                        <a href="#statutes" onclick="showPage('statutes'); return false;">Statut</a>
+                        <a href="#resolutions" onclick="showPage('resolutions'); return false;">Uchwały</a>
+                        <a href="#reports" onclick="showPage('reports'); return false;">Sprawozdania</a>
+                        <a href="#accessibility" onclick="showPage('accessibility'); return false;">Deklaracja dostępności</a>
+                        <a href="#rodo" onclick="showPage('rodo'); return false;">Klauzula RODO</a>
+                        <a href="#contacts" onclick="showPage('contacts'); return false;">Kontakt</a>
                     </div>
+
                     <div class="copyright">
-                        &copy; 2025
-                        <a rel="nofollow" href="https://naapp.pl" target="_blank">NAAPP New Advance APP</a>
+                        &copy; 2026 Związek Miast i Gmin Regionu Świętokrzyskiego
+                        <span class="copyright-sub">Realizacja techniczna: <a rel="nofollow" href="https://naapp.pl" target="_blank">NAAPP New Advance APP</a></span>
                     </div>
                 </div>
             </footer>
