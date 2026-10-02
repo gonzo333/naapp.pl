@@ -3300,3 +3300,185 @@ body.font-size-lg:not(html.font-size-lg body) {
 body.reduced-motion .shape {
     animation-play-state: paused !important;
 }
+
+
+/* ── 10. NAWIGACJA ARTYKUŁU I DOSTĘPNOŚĆ (IKONA WSTECZ, UDOSTĘPNIJ, SR-ONLY) ── */
+.article-top-nav {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 16px 30px 0 30px;
+    margin: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.article-back-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.article-back-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-3px);
+}
+
+.article-back-icon-btn:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 3px;
+}
+
+.article-back-icon-btn .material-symbols-outlined {
+    font-size: 1.25rem;
+}
+
+#article-div .article-detail {
+    padding-top: 6px;
+}
+
+@media (max-width: 768px) {
+    .article-top-nav {
+        padding: 12px 16px 0 16px;
+    }
+
+    #article-div .article-detail,
+    #article-div.gallery-hero-grid .article-detail {
+        padding-top: 4px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+.article-date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.article-date-row .article-date {
+    margin-bottom: 0;
+}
+
+.article-share-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.article-share-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.article-share-icon-btn:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 3px;
+}
+
+.article-share-icon-btn .material-symbols-outlined {
+    font-size: 1.2rem;
+}
+
+/* Klasa pomocnicza dla czytników ekranowych (WCAG) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Wsparcie wysokiego kontrastu dla ikon nawigacji artykułu */
+body.high-contrast .article-back-icon-btn,
+body.high-contrast .article-share-icon-btn {
+    background: #000000 !important;
+    border: 2px solid #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+body.high-contrast .article-back-icon-btn:hover,
+body.high-contrast .article-share-icon-btn:hover {
+    background: #ffff00 !important;
+    color: #000000 !important;
+}
+
+
+/* ── 11. ZNAK URZĘDOWY BIP (SVG Z ASSETS/IMAGES/BIP.SVG) ── */
+.bip-top-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #ffffff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    vertical-align: middle;
+}
+
+.bip-top-icon-link:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(192, 4, 24, 0.4);
+}
+
+.bip-top-icon-link:focus-visible {
+    outline: 2px solid #ffff00;
+    outline-offset: 2px;
+}
+
+.bip-icon-img {
+    height: 18px;
+    width: auto;
+    display: block;
+}
+
+.bip-flag-large {
+    background: #ffffff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bip-flag-large-img {
+    height: 38px;
+    width: auto;
+    display: block;
+}
+
+body.high-contrast .bip-top-icon-link,
+body.high-contrast .bip-flag-large {
+    background: #ffff00 !important;
+    border: 2px solid #000000 !important;
+}

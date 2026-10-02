@@ -1,8 +1,6 @@
 let currentPage = "home";
-let api_url =
-  // "https://script.google.com/macros/s/AKfycbw_SyqFrfO4WA9HjrX6TQf4HUhcMxpNCQuYaEI-Cwe6mB7D-toubQcZXMglLi0J1vg/exec";
-  // "https://localhost:4000";
-  "https://zmigrs-api.newadvanceapp.workers.dev";
+let currentArticleId = null;
+let api_url = "https://zmigrs-api.newadvanceapp.workers.dev";
 const cities = [
   {
     name: "Ostrowiec Świętokrzyski",
@@ -331,15 +329,26 @@ function moveGallery(direction) {
 
 /**
  * Loads and renders full article details from Cloudflare Worker API by ID, including metadata, sanitized content, and gallery attachments.
+ * Updates URL hash, document title, and meta description for SEO and browser history.
  * @param {number|string} id - Article database ID.
+ * @param {boolean} [shouldPushState=true] - Whether to push route to browser History API.
  */
-async function loadArticle(id) {
+async function loadArticle(id, shouldPushState = true) {
   showLoadingToast("Wczytywanie artykułu...");
   const articleContainer = document.getElementById("article-text-div");
   const galleryContainer = document.getElementById("article-gallery-div");
 
+  currentArticleId = id;
+  const targetHash = `#/aktualnosci/${encodeURIComponent(id)}`;
+  if (shouldPushState && window.location.hash !== targetHash) {
+    history.pushState({ page: "article", id }, "", targetHash);
+  }
+
+  // Switch view to article container without re-pushing history
+  showPage("article", false);
+
   // Clear previous content
-  galleryContainer.replaceChildren();
+  if (galleryContainer) galleryContainer.replaceChildren();
   document.querySelectorAll(".prev-btn, .next-btn").forEach((btn) => {
     btn.style.visibility = "hidden";
     btn.style.opacity = "0";
@@ -353,6 +362,19 @@ async function loadArticle(id) {
 
     if (!article) {
       hideLoadingToast();
+      if (articleContainer) {
+        articleContainer.innerHTML = `
+          <div class="empty-search-state" style="text-align: center; padding: 40px 20px;">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: #f87171; margin-bottom: 15px;">error_outline</span>
+            <h3>Nie znaleziono artykułu</h3>
+            <p>Wskazany artykuł nie istnieje lub został zarchiwizowany.</p>
+            <button type="button" class="article-back-btn" onclick="navigateBackToNews()" style="margin-top: 15px;">
+              <span class="material-symbols-outlined">arrow_back</span>
+              <span>Wróć do listy aktualności</span>
+            </button>
+          </div>
+        `;
+      }
       return;
     }
 
@@ -367,6 +389,13 @@ async function loadArticle(id) {
       folder_id,
       attachments_count,
     } = article;
+
+    // Update dynamic document title and meta description for SEO and browser tabs
+    document.title = `${name} - Związek Miast i Gmin Regionu Świętokrzyskiego`;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc && description) {
+      metaDesc.setAttribute("content", truncateText(description, 160));
+    }
 
     const sourceTrimmed = source && source.trim() !== "" ? source.trim() : null;
     const photosCreditTrimmed =
@@ -386,17 +415,31 @@ async function loadArticle(id) {
     titleEl.className = "article-title";
     titleEl.textContent = name;
 
+    const dateRow = document.createElement("div");
+    dateRow.className = "article-date-row";
+
     const dateP = document.createElement("p");
     dateP.className = "article-date";
     const dateSmall = document.createElement("small");
     dateSmall.textContent = formatDateToPolish(publication_date);
     dateP.appendChild(dateSmall);
+    dateRow.appendChild(dateP);
+
+    const shareBtn = document.createElement("button");
+    shareBtn.type = "button";
+    shareBtn.className = "article-share-icon-btn";
+    shareBtn.setAttribute("aria-label", "Kopiuj link do artykułu");
+    shareBtn.setAttribute("title", "Kopiuj link do artykułu");
+    shareBtn.innerHTML =
+      '<span class="material-symbols-outlined">share</span><span class="sr-only">Kopiuj link do artykułu</span>';
+    shareBtn.addEventListener("click", copyArticleShareLink);
+    dateRow.appendChild(shareBtn);
 
     const divider = document.createElement("hr");
     divider.className = "article-divider";
 
     headerEl.appendChild(titleEl);
-    headerEl.appendChild(dateP);
+    headerEl.appendChild(dateRow);
     headerEl.appendChild(divider);
     articleEl.appendChild(headerEl);
 
@@ -492,8 +535,6 @@ async function loadArticle(id) {
     articleEl.appendChild(footerEl);
 
     articleContainer.appendChild(articleEl);
-
-    showPage("article");
     hideLoadingToast();
 
     if (folder_id || attachments_count > 0) {
@@ -513,6 +554,19 @@ async function loadArticle(id) {
   } catch (e) {
     console.error("Błąd ładowania artykułu:", e);
     hideLoadingToast();
+    if (articleContainer) {
+      articleContainer.innerHTML = `
+        <div class="empty-search-state" style="text-align: center; padding: 40px 20px;">
+          <span class="material-symbols-outlined" style="font-size: 48px; color: #f87171; margin-bottom: 15px;">error_outline</span>
+          <h3>Błąd wczytywania artykułu</h3>
+          <p>Wystąpił problem z połączeniem. Spróbuj odświeżyć stronę.</p>
+          <button type="button" class="article-back-btn" onclick="navigateBackToNews()" style="margin-top: 15px;">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Wróć do listy aktualności</span>
+          </button>
+        </div>
+      `;
+    }
   }
 }
 
@@ -1257,7 +1311,7 @@ function createNewsCard(item, query = "") {
 
   const h3 = document.createElement("h3");
   const a = document.createElement("a");
-  a.href = "#article";
+  a.href = `#/aktualnosci/${news_id}`;
   a.innerHTML = highlightSearchTerms(name || "Brak tytułu", query);
   a.addEventListener("click", (e) => {
     e.preventDefault();
@@ -2529,12 +2583,121 @@ function initAccessibilityToolbar() {
   }
 }
 
+const CANONICAL_PAGE_SLUGS = {
+  home: "home",
+  authorities: "wladze",
+  news: "aktualnosci",
+  members: "czlonkowie",
+  statutes: "statut",
+  resolutions: "uchwaly",
+  reports: "sprawozdania",
+  contacts: "kontakt",
+  bip: "bip",
+  accessibility: "dostepnosc",
+  rodo: "rodo",
+};
+
+const PAGE_TITLES = {
+  home: "Związek Miast i Gmin Regionu Świętokrzyskiego",
+  authorities: "Władze - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  news: "Aktualności - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  members: "Gminy członkowskie - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  statutes: "Statut - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  resolutions: "Uchwały - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  reports: "Sprawozdania - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  contacts: "Kontakt - Związek Miast i Gmin Regionu Świętokrzyskiego",
+  bip: "Biuletyn Informacji Publicznej - ZMiGRS",
+  accessibility: "Deklaracja dostępności - ZMiGRS",
+  rodo: "Klauzula informacyjna RODO - ZMiGRS",
+};
+
+/**
+ * Parses current URL hash into canonical pageId and optional param (e.g. article ID).
+ * Robustly supports aliases: '#/aktualnosci/1', '#aktualnosci/1', '#aktualności/1', '#news/1', '#wladze'.
+ * @param {string} [rawHash] - Optional raw hash string (defaults to window.location.hash).
+ * @returns {{ pageId: string, id: string|null }}
+ */
+function parseHashRoute(rawHash = window.location.hash) {
+  if (!rawHash) return { pageId: "home", id: null };
+
+  let clean = "";
+  try {
+    clean = decodeURIComponent(rawHash).trim();
+  } catch {
+    clean = rawHash.trim();
+  }
+
+  // Remove leading '#' and any leading/trailing slashes
+  clean = clean.replace(/^#\/?/, "").replace(/\/+$/, "");
+  if (!clean) return { pageId: "home", id: null };
+
+  const segments = clean.split("/").map((s) => s.trim()).filter(Boolean);
+  const root = (segments[0] || "").toLowerCase();
+  const subId = segments[1] || null;
+
+  // Article subroute matching (e.g. #/aktualnosci/1, #aktualności/1, #news/1, #article/1)
+  const isArticleRoot = [
+    "aktualnosci",
+    "aktualności",
+    "news",
+    "article",
+    "artykul",
+    "artykuł",
+    "articles",
+  ].includes(root);
+
+  if (isArticleRoot && subId) {
+    return { pageId: "article", id: subId };
+  }
+
+  const aliasMap = {
+    "": "home",
+    "/": "home",
+    home: "home",
+    zwiazek: "home",
+    związek: "home",
+    authorities: "authorities",
+    wladze: "authorities",
+    władze: "authorities",
+    news: "news",
+    aktualnosci: "news",
+    aktualności: "news",
+    article: "news",
+    artykul: "news",
+    artykuł: "news",
+    articles: "news",
+    members: "members",
+    czlonkowie: "members",
+    członkowie: "members",
+    gminy: "members",
+    statutes: "statutes",
+    statut: "statutes",
+    resolutions: "resolutions",
+    uchwaly: "resolutions",
+    uchwały: "resolutions",
+    reports: "reports",
+    sprawozdania: "reports",
+    contacts: "contacts",
+    kontakt: "contacts",
+    bip: "bip",
+    accessibility: "accessibility",
+    dostepnosc: "accessibility",
+    dostępność: "accessibility",
+    rodo: "rodo",
+  };
+
+  const resolvedPage =
+    aliasMap[root] || (document.getElementById(root) ? root : "home");
+  return { pageId: resolvedPage, id: null };
+}
+
 /**
  * Single Page Application (SPA) view router. Displays the specified page view and hides others.
  * Updates navigation active state, repositions footer to current view, syncs URL hash, and scrolls to top.
  * @param {string} pageId - DOM ID of the target page view container ('home', 'article', etc.).
+ * @param {boolean} [shouldPushState=true] - Whether to push new history entry.
  */
-function showPage(pageId) {
+function showPage(pageId, shouldPushState = true) {
   closeMobileDrawer();
 
   const targetEl = document.getElementById(pageId);
@@ -2562,7 +2725,15 @@ function showPage(pageId) {
     link.classList.remove("active");
     const oc = link.getAttribute("onclick") || "";
     const href = link.getAttribute("href") || "";
-    if (oc.includes(`'${pageId}'`) || href === `#${pageId}`) {
+    const slug = CANONICAL_PAGE_SLUGS[pageId] || pageId;
+    if (
+      oc.includes(`'${pageId}'`) ||
+      href === `#${pageId}` ||
+      href === `#/${slug}` ||
+      href === `#${slug}` ||
+      (pageId === "article" &&
+        (oc.includes("'news'") || href.includes("aktualnosci") || href.includes("news")))
+    ) {
       link.classList.add("active");
     }
   });
@@ -2575,23 +2746,76 @@ function showPage(pageId) {
     targetEl.appendChild(footer);
   }
 
-  // Sync browser URL hash for bookmarking and back button navigation
-  if (window.location.hash !== `#${pageId}` && pageId !== "article") {
-    history.pushState(null, "", `#${pageId}`);
+  // Update browser URL hash and title
+  if (pageId !== "article") {
+    const slug = CANONICAL_PAGE_SLUGS[pageId] || pageId;
+    const targetHash = slug === "home" ? "#/" : `#/${slug}`;
+    if (shouldPushState && window.location.hash !== targetHash) {
+      history.pushState({ page: pageId }, "", targetHash);
+    }
+    if (PAGE_TITLES[pageId]) {
+      document.title = PAGE_TITLES[pageId];
+    }
   }
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Handle browser Back / Forward navigation buttons
-window.addEventListener("popstate", () => {
-  const hash = window.location.hash.replace(/^#/, "");
-  if (hash && document.getElementById(hash)) {
-    showPage(hash);
-  } else if (!hash) {
-    showPage("home");
+/**
+ * Handles browser navigation (popstate/hashchange) or initial page load by routing to appropriate view.
+ * @param {boolean} [shouldPushState=false] - Whether to push state during route transition.
+ */
+function handleRouteFromLocation(shouldPushState = false) {
+  const route = parseHashRoute(window.location.hash);
+  if (route.pageId === "article" && route.id) {
+    loadArticle(route.id, shouldPushState);
+  } else {
+    showPage(route.pageId, shouldPushState);
   }
+}
+
+/**
+ * Navigates back to the news list. If user came from news, uses browser history; otherwise navigates to news view.
+ */
+function navigateBackToNews() {
+  if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+    window.history.back();
+  } else {
+    showPage("news");
+  }
+}
+
+/**
+ * Copies current article share link to clipboard and notifies user.
+ */
+function copyArticleShareLink() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showLoadingToast("Skopiowano link do schowka!");
+      setTimeout(hideLoadingToast, 2000);
+    }).catch(() => {
+      prompt("Skopiuj link do artykułu:", url);
+    });
+  } else {
+    prompt("Skopiuj link do artykułu:", url);
+  }
+}
+
+// Handle browser Back / Forward navigation buttons
+window.addEventListener("popstate", (e) => {
+  if (e.state && e.state.page === "article" && e.state.id) {
+    loadArticle(e.state.id, false);
+  } else if (e.state && e.state.page) {
+    showPage(e.state.page, false);
+  } else {
+    handleRouteFromLocation(false);
+  }
+});
+
+window.addEventListener("hashchange", () => {
+  handleRouteFromLocation(false);
 });
 
 // ── APPLICATION BOOTSTRAP & EVENT LISTENERS ──
@@ -2609,17 +2833,8 @@ window.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => generateResolutions("resolutions-div"), 300);
   setTimeout(() => generateReports("reports-div"), 600);
 
-  // Check if user navigated directly with a URL hash (e.g. #bip, #accessibility, #rodo)
-  const initialHash = window.location.hash.replace(/^#/, "");
-  if (
-    initialHash &&
-    document.getElementById(initialHash) &&
-    initialHash !== "home"
-  ) {
-    showPage(initialHash);
-  } else {
-    homePage.appendChild(footer);
-  }
+  // Route to the view requested in URL hash (e.g. #/aktualnosci/123, #/bip, #/kontakt)
+  handleRouteFromLocation(false);
 
   // Mobile / Tablet drawer navigation event listeners
   const mobileToggle = document.getElementById("mobile-menu-toggle");

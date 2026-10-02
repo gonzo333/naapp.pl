@@ -158,6 +158,16 @@
         .badge.green  { background: #2d7a4f; }
         .badge.orange { background: #c97a2a; }
 
+        /* ── Code snippets ── */
+        code {
+            background: #f1f5f9;
+            color: #0f3460;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 9pt;
+        }
+
         /* ── Footer ── */
         .doc-footer {
             margin-top: 50px;
@@ -180,6 +190,7 @@
             border-radius: 6px;
             font-size: 13px;
             cursor: pointer;
+            transition: background 0.2s ease;
         }
         .print-btn:hover { background: #16213e; }
     </style>
@@ -199,11 +210,12 @@
     <div class="cover">
         <div class="cover-title">
             <h1>Specyfikacja Techniczna<br>Strony Internetowej</h1>
-            <p>Związek Miast i Gmin Regionu Świętokrzyskiego</p>
+            <p>Stowarzyszenie Związek Miast i Gmin Regionu Świętokrzyskiego (ZMiGRS)</p>
         </div>
         <div class="cover-meta">
             <strong>NAAPP New Advance APP</strong>
-            naapp.pl
+            naapp.pl<br>
+            Wersja: 2.2 (Aktualizacja: 2026-10)
         </div>
     </div>
 
@@ -213,15 +225,16 @@
     <section>
         <h2 class="section-heading">1. Wprowadzenie i zakres dokumentu</h2>
         <p>
-            Niniejszy dokument stanowi specyfikację techniczną do oferty na wykonanie i wdrożenie strony
-            internetowej dla Stowarzyszenia <strong>Związek Miast i Gmin Regionu Świętokrzyskiego</strong>
-            (ZMiGRS). Opisuje zastosowaną architekturę, stos technologiczny, model bezpieczeństwa
-            oraz przyjęte standardy jakości i dostępności.
+            Niniejszy dokument stanowi aktualną specyfikację techniczną oficjalnego serwisu internetowego
+            Stowarzyszenia <strong>Związek Miast i Gmin Regionu Świętokrzyskiego</strong> (ZMiGRS), zrzeszającego
+            100 jednostek samorządu terytorialnego województwa świętokrzyskiego.
         </p>
         <p>
-            Dokument przeznaczony jest dla osób decyzyjnych oraz specjalistów IT po stronie
-            Zamawiającego i obejmuje zarówno warstwę frontendową (interfejs użytkownika), jak
-            i integrację z systemem bazodanowym oraz usługami zewnętrznymi.
+            Dokument szczegółowo opisuje architekturę chmurową <strong>Jamstack / Serverless Edge</strong>,
+            stos technologiczny oparty o ekosystem <strong>Cloudflare</strong> (Workers, D1, Cache API, Turnstile),
+            integrację z <strong>Google Drive API v3</strong> i <strong>Google Identity Services</strong>,
+            zasady bezpieczeństwa, standardy dostępności cyfrowej (<strong>WCAG 2.1 AA</strong>) oraz strukturę bazy danych
+            i panelu redakcyjnego.
         </p>
     </section>
 
@@ -231,579 +244,412 @@
     <section>
         <h2 class="section-heading">2. Architektura systemu</h2>
 
-        <h3 class="sub-heading">2.1 Model ogólny</h3>
+        <h3 class="sub-heading">2.1 Model ogólny – Serverless Edge & Static-First SPA</h3>
         <p>
-            Serwis internetowy oparty jest na architekturze <strong>Jamstack</strong> (static-first SPA –
-            Single Page Application). Podejście to polega na oddzieleniu warstwy prezentacji
-            (HTML/CSS/JavaScript) od warstwy danych (REST API), co przynosi wymierne korzyści
-            w zakresie bezpieczeństwa, wydajności i utrzymania.
+            Serwis internetowy zrealizowany jest w nowoczesnej architekturze <strong>Jamstack / Serverless Edge</strong>.
+            Warstwa prezentacji stanowi statyczną aplikację jednoukładową (Single Page Application – SPA),
+            natomiast warstwę logiki biznesowej, bazy danych oraz integracji zewnętrznych obsługuje bezserwerowe
+            środowisko brzegowe (Cloudflare Global Network).
         </p>
 
-        <div class="box">
-            <strong>Kluczowa cecha architektury:</strong> brak serwera aplikacyjnego po stronie
-            frontendu. Strona internetowa to zbiór statycznych plików serwowanych przez serwer HTTP –
-            nie ma możliwości ataku na interpreter, bazy danych czy logikę serwerową poprzez
-            interfejs użytkownika.
+        <div class="box green">
+            <strong>Kluczowe zalety architektury:</strong> brak tradycyjnego serwera monolitycznego (np. LAMP/WordPress)
+            eliminuje luki typu SQL Injection, Remote Code Execution i ataki na interpreter PHP. Wszystkie żądania
+            publiczne obsługiwane są z krawędzi sieci (Edge) z czasami odpowiedzi poniżej 50 ms.
         </div>
 
-        <h3 class="sub-heading">2.2 Warstwy systemu</h3>
+        <h3 class="sub-heading">2.2 Warstwy systemu i komponenty</h3>
         <table>
             <tr>
                 <th>Warstwa</th>
                 <th>Technologia</th>
-                <th>Lokalizacja</th>
+                <th>Rola / Środowisko</th>
             </tr>
             <tr>
-                <td>Interfejs użytkownika (frontend)</td>
-                <td>HTML5, CSS3, JavaScript (ES2022+)</td>
-                <td>Serwer WWW (pliki statyczne)</td>
+                <td>Frontend (Prezentacja)</td>
+                <td>HTML5, CSS3 (Glassmorphism), Vanilla JS (ES2022+)</td>
+                <td>Statyczne pliki serwowane przez HTTP/HTTPS</td>
             </tr>
             <tr>
-                <td>Galeria multimediów</td>
-                <td>PhotoSwipe 5.3.7 (ESM)</td>
-                <td>CDN jsDelivr (cdn.jsdelivr.net)</td>
+                <td>Galeria zdjęć</td>
+                <td>PhotoSwipe 5.3.7 (ES Modules)</td>
+                <td>Lekka, dotykowa przeglądarka multimediów (CDN)</td>
             </tr>
             <tr>
-                <td>Warstwa danych (backend)</td>
-                <td>Oracle APEX REST API (ORDS)</td>
-                <td>Zewnętrzny serwer Oracle (HTTPS)</td>
+                <td>Bezpieczeństwo DOM</td>
+                <td>DOMPurify 3.2.4</td>
+                <td>Sanityzacja treści HTML artykułów i formularzy</td>
             </tr>
             <tr>
-                <td>Przechowywanie plików / galerii</td>
-                <td>Google Drive (lh3.googleusercontent.com)</td>
-                <td>Usługa chmurowa Google</td>
+                <td>Backend API (Edge Runtime)</td>
+                <td>Cloudflare Workers (TypeScript / V8 Isolates)</td>
+                <td>Autonomiczny punkt końcowy API (zmigrs-api) o architekturze SRP</td>
             </tr>
             <tr>
-                <td>Mapa lokalizacji</td>
-                <td>Google Maps Embed API</td>
-                <td>Usługa chmurowa Google</td>
+                <td>Relacyjna Baza Danych</td>
+                <td>Cloudflare D1 (Serverless Distributed SQLite)</td>
+                <td>Przechowywanie aktualności, uchwał, sprawozdań i kontaktów</td>
+            </tr>
+            <tr>
+                <td>Magazyn plików i multimediów</td>
+                <td>Google Drive API v3 (Konto Usługi / Service Account)</td>
+                <td>Przechowywanie załączników PDF i zdjęć w chmurze Google</td>
+            </tr>
+            <tr>
+                <td>Pamięć podręczna plików (Cache)</td>
+                <td>Cloudflare Cache API (caches.default)</td>
+                <td>Strumieniowanie mediów z Drive z buforowaniem (nagłówki immutable)</td>
+            </tr>
+            <tr>
+                <td>Ochrona antyspamowa</td>
+                <td>Cloudflare Turnstile (CAPTCHA bez barier)</td>
+                <td>Niewidoczna weryfikacja botów w formularzu kontaktowym</td>
+            </tr>
+            <tr>
+                <td>Autoryzacja redaktorów</td>
+                <td>Google Identity Services (OAuth 2.0 ID Token)</td>
+                <td>Weryfikacja kryptograficzna sygnatury i audience (aud) po stronie API</td>
+            </tr>
+            <tr>
+                <td>Powiadomienia pocztowe</td>
+                <td>Resend REST API</td>
+                <td>Wysyłka zapytań z formularza kontaktowego do Biura Związku</td>
             </tr>
         </table>
 
-        <h3 class="sub-heading">2.3 Nawigacja i routing</h3>
+        <h3 class="sub-heading">2.3 Routing URL, Deep Linking i Open Graph (SEO)</h3>
         <p>
-            Serwis realizuje nawigację po stronie klienta (client-side routing) bez przeładowań
-            strony. Funkcja <code>showPage()</code> zarządza widocznością sekcji DOM, co eliminuje
-            zbędne żądania HTTP i zapewnia natychmiastowe przejścia między zakładkami. Wszystkie
-            zasoby niezbędne do wyświetlenia każdej sekcji są wczytywane przy pierwszym otwarciu
-            strony.
-        </p>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         3. STOS TECHNOLOGICZNY
-    ══════════════════════════════════════════════════ -->
-    <section>
-        <h2 class="section-heading">3. Stos technologiczny</h2>
-
-        <h3 class="sub-heading">3.1 Frontend – technologie podstawowe</h3>
-        <table>
-            <tr>
-                <th>Komponent</th>
-                <th>Standard / Wersja</th>
-                <th>Uwagi</th>
-            </tr>
-            <tr>
-                <td>Język znaczników</td>
-                <td>HTML5 (Living Standard)</td>
-                <td>Semantyczny markup, atrybuty dostępności</td>
-            </tr>
-            <tr>
-                <td>Arkusze stylów</td>
-                <td>CSS3 (W3C)</td>
-                <td>Własne – brak zależności od frameworków CSS</td>
-            </tr>
-            <tr>
-                <td>Logika klienta</td>
-                <td>Vanilla JavaScript ES2022+</td>
-                <td>Brak zewnętrznych frameworków (React, Vue itp.)</td>
-            </tr>
-            <tr>
-                <td>Czcionki systemowe</td>
-                <td>Segoe UI, Tahoma, Verdana (stack)</td>
-                <td>Bez zewnętrznych żądań do Google Fonts</td>
-            </tr>
-            <tr>
-                <td>Moduły JS</td>
-                <td>ES Modules (type="module")</td>
-                <td>Natywne wsparcie przeglądarek, bez bundlera</td>
-            </tr>
-        </table>
-
-        <h3 class="sub-heading">3.2 Biblioteki zewnętrzne</h3>
-        <table>
-            <tr>
-                <th>Biblioteka</th>
-                <th>Wersja</th>
-                <th>Przeznaczenie</th>
-                <th>Źródło</th>
-            </tr>
-            <tr>
-                <td>PhotoSwipe</td>
-                <td>5.3.7</td>
-                <td>Interaktywna galeria zdjęć w artykułach</td>
-                <td>jsDelivr CDN (SRI-weryfikowalny)</td>
-            </tr>
-        </table>
-
-        <div class="box orange">
-            <strong>Minimalizm zależności:</strong> serwis celowo nie korzysta z żadnego frameworka
-            JavaScript (Angular, React, Vue, jQuery itp.). Oznacza to brak całych klas luk
-            bezpieczeństwa związanych z łańcuchem dostaw oprogramowania (supply chain attacks)
-            oraz brak konieczności regularnego aktualizowania dziesiątek pakietów npm.
-        </div>
-
-        <h3 class="sub-heading">3.3 Integracja z Oracle APEX REST API (ORDS)</h3>
-        <p>
-            Dane dynamiczne (aktualności, uchwały, sprawozdania, załączniki) pobierane są
-            asynchronicznie z REST API opartego na Oracle REST Data Services (ORDS),
-            wchodzącego w skład platformy Oracle APEX. Komunikacja odbywa się wyłącznie
-            metodą <code>GET</code> za pośrednictwem protokołu HTTPS z szyfrowanym połączeniem TLS.
-        </p>
-        <p>
-            Obsługiwane endpointy REST:
+            Serwis łączy elastyczność routingu po stronie klienta (History API z adresami kanonicznymi
+            <code>#/aktualnosci/:id</code>, <code>#/wladze</code>, <code>#/uchwaly</code>, <code>#/bip</code> itp.)
+            ze wsparciem dla robotów indeksujących (SEO) i podglądów społecznościowych (Facebook, LinkedIn, X):
         </p>
         <ul>
-            <li><code>/api/articles</code> – lista aktualności</li>
-            <li><code>/api/article/{id}</code> – pełna treść artykułu</li>
-            <li><code>/api/resolutions</code> – lista uchwał</li>
-            <li><code>/api/reports</code> – lista sprawozdań</li>
-            <li><code>/api/attachments/{type}/{id}</code> – wykaz załączników do pozycji</li>
-            <li><code>/api/attachments/{type}/file/{fileId}</code> – pobranie pliku</li>
+            <li>Każdy artykuł posiada bezpośredni, kopiowalny odnośnik ze skrótem oraz funkcją udostępnienia jednym kliknięciem.</li>
+            <li>Cloudflare Worker udostępnia dedykowany punkt wejścia <code>/aktualnosci/:id</code> oraz <code>/article/:id</code>,
+                który generuje semantyczny kod HTML z metatagami Open Graph (<code>og:title</code>, <code>og:description</code>,
+                <code>og:image</code>, <code>og:url</code>) bezpośrednio z bazy D1, po czym płynnie przekierowuje użytkownika do widoku aplikacji.</li>
+            <li>Pełne wsparcie dla przycisków przeglądarki „Wstecz” i „Dalej” (zdarzenia <code>popstate</code> i <code>hashchange</code>).</li>
         </ul>
     </section>
 
     <!-- ══════════════════════════════════════════════════
-         4. BEZPIECZEŃSTWO
+         3. STOS TECHNOLOGICZNY I BAZA DANYCH
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">3. Stos technologiczny i model danych</h2>
+
+        <h3 class="sub-heading">3.1 Frontend – lekkość i brak frameworkowego narzutu</h3>
+        <p>
+            Kod interfejsu użytkownika nie korzysta z ciężkich bibliotek monolitycznych (React, Angular, Vue, jQuery).
+            Dzięki temu cała strona waży ułamek standardowej witryny samorządowej, a kod pozostaje w pełni
+            przejrzysty, stabilny w długiej perspektywie czasowej i niewrażliwy na luki w łańcuchu dostaw pakietów npm.
+        </p>
+
+        <h3 class="sub-heading">3.2 Baza Danych Cloudflare D1 (Struktura tabel)</h3>
+        <p>
+            Serwis korzysta z produkcyjnej bazy danych D1 (<code>zmigrs-db</code>), zapewniającej transakcyjność ACID,
+            zerowe opóźnienia odczytu (edge read replication) oraz automatyczną kopię Time Travel:
+        </p>
+        <table>
+            <tr>
+                <th>Tabela</th>
+                <th>Kluczowe kolumny</th>
+                <th>Opis funkcjonalny</th>
+            </tr>
+            <tr>
+                <td><code>news</code></td>
+                <td>id, name, description, content, publication_date, author, source, photos_credit, folder_id, is_active</td>
+                <td>Aktualności i komunikaty zarządu z obsługą edytora WYSIWYG i galerii</td>
+            </tr>
+            <tr>
+                <td><code>resolutions</code></td>
+                <td>id, name, description, publication_date, folder_id, is_active</td>
+                <td>Rejestr uchwał Walnego Zebrania Członków oraz Zarządu Związku</td>
+            </tr>
+            <tr>
+                <td><code>reports</code></td>
+                <td>id, name, description, publication_date, folder_id, is_active</td>
+                <td>Sprawozdania merytoryczne i finansowe z działalności organizacji</td>
+            </tr>
+            <tr>
+                <td><code>contacts</code></td>
+                <td>id, name, email, subject, message, created_at, status</td>
+                <td>Zgłoszenia i zapytania nadsyłane przez formularz kontaktowy</td>
+            </tr>
+        </table>
+
+        <h3 class="sub-heading">3.3 Architektura Cloudflare Workera (SRP – Single Responsibility Principle)</h3>
+        <p>
+            Kod backendu (<code>worker.ts</code>) zorganizowany jest w modularną architekturę warstwową:
+        </p>
+        <ul>
+            <li><strong>Główny Dispatcher (fetch):</strong> zwięzły router rozdzielający żądania publiczne, administracyjne i SEO.</li>
+            <li><strong>Warstwa Repozytoriów (ContentRepository):</strong> enkapsulacja zapytań SQL, sparametryzowane bindowanie zmiennych, automatyczna logika publikacji (uwzględnianie godziny publikacji 08:00).</li>
+            <li><strong>Warstwa Usług Zewnętrznych:</strong> <code>DriveService</code> (komunikacja z Google Drive API v3, obsługa folderów i plików), <code>AuthService</code> (kryptograficzna weryfikacja tokenów Google JWT), <code>EmailNotificationService</code> (powiadomienia Resend).</li>
+            <li><strong>Zabezpieczenia limitów subrequestów:</strong> ścisła ochrona przed przekroczeniem limitu 50 subrequestów (ograniczenie zapisu do maksymalnie 20 załączników na jeden wpis z czytelnym komunikatem walidacyjnym).</li>
+        </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         4. BEZPIECZEŃSTWO I OCHRONA DANYCH
     ══════════════════════════════════════════════════ -->
     <section class="page-break">
-        <h2 class="section-heading">4. Bezpieczeństwo</h2>
+        <h2 class="section-heading">4. Bezpieczeństwo i ochrona danych (RODO)</h2>
 
-        <h3 class="sub-heading">4.1 Brak serwerowej powierzchni ataku po stronie frontendu</h3>
+        <h3 class="sub-heading">4.1 Model autoryzacji redaktorów (P0)</h3>
         <p>
-            Strona internetowa składa się wyłącznie ze statycznych plików (HTML, CSS, JS, grafiki).
-            Na serwerze WWW nie działa żaden interpreter skryptów serwerowych (PHP, Python, Node.js
-            itp.), baza danych ani silnik szablonów. W związku z tym wyeliminowane są całe klasy
-            podatności, m.in.:
+            Zarządzanie treścią zabezpieczone jest dwustopniowym mechanizmem weryfikacji tożsamości:
         </p>
         <ul>
-            <li>SQL Injection (brak warstwy serwerowej z dostępem do bazy danych od strony frontendu)</li>
-            <li>Remote Code Execution przez interpretator serwerowy</li>
-            <li>Server-Side Request Forgery (SSRF)</li>
-            <li>Ataki na sesję serwerową (brak cookies sesyjnych / mechanizmu logowania publicznego)</li>
+            <li><strong>Weryfikacja Audience (aud):</strong> Worker każdorazowo weryfikuje token ID w Google API, sprawdzając czy został wydany dokładnie dla identyfikatora aplikacji ZMiGRS (wykluczenie ataków cross-app token reuse).</li>
+            <li><strong>Biała lista administratorów (Allowlist):</strong> dostęp do edytora posiadają wyłącznie zweryfikowane adresy e-mail redaktorów weryfikowane w małych literach (lowercase).</li>
+            <li><strong>Brak haseł w bazie:</strong> wyeliminowano ryzyko wycieku bazy skrótów haseł; bezpieczeństwo opiera się na infrastrukturze Google z obowiązkowym 2FA.</li>
         </ul>
 
-        <h3 class="sub-heading">4.2 Komunikacja sieciowa – HTTPS / TLS</h3>
+        <h3 class="sub-heading">4.2 Bezpieczeństwo magazynu plików Google Drive</h3>
         <p>
-            Całość komunikacji między przeglądarką użytkownika a serwisem oraz serwisem
-            a zewnętrznymi API odbywa się wyłącznie z użyciem protokołu HTTPS (TLS 1.2 / TLS 1.3).
-            Zapewnia to:
+            Pliki nie są publicznie eksponowane ani podatne na manipulację parametrami zapytań:
         </p>
         <ul>
-            <li>Poufność danych w transmisji (szyfrowanie end-to-end)</li>
-            <li>Integralność przesyłanych treści (ochrona przed modyfikacją w ruchu)</li>
-            <li>Uwierzytelnienie serwera (certyfikat SSL/TLS)</li>
+            <li><strong>Walidacja przynależności:</strong> żądania pobrania załączników (<code>?action=attachments</code> oraz <code>/files/:id</code>) weryfikują w bazie D1, czy żądany identyfikator folderu lub rodzic pliku faktycznie należy do opublikowanego wpisu.</li>
+            <li><strong>Eliminacja publicznego udostępniania Dysku:</strong> pliki i foldery są pobierane przez konto usługi (Service Account), uniemożliwiając wgląd osobom niepowołanym w szkice i nieopublikowane materiały.</li>
         </ul>
 
-        <h3 class="sub-heading">4.3 Ochrona przed Cross-Site Scripting (XSS)</h3>
-        <p>
-            W miejscach, gdzie treści z API są wstawiane do DOM (aktualności, uchwały,
-            sprawozdania), stosowane są bezpieczne metody przypisania właściwości elementów DOM
-            (<code>element.textContent</code>, <code>element.title</code>, atrybuty danych)
-            zamiast bezpośredniego wstawiania surowego HTML. Tam gdzie wymagane jest użycie
-            <code>innerHTML</code> (np. treść artykułu pobrana z zaufanego API), dane pochodzą
-            z kontrolowanego backendu Oracle APEX.
-        </p>
-
-        <h3 class="sub-heading">4.4 Zarządzanie załącznikami i plikami</h3>
-        <p>
-            Pliki do pobrania (uchwały, sprawozdania, dokumenty statutowe) są przechowywane
-            po stronie backendu lub w dedykowanej usłudze chmurowej Google Drive. Strona
-            internetowa nie obsługuje przesyłania plików przez użytkowników – brak możliwości
-            wykonania ataku typu <em>malicious file upload</em>.
-        </p>
-
-        <h3 class="sub-heading">4.5 Polityka żądań zewnętrznych (referrer policy)</h3>
-        <p>
-            Osadzona mapa Google Maps posiada ustawiony atrybut
-            <code>referrerpolicy="no-referrer-when-downgrade"</code> zgodnie z rekomendacją W3C,
-            ograniczając zakres informacji o URL przekazywanych do zewnętrznych usług.
-        </p>
-
-        <h3 class="sub-heading">4.6 Brak persistencji danych po stronie klienta</h3>
-        <p>
-            Aplikacja nie korzysta z <code>localStorage</code>, <code>sessionStorage</code>,
-            IndexedDB ani plików cookies do przechowywania danych użytkownika. Brak mechanizmu
-            logowania dla użytkowników publicznych eliminuje ryzyko kradzieży sesji
-            (session hijacking).
-        </p>
-
-        <div class="box green">
-            <strong>Podsumowanie profilu ryzyka:</strong> zastosowana architektura static-first SPA
-            z REST API w modelu tylko-do-odczytu (read-only dla użytkowników publicznych) minimalizuje
-            powierzchnię ataku do minimum możliwego dla serwisu internetowego prezentującego
-            informacje publiczne.
-        </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         5. WYDAJNOŚĆ
-    ══════════════════════════════════════════════════ -->
-    <section>
-        <h2 class="section-heading">5. Wydajność i optymalizacja</h2>
-
-        <h3 class="sub-heading">5.1 Ładowanie zasobów</h3>
-        <p>
-            Strona ładuje się jako pojedynczy dokument HTML. Brak konieczności wczytywania
-            ciężkich frameworków JavaScript (plik <code>script.js</code> obsługuje całą logikę
-            aplikacji). Czas do pierwszej interakcji (Time to Interactive) jest zatem bardzo krótki.
-        </p>
+        <h3 class="sub-heading">4.3 Ochrona formularza kontaktowego i RODO</h3>
         <ul>
-            <li>Obrazy w galeriach ładowane z atrybutem <code>loading="lazy"</code> (natywne lazy loading)</li>
-            <li>PhotoSwipe ładowany dynamicznie jako moduł ES (import on demand) – tylko gdy użytkownik otwiera artykuł z galerią</li>
-            <li>Czcionki systemowe – zero zewnętrznych żądań do serwerów czcionek</li>
-            <li>Brak pakietyzacji npm/webpack – brak bloatware zależności</li>
-        </ul>
-
-        <h3 class="sub-heading">5.2 Sieć CDN dla zasobów zewnętrznych</h3>
-        <p>
-            Biblioteka PhotoSwipe serwowana jest z sieci CDN jsDelivr – jednej z największych
-            i najbardziej wydajnych sieci dystrybucji treści open-source, z węzłami w Polsce
-            i po całej Europie. Zapewnia to niskie opóźnienia i wysoką dostępność bez
-            obciążania własnego serwera.
-        </p>
-
-        <h3 class="sub-heading">5.3 Responsywność (RWD)</h3>
-        <p>
-            Interfejs jest w pełni responsywny i dostosowany do wszystkich rozdzielczości ekranu:
-        </p>
-        <table>
-            <tr>
-                <th>Breakpoint</th>
-                <th>Układ</th>
-            </tr>
-            <tr>
-                <td>Desktop (≥ 1024px)</td>
-                <td>Siatka 3-kolumnowa, nawigacja pozioma, mapa 500px</td>
-            </tr>
-            <tr>
-                <td>Tablet (768px – 1024px)</td>
-                <td>Siatka 2-kolumnowa dla zarządu</td>
-            </tr>
-            <tr>
-                <td>Mobile (&lt; 768px)</td>
-                <td>Układ jednkolumnowy, nawigacja 2×4, mapa 350px</td>
-            </tr>
-        </table>
-        <p style="margin-top:8px;">
-            Wdrożone media queries CSS zapewniają poprawne działanie na urządzeniach mobilnych,
-            tabletach i komputerach stacjonarnych bez konieczności instalowania dedykowanych
-            aplikacji mobilnych.
-        </p>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         6. DOSTĘPNOŚĆ
-    ══════════════════════════════════════════════════ -->
-    <section>
-        <h2 class="section-heading">6. Dostępność (Accessibility)</h2>
-        <p>
-            Projekt uwzględnia wytyczne WCAG 2.1 (Web Content Accessibility Guidelines) na
-            poziomie AA:
-        </p>
-        <ul>
-            <li>Obrazy posiadają atrybuty <code>alt</code> z opisami tekstowymi</li>
-            <li>Elementy interaktywne (przyciski, linki) posiadają atrybuty <code>title</code></li>
-            <li>Struktura nagłówkowa (<code>h1</code>–<code>h4</code>) jest hierarchiczna i semantyczna</li>
-            <li>Kontrast kolorów tekstu na tle spełnia wymagania WCAG 2.1 AA (stosunek ≥ 4,5:1)</li>
-            <li>Strona jest operowalna za pomocą klawiatury (focus management na elementach nawigacji)</li>
-            <li>Formularz kontaktowy posiada etykiety <code>&lt;label&gt;</code> powiązane z polami</li>
-            <li>Język dokumentu zadeklarowany jako <code>lang="pl"</code> (wsparcie czytników ekranu)</li>
+            <li>Formularz zabezpieczony jest mechanizmem <strong>Cloudflare Turnstile</strong>, eliminującym spam bez uciążliwych łamigłówek graficznych.</li>
+            <li>Podwójna sanityzacja danych: po stronie przeglądarki (DOMPurify) oraz restrykcyjna walidacja długości i formatów pól w Workerze.</li>
+            <li>Dedykowana podstrona <code>#rodo</code> z pełną klauzulą informacyjną (art. 13 RODO), danymi IOD oraz prawami osób, których dane dotyczą.</li>
         </ul>
     </section>
 
     <!-- ══════════════════════════════════════════════════
-         7. ZAWARTOŚĆ MERYTORYCZNA
+         5. DOSTĘPNOŚĆ CYFROWA (WCAG 2.1 AA) I BIP
     ══════════════════════════════════════════════════ -->
     <section>
-        <h2 class="section-heading">7. Struktura i zawartość serwisu</h2>
-        <p>Serwis składa się z następujących sekcji dostępnych z poziomu jednej nawigacji:</p>
+        <h2 class="section-heading">5. Dostępność cyfrowa (WCAG 2.1 AA) i identyfikacja BIP</h2>
+
+        <h3 class="sub-heading">5.1 Zgodność z Ustawą z dnia 4 kwietnia 2019 r.</h3>
+        <p>
+            Serwis spełnia wymogi Ustawy o dostępności cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych
+            w standardzie <strong>WCAG 2.1 na poziomie AA</strong>:
+        </p>
+        <ul>
+            <li><strong>Pasek narzędzi dostępności (A11y Toolbar):</strong>
+                <ul>
+                    <li>Tryb wysokiego kontrastu (czarno-żółty) o współczynniku kontrastu przewyższającym 7:1.</li>
+                    <li>3-stopniowy selektor wielkości czcionki (A / A+ / A++).</li>
+                    <li>Przełącznik „Zatrzymaj ruch” wyłączający animacje tła dla osób z zaburzeniami błędnika.</li>
+                    <li>Zapamiętywanie preferencji w <code>localStorage</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Skrót klawiaturowy "Skip Link":</strong> natychmiastowe przejście do głównej treści klawiszem Tab.</li>
+            <li><strong>Dostępność ikon nawigacyjnych:</strong> przyciski powrotu i udostępniania posiadają atrybuty <code>aria-label</code>, <code>title</code> oraz etykiety <code>.sr-only</code> dla czytników ekranu (NVDA/JAWS), przy minimalnym rozmiarze klikalnym &gt; 36px.</li>
+            <li><strong>Deklaracja Dostępności (<code>#accessibility</code>):</strong> kompletny dokument prawny zawierający audyt, dane kontaktowe koordynatora oraz opis dostępności architektonicznej siedziby.</li>
+        </ul>
+
+        <h3 class="sub-heading">5.2 Integracja z Biuletynem Informacji Publicznej (BIP)</h3>
+        <p>
+            W serwisie zintegrowano urzędowy znak graficzny <strong>BIP</strong> w postaci wektorowej (<code>assets/images/bip.svg</code>),
+            zgodny z rozporządzeniem Ministra Spraw Wewnętrznych i Administracji w sprawie Biuletynu Informacji Publicznej:
+        </p>
+        <ul>
+            <li>Oficjalne logo BIP umieszczone na stałe w górnym pasku narzędzi oraz w nagłówku dedykowanej sekcji <code>#bip</code>.</li>
+            <li>Sekcja informacyjna BIP zawiera dane rejestrowe Związku, wykaz organów statutowych, odnośniki do rejestrów uchwał i statutów oraz instrukcję wnioskowania o informację publiczną.</li>
+        </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         6. STRUKTURA I ZAWARTOŚĆ SERWISU
+    ══════════════════════════════════════════════════ -->
+    <section>
+        <h2 class="section-heading">6. Struktura i zawartość serwisu</h2>
         <table>
             <tr>
                 <th>Sekcja</th>
-                <th>Źródło danych</th>
-                <th>Charakter treści</th>
+                <th>Typ / Źródło danych</th>
+                <th>Funkcjonalność</th>
             </tr>
             <tr>
-                <td>Związek (strona główna)</td>
+                <td>Związek (Start)</td>
                 <td>Statyczny HTML</td>
-                <td>Opis organizacji, statystyki kluczowe</td>
+                <td>Misja, historia, statystyka 100 zrzeszonych gmin</td>
             </tr>
             <tr>
                 <td>Władze</td>
                 <td>Statyczny HTML</td>
-                <td>Zarząd (14 osób) + Komisja Rewizyjna (3 osoby)</td>
+                <td>Skład Zarządu (14 włodarzy) oraz Komisji Rewizyjnej (3 osoby)</td>
             </tr>
             <tr>
                 <td>Aktualności</td>
-                <td>Oracle APEX REST API</td>
-                <td>Artykuły z galerią zdjęć i datą publikacji</td>
+                <td>Cloudflare D1 + Google Drive</td>
+                <td>Live search z normalizacją polskich znaków, podświetlanie fraz, filtry rocznika, sortowanie, widok artykułu, galeria PhotoSwipe</td>
             </tr>
             <tr>
                 <td>Członkowie</td>
                 <td>Statyczne tablice JS</td>
-                <td>99 gmin (linki do stron samorządowych)</td>
+                <td>Wykaz 100 gmin z podziałem na miasta i gminy z odnośnikami do urzędów</td>
             </tr>
             <tr>
                 <td>Statut</td>
-                <td>Statyczny HTML + pliki</td>
-                <td>Treść wstępu i dokumenty do pobrania (.docx, .png)</td>
+                <td>Statyczny HTML + DOCX</td>
+                <td>Treść statutu oraz pliki do pobrania</td>
             </tr>
             <tr>
                 <td>Uchwały</td>
-                <td>Oracle APEX REST API</td>
-                <td>Lista uchwał z datami i załącznikami</td>
+                <td>Cloudflare D1 + Google Drive</td>
+                <td>Wyszukiwarka, filtr roczników, pobieranie załączników PDF w oknie modalnym</td>
             </tr>
             <tr>
                 <td>Sprawozdania</td>
-                <td>Oracle APEX REST API</td>
-                <td>Lista sprawozdań z datami i załącznikami</td>
+                <td>Cloudflare D1 + Google Drive</td>
+                <td>Sprawozdania merytoryczne i finansowe z pobieraniem załączników</td>
+            </tr>
+            <tr>
+                <td>BIP</td>
+                <td>Statyczny HTML + D1</td>
+                <td>Urzędowy publikator z danymi rejestrowymi i dostępem do informacji</td>
+            </tr>
+            <tr>
+                <td>Dostępność</td>
+                <td>Statyczny HTML</td>
+                <td>Deklaracja dostępności cyfrowej i architektonicznej</td>
+            </tr>
+            <tr>
+                <td>RODO</td>
+                <td>Statyczny HTML</td>
+                <td>Klauzula informacyjna przetwarzania danych osobowych</td>
             </tr>
             <tr>
                 <td>Kontakt</td>
-                <td>Statyczny HTML</td>
-                <td>Dane kontaktowe, formularz, mapa Google Maps</td>
+                <td>Statyczny HTML + API</td>
+                <td>Dane teleadresowe, interaktywna mapa, formularz z Turnstile i powiadomieniem e-mail</td>
+            </tr>
+            <tr>
+                <td>Panel Redakcyjny</td>
+                <td>admin/index.html + editor.html</td>
+                <td>Logowanie Google OAuth, edytor Summernote, zarządzanie załącznikami</td>
             </tr>
         </table>
-
-        <h3 class="sub-heading">7.1 System załączników</h3>
-        <p>
-            Uchwały i sprawozdania obsługują dynamiczne pobieranie załączników poprzez modal
-            okienkowy. System odpytuje API o listę plików powiązanych z daną pozycją
-            i prezentuje użytkownikowi nazwę, datę oraz przycisk pobrania dla każdego pliku.
-            Pobieranie odbywa się poprzez przekierowanie do bezpośredniego URL zasobu –
-            bez buforowania pliku w przeglądarce i bez ekspozycji tokenów autoryzacyjnych
-            po stronie klienta.
-        </p>
-
-        <h3 class="sub-heading">7.2 Panel administracyjny</h3>
-        <p>
-            Do zarządzania treścią (artykuły, uchwały, sprawozdania) dostarczony zostanie
-            dedykowany panel (<code>add_edit_article.html</code>) umożliwiający dodawanie
-            i edycję wpisów bez ingerencji w kod źródłowy strony. Panel komunikuje się
-            z tym samym Oracle APEX REST API z rozszerzonymi uprawnieniami zapisu.
-        </p>
     </section>
 
     <!-- ══════════════════════════════════════════════════
-         8. KOMPATYBILNOŚĆ
+         7. PODSUMOWANIE TECHNICZNE
     ══════════════════════════════════════════════════ -->
     <section>
-        <h2 class="section-heading">8. Kompatybilność z przeglądarkami</h2>
-        <p>
-            Serwis korzysta wyłącznie z natywnych API przeglądarek dostępnych bez polyfilli
-            w każdej nowoczesnej przeglądarce. Minimalne wspierane wersje:
-        </p>
+        <h2 class="section-heading">7. Podsumowanie techniczne i koszty utrzymania</h2>
         <table>
             <tr>
-                <th>Przeglądarka</th>
-                <th>Minimalna wersja</th>
-            </tr>
-            <tr>
-                <td>Google Chrome</td>
-                <td>≥ 90</td>
-            </tr>
-            <tr>
-                <td>Mozilla Firefox</td>
-                <td>≥ 90</td>
-            </tr>
-            <tr>
-                <td>Microsoft Edge</td>
-                <td>≥ 90</td>
-            </tr>
-            <tr>
-                <td>Apple Safari</td>
-                <td>≥ 14</td>
-            </tr>
-            <tr>
-                <td>Przeglądarki mobilne (Chrome/Safari iOS)</td>
-                <td>≥ 2021</td>
-            </tr>
-        </table>
-        <p style="margin-top:8px;">
-            Zastosowanie ES Modules (natywne) oraz CSS Grid/Flexbox (powszechne wsparcie od 2018)
-            gwarantuje poprawne działanie na ponad 98% urządzeń używanych przez polskich
-            internautów według danych StatCounter (2024).
-        </p>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         9. UTRZYMANIE I AKTUALIZACJE
-    ══════════════════════════════════════════════════ -->
-    <section>
-        <h2 class="section-heading">9. Utrzymanie i aktualizacje</h2>
-
-        <h3 class="sub-heading">9.1 Niski koszt utrzymania</h3>
-        <p>
-            Brak zależności od frameworków JavaScript oraz menedżera pakietów (npm) oznacza
-            brak konieczności regularnego aktualizowania dziesiątek pakietów. Jedyna biblioteka
-            zewnętrzna (PhotoSwipe) jest dostarczana w pinned wersji z CDN i nie wymaga
-            ingerencji w kod przy braku znanych podatności.
-        </p>
-
-        <h3 class="sub-heading">9.2 Aktualizacja treści</h3>
-        <p>
-            Treści dynamiczne (aktualności, uchwały, sprawozdania) zarządzane są wyłącznie
-            przez panel administracyjny zintegrowany z bazą Oracle APEX – bez potrzeby
-            dostępu do kodu źródłowego strony. Treści statyczne (władze, członkowie, statut)
-            wymagają jednokrotnej interwencji programistycznej przy zmianie stanu faktycznego
-            (np. zmiana składu zarządu po wyborach).
-        </p>
-
-        <h3 class="sub-heading">9.3 Monitoring i dostępność</h3>
-        <p>
-            Dostępność serwisu zależy od dostępności serwera WWW (hostingu) oraz Oracle APEX API.
-            Zalecane jest wdrożenie monitoringu HTTP (np. UptimeRobot lub Pingdom) z alertami
-            e-mail/SMS dla administratorów. Statyczna warstwa frontendowa jest odporna na awarie
-            backendu – użytkownik zobaczy stronę z komunikatem o braku danych zamiast błędu
-            serwera.
-        </p>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         10. PODSUMOWANIE
-    ══════════════════════════════════════════════════ -->
-    <section>
-        <h2 class="section-heading">10. Podsumowanie techniczne</h2>
-        <table>
-            <tr>
-                <th>Kryterium</th>
+                <th>Obszar</th>
                 <th>Ocena</th>
                 <th>Uzasadnienie</th>
             </tr>
             <tr>
                 <td>Bezpieczeństwo</td>
                 <td><span class="badge green">Wysokie</span></td>
-                <td>Architektura static-first, brak serwera aplikacyjnego, HTTPS, read-only API</td>
+                <td>Serverless Edge, brak interpreterów serwerowych, weryfikacja Google OAuth aud, Turnstile antyspam</td>
             </tr>
             <tr>
                 <td>Wydajność</td>
                 <td><span class="badge green">Wysoka</span></td>
-                <td>Minimalne zależności, lazy loading, brak bundlera, CDN</td>
-            </tr>
-            <tr>
-                <td>Responsywność</td>
-                <td><span class="badge green">Pełna (RWD)</span></td>
-                <td>Obsługa mobile/tablet/desktop z CSS media queries</td>
+                <td>Dystrybucja brzegowa Cloudflare, buforowanie Cache API, zero frameworkowego bloatware</td>
             </tr>
             <tr>
                 <td>Dostępność</td>
-                <td><span class="badge">WCAG 2.1 AA</span></td>
-                <td>Semantyczny HTML, alt, label, lang, kontrast</td>
+                <td><span class="badge green">WCAG 2.1 AA</span></td>
+                <td>Wysoki kontrast 7:1, zmiana czcionki, pauza animacji, skip link, oficjalny wektor BIP</td>
             </tr>
             <tr>
-                <td>Koszt utrzymania</td>
-                <td><span class="badge green">Niski</span></td>
-                <td>Brak npm/frameworków, panel CMS do treści dynamicznych</td>
-            </tr>
-            <tr>
-                <td>Kompatybilność</td>
-                <td><span class="badge green">≥ 98% urządzeń</span></td>
-                <td>Natywne API przeglądarek, ES Modules, CSS Grid</td>
+                <td>Koszty infrastruktury</td>
+                <td><span class="badge green">0 zł / miesięcznie</span></td>
+                <td>Rozwiązanie mieści się w bezpłatnych pakietach Cloudflare (Workers, D1, Turnstile) oraz Google Cloud</td>
             </tr>
             <tr>
                 <td>Skalowalność</td>
-                <td><span class="badge">Dobra</span></td>
-                <td>Backend Oracle APEX skaluje się niezależnie od frontendu</td>
+                <td><span class="badge green">Nieograniczona</span></td>
+                <td>Globalna sieć CDN Cloudflare automatycznie absorbuje nagłe skoki ruchu bez awarii serwera</td>
             </tr>
         </table>
     </section>
 
     <!-- ══════════════════════════════════════════════════
-         11. WYCENA
+         8. WYCENA REALIZACJI
     ══════════════════════════════════════════════════ -->
     <section class="page-break">
-        <h2 class="section-heading">11. Wycena realizacji</h2>
+        <h2 class="section-heading">8. Wycena realizacji i wdrożenia</h2>
         <p>
             Poniższa tabela przedstawia szczegółową wycenę poszczególnych elementów składowych
-            strony internetowej ZMiGRS. Ceny wyrażone są w wartościach netto (PLN).
+            zmodernizowanego serwisu internetowego ZMiGRS. Wartości wyrażone są w kwotach netto (PLN).
         </p>
 
         <table style="margin-top:16px;">
             <tr>
                 <th style="width:40px;">#</th>
-                <th>Element / Zakres prac</th>
-                <th>Opis</th>
+                <th>Zakres prac modernizacyjnych</th>
+                <th>Opis techniczny</th>
                 <th style="text-align:right; white-space:nowrap;">Cena netto</th>
             </tr>
             <tr>
                 <td>1</td>
-                <td>Analiza wymagań i projekt UX</td>
-                <td>Ustalenie struktury informacyjnej, mapowanie sekcji, makieta nawigacji SPA</td>
-                <td style="text-align:right; white-space:nowrap;">300,00 zł</td>
+                <td>Analiza wymagań, tożsamość i projekt UX/UI</td>
+                <td>Architektura informacji, makieta SPA, stylistyka Glassmorphism, optymalizacja typografii</td>
+                <td style="text-align:right; white-space:nowrap;">800,00 zł</td>
             </tr>
             <tr>
                 <td>2</td>
-                <td>Projekt graficzny interfejsu</td>
-                <td>Opracowanie koncepcji wizualnej (glass morphism), dobór palety barw, typografii i layoutu responsywnego</td>
-                <td style="text-align:right; white-space:nowrap;">500,00 zł</td>
+                <td>Frontend SPA i system routingu URL</td>
+                <td>Kodowanie 11 sekcji serwisu, obsługa History API (Deep Linking), responsywność (RWD), PhotoSwipe 5</td>
+                <td style="text-align:right; white-space:nowrap;">1 200,00 zł</td>
             </tr>
             <tr>
                 <td>3</td>
-                <td>Implementacja frontendu (HTML/CSS/JS)</td>
-                <td>Kodowanie wszystkich 8 sekcji serwisu, nawigacja SPA, animacje, efekt parallax, ripple, toast</td>
-                <td style="text-align:right; white-space:nowrap;">1 100,00 zł</td>
+                <td>Moduł dostępności cyfrowej (WCAG 2.1 AA) i BIP</td>
+                <td>Pasek narzędzi (kontrast 7:1, czcionki, ruch), skip link, wektorowy znak BIP, Deklaracja Dostępności</td>
+                <td style="text-align:right; white-space:nowrap;">600,00 zł</td>
             </tr>
             <tr>
                 <td>4</td>
-                <td>Responsywność (RWD)</td>
-                <td>Dostosowanie layoutu do urządzeń mobilnych, tabletów i desktopów (3 breakpointy)</td>
-                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+                <td>Wyszukiwarka na żywo i filtrowanie danych</td>
+                <td>Live search z debouncingiem, normalizacja polskich znaków, wyróżnianie fraz, filtry roczników, sortowanie</td>
+                <td style="text-align:right; white-space:nowrap;">500,00 zł</td>
             </tr>
             <tr>
                 <td>5</td>
-                <td>Integracja z Oracle APEX REST API</td>
-                <td>Podłączenie 6 endpointów (aktualności, artykuły, uchwały, sprawozdania, załączniki), obsługa błędów, formatowanie dat PL</td>
-                <td style="text-align:right; white-space:nowrap;">700,00 zł</td>
+                <td>Backend Cloudflare Worker (SRP) i Baza D1</td>
+                <td>Refaktoryzacja monolitu do wzorca SRP, repozytoria D1 SQL, endpointy SEO Open Graph, streaming plików</td>
+                <td style="text-align:right; white-space:nowrap;">900,00 zł</td>
             </tr>
             <tr>
                 <td>6</td>
-                <td>Galeria zdjęć (PhotoSwipe)</td>
-                <td>Integracja biblioteki PhotoSwipe 5, lazy loading obrazów z Google Drive, scrollowalny podgląd w artykule</td>
-                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+                <td>Integracja Google Drive i Bezpieczeństwo OAuth</td>
+                <td>Obsługa załączników kontem usługi, weryfikacja Google aud, ochrona subrequestów (limit 20 plików)</td>
+                <td style="text-align:right; white-space:nowrap;">500,00 zł</td>
             </tr>
             <tr>
                 <td>7</td>
-                <td>System załączników (modal)</td>
-                <td>Dynamiczne okno pobierania plików dla uchwał i sprawozdań z listy API</td>
-                <td style="text-align:right; white-space:nowrap;">200,00 zł</td>
+                <td>Formularz kontaktowy z Turnstile i powiadomieniami</td>
+                <td>Ochrona Cloudflare Turnstile, sanityzacja DOMPurify, powiadomienia e-mail przez Resend API, sekcja RODO</td>
+                <td style="text-align:right; white-space:nowrap;">400,00 zł</td>
             </tr>
             <tr>
                 <td>8</td>
-                <td>Panel administracyjny</td>
-                <td>Formularz dodawania i edycji artykułów / uchwał / sprawozdań z obsługą przesyłania załączników</td>
-                <td style="text-align:right; white-space:nowrap;">400,00 zł</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>Testy, wdrożenie i dokumentacja</td>
-                <td>Testy cross-browser, walidacja HTML/CSS (W3C), wdrożenie na serwer docelowy, niniejsza specyfikacja techniczna</td>
-                <td style="text-align:right; white-space:nowrap;">400,00 zł</td>
+                <td>Panel Administracyjny CMS (W repozytorium)</td>
+                <td>Autoryzacja Google Identity Services, edytor Summernote, bezpieczne zarządzanie wpisami i plikami</td>
+                <td style="text-align:right; white-space:nowrap;">500,00 zł</td>
             </tr>
             <tr style="background:#0f3460; color:white;">
                 <td colspan="3" style="font-weight:700; font-size:11pt; color:white;">RAZEM NETTO</td>
-                <td style="text-align:right; font-weight:700; font-size:13pt; color:white; white-space:nowrap;">4 000,00 zł</td>
+                <td style="text-align:right; font-weight:700; font-size:13pt; color:white; white-space:nowrap;">5 400,00 zł</td>
             </tr>
             <tr>
-                <td colspan="3" style="color:#555; font-size:9.5pt;">VAT (23%)</td>
-                <td style="text-align:right; color:#555; font-size:9.5pt; white-space:nowrap;">920,00 zł</td>
+                <td colspan="3" style="color:#555; font-size:9.5pt;">Podatek VAT (23%)</td>
+                <td style="text-align:right; color:#555; font-size:9.5pt; white-space:nowrap;">1 242,00 zł</td>
             </tr>
             <tr style="background:#eef2f9;">
                 <td colspan="3" style="font-weight:700;">RAZEM BRUTTO</td>
-                <td style="text-align:right; font-weight:700; white-space:nowrap;">4 920,00 zł</td>
+                <td style="text-align:right; font-weight:700; white-space:nowrap;">6 642,00 zł</td>
             </tr>
         </table>
-
     </section>
 
     <!-- ══════════════════════════════════════════════════
@@ -811,7 +657,7 @@
     ══════════════════════════════════════════════════ -->
     <div class="doc-footer">
         <span>NAAPP New Advance APP &bull; naapp.pl</span>
-        <span>Dokument poufny – przeznaczony wyłącznie dla Zamawiającego</span>
+        <span>Dokument poufny – specyfikacja techniczna dla Zamawiającego</span>
     </div>
 
 </div>
